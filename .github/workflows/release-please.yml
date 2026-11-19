@@ -1,0 +1,32 @@
+name: Release Please
+
+# On every push to main, release-please updates a "release PR" with the next
+# version and changelog, computed from Conventional Commits. Merging that PR
+# tags the release and publishes a GitHub Release.
+on:
+  push:
+    branches: [main]
+
+permissions:
+  contents: write
+  issues: write
+  pull-requests: write
+
+concurrency:
+  group: release-please
+  cancel-in-progress: false
+
+jobs:
+  release-please:
+    name: Release Please
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: googleapis/release-please-action@v5
+        with:
+          # A fine-grained token is needed so the release PR triggers CI, which
+          # the main ruleset requires. PRs opened with GITHUB_TOKEN don't run
+          # workflows, so the fallback only works until the secret exists.
+          token: ${{ secrets.RELEASE_PLEASE_TOKEN || github.token }}
+          config-file: release-please-config.json
+          manifest-file: .release-please-manifest.json
