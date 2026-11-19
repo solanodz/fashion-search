@@ -43,25 +43,26 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 <http://localhost:6333/dashboard>. Environment variables are documented in
 [`.env.example`](.env.example) and validated at startup by `src/env.ts`.
 
-| Script                     | What it does                               |
-| -------------------------- | ------------------------------------------ |
-| `npm run setup`            | Create `.env.local` and start Qdrant       |
-| `npm run dev`              | Development server                         |
-| `npm run dev:all`          | Start Qdrant, then the development server  |
-| `npm run lint`             | ESLint, fails on warnings                  |
-| `npm run typecheck`        | Generate route types, then TypeScript      |
-| `npm run test`             | Unit tests (Vitest), single run            |
-| `npm run test:watch`       | Unit tests in watch mode                   |
-| `npm run test:integration` | Integration tests against a running Qdrant |
-| `npm run test:e2e`         | E2E tests (Playwright, Chromium)           |
-| `npm run test:e2e:ui`      | E2E tests in Playwright's UI mode          |
-| `npm run format`           | Format every file with Prettier            |
-| `npm run format:check`     | Check formatting without writing           |
-| `npm run build`            | Production build                           |
-| `npm run index:prepare`    | Dataset → catalog and images in `data/`    |
-| `npm run db:up`            | Start Qdrant                               |
-| `npm run db:down`          | Stop Qdrant, keep its data                 |
-| `npm run db:reset`         | Stop Qdrant and delete its data            |
+| Script                     | What it does                                |
+| -------------------------- | ------------------------------------------- |
+| `npm run setup`            | Create `.env.local` and start Qdrant        |
+| `npm run dev`              | Development server                          |
+| `npm run dev:all`          | Start Qdrant, then the development server   |
+| `npm run lint`             | ESLint, fails on warnings                   |
+| `npm run typecheck`        | Generate route types, then TypeScript       |
+| `npm run test`             | Unit tests (Vitest), single run             |
+| `npm run test:watch`       | Unit tests in watch mode                    |
+| `npm run test:integration` | Integration tests against a running Qdrant  |
+| `npm run test:model`       | CLIP model tests (local only, downloads it) |
+| `npm run test:e2e`         | E2E tests (Playwright, Chromium)            |
+| `npm run test:e2e:ui`      | E2E tests in Playwright's UI mode           |
+| `npm run format`           | Format every file with Prettier             |
+| `npm run format:check`     | Check formatting without writing            |
+| `npm run build`            | Production build                            |
+| `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
+| `npm run db:up`            | Start Qdrant                                |
+| `npm run db:down`          | Stop Qdrant, keep its data                  |
+| `npm run db:reset`         | Stop Qdrant and delete its data             |
 
 Every pull request runs lint, format check, typecheck, unit and integration
 tests (against a Qdrant service container), E2E tests on a production build,

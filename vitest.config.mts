@@ -1,13 +1,13 @@
 import { fileURLToPath } from "node:url";
 
 import react from "@vitejs/plugin-react";
-import tsconfigPaths from "vite-tsconfig-paths";
 import { loadEnv } from "vite";
 import { defineConfig } from "vitest/config";
 
 export default defineConfig(({ mode }) => ({
-  plugins: [tsconfigPaths(), react()],
+  plugins: [react()],
   resolve: {
+    tsconfigPaths: true,
     alias: {
       // `server-only` throws outside React Server Components; tests run in plain Node.
       "server-only": fileURLToPath(
@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => ({
           name: "unit",
           environment: "jsdom",
           include: ["src/**/*.test.{ts,tsx}"],
-          exclude: ["src/**/*.integration.test.ts"],
+          exclude: ["src/**/*.integration.test.ts", "src/**/*.model.test.ts"],
         },
       },
       {
@@ -34,6 +34,15 @@ export default defineConfig(({ mode }) => ({
           name: "integration",
           environment: "node",
           include: ["src/**/*.integration.test.ts"],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: "model",
+          environment: "node",
+          include: ["src/**/*.model.test.ts"],
+          testTimeout: 300_000,
         },
       },
     ],
