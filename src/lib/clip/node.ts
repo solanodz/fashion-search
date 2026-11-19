@@ -2,7 +2,7 @@ import { join } from "node:path";
 
 import { env } from "@huggingface/transformers";
 
-import { RawImage } from "./encoder";
+import { RawImage } from "./encoder.ts";
 
 /**
  * Node-only setup for the CLIP encoders: keep downloaded model files in the
@@ -15,4 +15,4 @@ export function readImageFile(path: string): Promise<RawImage> {
   return RawImage.read(path);
 }
 
-export * from "./encoder";
+export * from "./encoder.ts";

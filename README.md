@@ -60,6 +60,7 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run format:check`     | Check formatting without writing            |
 | `npm run build`            | Production build                            |
 | `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
+| `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
 | `npm run db:reset`         | Stop Qdrant and delete its data             |
@@ -83,7 +84,14 @@ The catalog is indexed locally in stages; outputs go to the git-ignored
 
 ```bash
 npm run index:prepare   # download the dataset (271.5 MB), write data/catalog.jsonl and data/images/
+npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
 ```
+
+`index:embed` downloads the CLIP model once (153.6 MB, cached in
+`data/models/`) and runs at about 85 images/s on an Apple Silicon laptop, so
+the full catalog takes roughly 9 minutes. Press Ctrl+C to stop after the
+current batch; running it again continues where it stopped. Use `--fresh` to
+start over.
 
 ## Contributing
 

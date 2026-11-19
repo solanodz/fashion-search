@@ -6,8 +6,8 @@ import {
   RawImage,
 } from "@huggingface/transformers";
 
-import { CLIP_DIMENSIONS, CLIP_DTYPE, CLIP_MODEL_ID } from "./config";
-import { splitRows } from "./vector";
+import { CLIP_DIMENSIONS, CLIP_DTYPE, CLIP_MODEL_ID } from "./config.ts";
+import { splitRows } from "./vector.ts";
 
 /**
  * CLIP encoders shared by the indexing scripts (Node) and the search UI

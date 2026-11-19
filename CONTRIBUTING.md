@@ -71,6 +71,14 @@ version and `CHANGELOG.md`. `feat` bumps the minor version (while `0.x`) and
 Release. Commits of type `docs`, `test`, `build`, `ci` and `chore` are hidden
 from the changelog.
 
+## Code shared with Node scripts
+
+`src/lib/clip/` and `src/lib/indexing/` are also imported by the indexing
+scripts, which Node runs as TypeScript without a bundler. In those folders,
+use relative imports with the `.ts` extension (`./config.ts`) and avoid
+TypeScript-only runtime syntax such as enums and constructor parameter
+properties.
+
 ## Architecture decisions
 
 Significant decisions are recorded as ADRs in [`docs/adr/`](docs/adr/). Copy
