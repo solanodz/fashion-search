@@ -13,6 +13,8 @@ and color.
 - **Model:** CLIP (`Xenova/clip-vit-base-patch32`, MIT) through Transformers.js.
   The same model indexes the catalog and encodes queries, so images and text
   share one vector space.
+- **Filters** by gender, category, type and colour are exact Qdrant payload
+  filters with live counts (`/api/facets`).
 - **Photo + text** ("this, but in blue") combines both vectors with the text
   weighted twice ([ADR 0007](docs/adr/0007-combined-queries.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo

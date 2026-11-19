@@ -17,7 +17,14 @@ import {
 } from "@/lib/clip/client";
 import { COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 import { combine } from "@/lib/clip/vector";
-import type { SearchResponse, SearchResult } from "@/lib/search/schema";
+import type { Facets } from "@/lib/search/facets";
+import type {
+  SearchFilters,
+  SearchResponse,
+  SearchResult,
+} from "@/lib/search/schema";
+
+import { Filters } from "./filters";
 
 import { PhotoChip } from "./photo-chip";
 import { IMAGE_BASE_URL, ResultsGrid } from "./results-grid";
@@ -44,12 +51,27 @@ export function SearchExperience() {
   const [status, setStatus] = useState<Status>({ kind: "idle" });
   const [progress, setProgress] = useState<ModelProgress | null>(null);
   const [dragging, setDragging] = useState(false);
+  const [filters, setFilters] = useState<SearchFilters>({});
+  const [facets, setFacets] = useState<Facets | null>(null);
   const latest = useRef(0);
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
   const fileInput = useRef<HTMLInputElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => onModelProgress(setProgress), []);
+
+  // Filter values and counts for the current selection. Search still works if this fails.
+  useEffect(() => {
+    const controller = new AbortController();
+    const params = new URLSearchParams(
+      Object.entries(filters).filter(([, v]) => v) as [string, string][],
+    );
+    fetch(`/api/facets?${params}`, { signal: controller.signal })
+      .then((response) => (response.ok ? response.json() : null))
+      .then((body: { facets: Facets } | null) => body && setFacets(body.facets))
+      .catch(() => {});
+    return () => controller.abort();
+  }, [filters]);
 
   // Free the previous preview URL when the photo changes or the page unmounts.
   useEffect(
@@ -65,7 +87,11 @@ export function SearchExperience() {
     return vector;
   }
 
-  async function search(text: string, currentPhoto: Photo | null) {
+  async function search(
+    text: string,
+    currentPhoto: Photo | null,
+    currentFilters: SearchFilters = filters,
+  ) {
     const trimmed = text.trim();
     if (!trimmed && !currentPhoto) return;
     const run = ++latest.current;
@@ -86,7 +112,11 @@ export function SearchExperience() {
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ vector: Array.from(vector), limit: 36 }),
+        body: JSON.stringify({
+          vector: Array.from(vector),
+          filters: currentFilters,
+          limit: 36,
+        }),
       });
       const body = (await response.json()) as SearchResponse & {
         error?: string;
@@ -96,7 +126,12 @@ export function SearchExperience() {
       const description = [currentPhoto?.label, trimmed && `“${trimmed}”`]
         .filter(Boolean)
         .join(" + ");
-      setStatus({ kind: "done", description, results: body.results });
+      const scope = Object.values(currentFilters).filter(Boolean).join(", ");
+      setStatus({
+        kind: "done",
+        description: scope ? `${description} in ${scope}` : description,
+        results: body.results,
+      });
     } catch (error) {
       if (run === latest.current) {
         setStatus({
@@ -194,6 +229,11 @@ export function SearchExperience() {
     };
   });
 
+  function changeFilters(next: SearchFilters) {
+    setFilters(next);
+    if (query.trim() || photo) void search(query, photo, next);
+  }
+
   function onSubmit(event: FormEvent) {
     event.preventDefault();
     void search(query, photo);
@@ -285,6 +325,10 @@ export function SearchExperience() {
           </p>
         )}
       </div>
+
+      {facets && (
+        <Filters facets={facets} filters={filters} onChange={changeFilters} />
+      )}
 
       {status.kind === "done" && (
         <ResultsGrid results={status.results} onMoreLikeThis={moreLikeThis} />
