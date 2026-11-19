@@ -17,6 +17,10 @@ and color.
   filters with live counts (`/api/facets`).
 - **Photo + text** ("this, but in blue") combines both vectors with the text
   weighted twice ([ADR 0007](docs/adr/0007-combined-queries.md)).
+- **Hybrid search:** text queries also match product names with BM25 keyword
+  vectors, fused with the CLIP results by rank
+  ([ADR 0009](docs/adr/0009-hybrid-search.md)). Precision@10 on all
+  attributes goes from 59% to 79%.
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server
   and no model API keys.
@@ -159,9 +163,10 @@ build time.
 
 ### Retrieval quality
 
-Baseline precision@10 over 27 text queries, without filters: article type
-79%, colour 75%, gender 93%, all attributes 57%. Details and known weak spots
-in [docs/evaluation.md](docs/evaluation.md).
+Precision@10 over 27 text queries, without filters, with hybrid search:
+article type 89%, colour 91%, gender 95%, all attributes 79% (image vectors
+alone: 77%, 78%, 94%, 59%). History, details and known weak spots in
+[docs/evaluation.md](docs/evaluation.md).
 
 ## Contributing
 

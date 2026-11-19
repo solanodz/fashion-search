@@ -10,7 +10,29 @@ The full report is written to `data/eval/latest.json`.
 Run it after any change to the model, quantization, preprocessing or indexing,
 and compare against the baseline below.
 
-## Current: 384×512 photos (2026-11-19)
+## Current: hybrid search (2026-11-19)
+
+Text queries search the CLIP image vectors and BM25 keyword vectors, fused by
+rank ([ADR 0009](adr/0009-hybrid-search.md)). `npm run index:eval` uses
+hybrid search; `-- --mode image` measures the image vectors alone.
+
+| Metric       | Image only | Hybrid |
+| ------------ | ---------: | -----: |
+| Article type |        77% |    89% |
+| Colour       |        78% |    91% |
+| Gender       |        94% |    95% |
+| All          |        59% |    79% |
+
+Biggest gains in "all": navy blue shirt for men 50% → 100%, gold watch for
+women 0% → 60%, red lipstick 0% → 50%, red sweatshirt 20% → 70%, a red dress
+10% → 50%, silver watch for men 10% → 50%. Worse: black high heels 60% → 20%
+("high" matches "High Black Socks").
+
+The image-only numbers differ slightly from the section below (81/79/94/60)
+because the collection was rebuilt with named vectors and HNSW search is
+approximate.
+
+## 384×512 photos (2026-11-19)
 
 Same model and queries, catalog photos at up to 384×512 instead of 60×80
 ([ADR 0008](adr/0008-catalog-photos.md)); 42,426 products.

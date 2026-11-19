@@ -3,7 +3,11 @@ import { randomUUID } from "node:crypto";
 import { afterAll, beforeAll, describe, expect, test } from "vitest";
 
 import type { CatalogItem } from "@/lib/indexing/catalog";
-import { createCollection, upsertPoints } from "@/lib/indexing/collection";
+import {
+  buildPoints,
+  createCollection,
+  upsertPoints,
+} from "@/lib/indexing/collection";
 import { qdrant } from "@/lib/qdrant";
 
 import { getFacets } from "./facets";
@@ -26,15 +30,19 @@ const product = (
 
 beforeAll(async () => {
   await createCollection(qdrant(), collection, 2);
+  const items = [
+    product(1, "Women", "Dresses", "Red"),
+    product(2, "Women", "Dresses", "Blue"),
+    product(3, "Women", "Tops", "Red"),
+    product(4, "Men", "Tshirts", "Red"),
+  ];
   await upsertPoints(
     qdrant(),
     collection,
-    [
-      product(1, "Women", "Dresses", "Red"),
-      product(2, "Women", "Dresses", "Blue"),
-      product(3, "Women", "Tops", "Red"),
-      product(4, "Men", "Tshirts", "Red"),
-    ].map((payload) => ({ id: payload.id, vector: [1, 0], payload })),
+    buildPoints(
+      items,
+      items.map(({ id }) => ({ id, vector: new Float32Array([1, 0]) })),
+    ),
   );
 });
 

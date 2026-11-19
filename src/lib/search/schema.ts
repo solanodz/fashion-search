@@ -28,7 +28,28 @@ export const searchRequestSchema = z.object({
     .array(z.object({ name: z.enum(QUERY_PARTS), vector: vectorSchema }))
     .max(QUERY_PARTS.length)
     .optional(),
+  /** Keyword vector of the query text, hashed in the browser (ADR 0009). */
+  keywords: z
+    .object({
+      indices: z
+        .array(
+          z
+            .number()
+            .int()
+            .min(0)
+            .max(2 ** 32 - 1),
+        )
+        .max(64),
+      values: z.array(z.number().finite()).max(64),
+    })
+    .refine((v) => v.indices.length === v.values.length, {
+      message: "indices and values must have the same length",
+    })
+    .optional(),
 });
+
+/** Which search found a result: the image vectors, the keyword vectors, or both. */
+export type Signal = "image" | "keywords";
 
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
 export type SearchRequest = z.input<typeof searchRequestSchema>;
@@ -40,5 +61,7 @@ export type SearchResult = {
   product: CatalogItem;
   /** Cosine similarity to each part of a combined query, when parts were sent. */
   parts?: Partial<Record<QueryPart, number>>;
+  /** Present on hybrid searches. */
+  signals?: Signal[];
 };
 export type SearchResponse = { results: SearchResult[] };

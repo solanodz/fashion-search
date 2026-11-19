@@ -1,5 +1,11 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
 
+import {
+  averageLength,
+  documentKeywords,
+  type SparseVector,
+} from "../search/keywords.ts";
+import { IMAGE_VECTOR, KEYWORD_VECTOR } from "../search/query.ts";
 import type { CatalogItem } from "./catalog.ts";
 
 /**
@@ -18,7 +24,12 @@ export const FILTER_FIELDS = [
   "baseColour",
 ] as const;
 
-export type Point = { id: number; vector: number[]; payload: CatalogItem };
+/** A product with its CLIP image vector and its keyword vector (ADR 0009). */
+export type Point = {
+  id: number;
+  vector: { [IMAGE_VECTOR]: number[]; [KEYWORD_VECTOR]: SparseVector };
+  payload: CatalogItem;
+};
 
 export function versionOf(collection: string, alias: string): number | null {
   const match = new RegExp(`^${escapeRegExp(alias)}_v(\\d+)$`).exec(collection);
@@ -45,9 +56,13 @@ export function buildPoints(
       `${missing.length} catalog items have no vector (first: ${missing[0].id}). Run index:embed.`,
     );
   }
+  const avgLength = averageLength(catalog);
   return catalog.map((item) => ({
     id: item.id,
-    vector: Array.from(byId.get(item.id)!),
+    vector: {
+      [IMAGE_VECTOR]: Array.from(byId.get(item.id)!),
+      [KEYWORD_VECTOR]: documentKeywords(item, avgLength),
+    },
     payload: item,
   }));
 }
@@ -58,7 +73,9 @@ export async function createCollection(
   dimensions: number,
 ): Promise<void> {
   await client.createCollection(name, {
-    vectors: { size: dimensions, distance: "Cosine" },
+    vectors: { [IMAGE_VECTOR]: { size: dimensions, distance: "Cosine" } },
+    // Qdrant computes IDF over the collection, completing BM25 at query time.
+    sparse_vectors: { [KEYWORD_VECTOR]: { modifier: "idf" } },
   });
   for (const field of FILTER_FIELDS) {
     await client.createPayloadIndex(name, {
