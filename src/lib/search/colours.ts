@@ -1,0 +1,56 @@
+/**
+ * Swatch colours for the catalog's baseColour values. Approximations chosen
+ * to read clearly as small dots; "Multi" is drawn as a gradient.
+ */
+export const COLOUR_SWATCHES: Record<string, string> = {
+  Black: "#1c1c1c",
+  White: "#ffffff",
+  Blue: "#2f5fd0",
+  Brown: "#7a4a2a",
+  Grey: "#8a8f98",
+  Red: "#cf2a2a",
+  Green: "#2f8a43",
+  Pink: "#f08cb4",
+  "Navy Blue": "#1f2c5c",
+  Purple: "#7b3fa0",
+  Silver: "#c7cbd1",
+  Yellow: "#f2c831",
+  Beige: "#e3d3b4",
+  Gold: "#c9a227",
+  Maroon: "#6e1a24",
+  Orange: "#f07a22",
+  Olive: "#6f7535",
+  Multi: "conic-gradient(#cf2a2a, #f2c831, #2f8a43, #2f5fd0, #7b3fa0, #cf2a2a)",
+  Cream: "#f4ead2",
+  Steel: "#71808f",
+  Charcoal: "#3a3d42",
+  Peach: "#f6b48f",
+  "Off White": "#f3efe6",
+  Skin: "#e7bf9f",
+  Lavender: "#b9a7e0",
+  "Grey Melange": "#a9adb3",
+  Khaki: "#b7a36f",
+  Magenta: "#c2257f",
+  Teal: "#18807f",
+  Tan: "#c49a6c",
+  Mustard: "#d4a017",
+  Bronze: "#9c6b30",
+  Copper: "#b56a3c",
+  "Turquoise Blue": "#2fb8c4",
+  Rust: "#a8461e",
+  Burgundy: "#7d1d34",
+  Metallic: "linear-gradient(135deg, #8d939b, #e6e8eb, #8d939b)",
+  "Coffee Brown": "#5a3a24",
+  Mauve: "#b07a92",
+  "Sea Green": "#3d9c76",
+  Rose: "#e2728c",
+  Nude: "#e6c2a6",
+  "Mushroom Brown": "#a08d7a",
+  Taupe: "#8b7d6b",
+  "Lime Green": "#8ccf2e",
+  "Fluorescent Green": "#7cff3a",
+};
+
+export function swatchFor(colour: string): string {
+  return COLOUR_SWATCHES[colour] ?? "#c9ceda";
+}
