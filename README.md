@@ -71,6 +71,17 @@ Git hooks (installed by `npm install` through Husky):
 - **commit-msg:** commit messages must follow
   [Conventional Commits](https://www.conventionalcommits.org/) (commitlint).
 
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, testing strategy and
+conventions, and [`docs/adr/`](docs/adr/) for architecture decisions.
+Security issues: [SECURITY.md](SECURITY.md).
+
 ## Status
 
-Scaffolded. Workflow, CI/CD, indexing and search are not built yet.
+Development workflow, CI and local environment are in place. Indexing and
+search are next ([project board](https://github.com/users/solanodz/projects/1)).
+
+## License
+
+[MIT](LICENSE). The dataset is also MIT licensed.

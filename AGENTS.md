@@ -1,3 +1,11 @@
+# Agent notes
+
+Follow [CONTRIBUTING.md](CONTRIBUTING.md): Conventional Commits, one concern per
+branch and PR, `main` is protected (no direct pushes). Before declaring work
+done, run `npm run lint`, `npm run typecheck`, `npm test` and, when touching
+server or search code, `npm run test:integration` with `npm run db:up`.
+Record significant decisions as ADRs in `docs/adr/`. Never commit secrets.
+
 <!-- BEGIN:nextjs-agent-rules -->
 
 ## This is NOT the Next.js you know
