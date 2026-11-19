@@ -142,6 +142,7 @@ export function SearchExperience() {
             }))
           : null,
       ]);
+      const [photoPart, textPart] = parts;
       const vector = combine(parts.filter((part) => part !== null));
       const encodeMs = performance.now() - encodeStart;
       const searchStart = performance.now();
@@ -152,6 +153,16 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
+          // A combined query also sends its parts, to score each result
+          // against the photo and the text separately.
+          ...(photoPart && textPart
+            ? {
+                parts: [
+                  { name: "photo", vector: Array.from(photoPart.vector) },
+                  { name: "text", vector: Array.from(textPart.vector) },
+                ],
+              }
+            : {}),
         }),
       });
       const body = (await response.json()) as SearchResponse & {

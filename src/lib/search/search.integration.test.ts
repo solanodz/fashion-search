@@ -45,6 +45,21 @@ describe("searchProducts", () => {
     ]);
   });
 
+  test("scores each part of a combined query", async () => {
+    const results = await searchProducts(qdrant(), collection, {
+      vector: axis(0),
+      filters: {},
+      limit: 2,
+      parts: [
+        { name: "photo", vector: axis(0) },
+        { name: "text", vector: axis(1) },
+      ],
+    });
+    expect(results[0].parts?.photo).toBeCloseTo(1);
+    expect(results[0].parts?.text).toBeCloseTo(0);
+    expect(results[1].parts?.text).toBeCloseTo(1);
+  });
+
   test("applies filters", async () => {
     const results = await searchProducts(qdrant(), collection, {
       vector: axis(0),

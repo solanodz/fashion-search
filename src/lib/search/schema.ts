@@ -14,14 +14,31 @@ export const searchFiltersSchema = z
   })
   .partial();
 
+const vectorSchema = z.array(z.number().finite()).length(CLIP_DIMENSIONS);
+
+/** The pieces of a combined query, scored separately against each result. */
+export const QUERY_PARTS = ["photo", "text"] as const;
+export type QueryPart = (typeof QUERY_PARTS)[number];
+
 export const searchRequestSchema = z.object({
-  vector: z.array(z.number().finite()).length(CLIP_DIMENSIONS),
+  vector: vectorSchema,
   filters: searchFiltersSchema.default({}),
   limit: z.number().int().min(1).max(60).default(36),
+  parts: z
+    .array(z.object({ name: z.enum(QUERY_PARTS), vector: vectorSchema }))
+    .max(QUERY_PARTS.length)
+    .optional(),
 });
 
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
 export type SearchRequest = z.input<typeof searchRequestSchema>;
 
-export type SearchResult = { id: number; score: number; product: CatalogItem };
+export type SearchResult = {
+  id: number;
+  /** Cosine similarity to the (combined) query vector. */
+  score: number;
+  product: CatalogItem;
+  /** Cosine similarity to each part of a combined query, when parts were sent. */
+  parts?: Partial<Record<QueryPart, number>>;
+};
 export type SearchResponse = { results: SearchResult[] };

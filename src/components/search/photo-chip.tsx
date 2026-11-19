@@ -13,13 +13,16 @@ export function PhotoChip({
   const src = photo.url.startsWith("blob:") ? photo.url : undefined;
   return (
     <span className="flex shrink-0 items-center gap-1 pl-1">
-      {/* Blob URL of a local photo; next/image can't optimize it. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={`Search photo: ${photo.label.replace(/[“”]/g, "")}`}
-        className="h-8 w-6 rounded-sm bg-tile object-contain mix-blend-multiply"
-      />
+      {/* isolate: the multiply blend mixes with the tile, not the search bar. */}
+      <span className="isolate flex h-8 w-6 rounded-sm bg-tile">
+        {/* Blob URL of a local photo; next/image can't optimize it. */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={src}
+          alt={`Search photo: ${photo.label.replace(/[“”]/g, "")}`}
+          className="h-full w-full object-contain mix-blend-multiply"
+        />
+      </span>
       <button
         type="button"
         onClick={onRemove}

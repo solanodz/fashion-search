@@ -32,7 +32,7 @@ export function ResultsGrid({
         const { id, product, score } = result;
         return (
           <li key={id} className="group text-sm">
-            <div className="relative flex aspect-[3/4] items-center justify-center overflow-hidden rounded-sm bg-tile">
+            <div className="relative isolate flex aspect-[3/4] items-center justify-center overflow-hidden rounded-sm bg-tile">
               {/* Plain <img>: photos come straight from the image store at their final size. */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -63,6 +63,15 @@ export function ResultsGrid({
                 />
               </span>
             </div>
+            {result.parts && (
+              <p
+                className="mt-0.5 text-xs text-muted tabular-nums"
+                title="Cosine similarity to the photo and to the text on their own"
+              >
+                photo {result.parts.photo?.toFixed(3)} · text{" "}
+                {result.parts.text?.toFixed(3)}
+              </p>
+            )}
             <p className="mt-1 line-clamp-2 leading-snug">{product.name}</p>
             <p className="mt-0.5 text-muted">
               {product.articleType}

@@ -30,9 +30,16 @@ test.beforeEach(async ({ page }) => {
 
 test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
   const vectors: number[][] = [];
+  const bodies: { parts?: { name: string; vector: number[] }[] }[] = [];
   await page.route("**/api/search", async (route) => {
-    vectors.push(route.request().postDataJSON().vector);
-    await route.fulfill({ json: { results } });
+    const body = route.request().postDataJSON();
+    vectors.push(body.vector);
+    bodies.push(body);
+    // The server scores each part of a combined query separately.
+    const parts = body.parts ? { photo: 0.9, text: 0.27 } : undefined;
+    await route.fulfill({
+      json: { results: results.map((r) => ({ ...r, parts })) },
+    });
   });
 
   await page.goto("/");
@@ -49,6 +56,7 @@ test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
     page.getByText("1 closest matches for your photo"),
   ).toBeVisible();
   expect(vectors[0].slice(0, 2)).toEqual([0, 1]);
+  expect(bodies[0].parts).toBeUndefined();
 
   const refinement = page.getByRole("textbox", {
     name: "Describe how it should differ from the photo",
@@ -62,6 +70,13 @@ test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
   // Text weighs twice the photo: normalize([2, 1]).
   expect(vectors[1][0]).toBeCloseTo(2 / Math.sqrt(5), 5);
   expect(vectors[1][1]).toBeCloseTo(1 / Math.sqrt(5), 5);
+
+  // The photo and text vectors go along, and each result shows both scores.
+  expect(bodies[1].parts?.map((p) => [p.name, p.vector.slice(0, 2)])).toEqual([
+    ["photo", [0, 1]],
+    ["text", [1, 0]],
+  ]);
+  await expect(page.getByText("photo 0.900 · text 0.270")).toBeVisible();
 });
 
 test("'More like this' searches with a product's photo, and the photo can be removed", async ({
