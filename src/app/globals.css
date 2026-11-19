@@ -1,76 +1,63 @@
 @import "tailwindcss";
 
 /*
- * Palette: garment lining, ink, denim indigo. Product photos sit on white
- * tiles, so the page itself is a cool grey that lets the white read as fabric
- * swatches.
+ * Minimal and monochrome: warm off-white paper, near-black ink, one grey for
+ * secondary text, hairline rules. Product photos sit on a light tile and are
+ * multiplied into it, so their white backgrounds disappear.
  */
 :root {
-  --lining: #e9ecf1;
-  --tile: #ffffff;
-  --ink: #1b1f2a;
-  --graphite: #5b6272;
-  --indigo: #2e3a8c;
-  --rule: #c9ceda;
+  --paper: #fdfdfc;
+  --ink: #21201c;
+  --muted: #63635e;
+  --rule: #e6e6e2;
+  --tile: #f3f3f1;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --lining: #161a22;
-    --tile: #f4f5f7;
-    --ink: #eef0f5;
-    --graphite: #a3a9b8;
-    --indigo: #9aa6f5;
-    --rule: #343a48;
+    --paper: #161615;
+    --ink: #ededeb;
+    --muted: #a1a19b;
+    --rule: #2e2e2b;
+    /* Tiles stay light: the photos are shot on white. */
+    --tile: #ededeb;
   }
 }
 
 @theme inline {
-  --color-lining: var(--lining);
-  --color-tile: var(--tile);
+  --color-paper: var(--paper);
   --color-ink: var(--ink);
-  --color-graphite: var(--graphite);
-  --color-indigo: var(--indigo);
+  --color-muted: var(--muted);
   --color-rule: var(--rule);
-  --font-sans: var(--font-bricolage);
+  --color-tile: var(--tile);
+  --font-sans: var(--font-geist);
+  --font-weight-normal: 450;
+  --font-weight-medium: 550;
 }
 
 body {
-  background: var(--lining);
+  background: var(--paper);
   color: var(--ink);
+  font-weight: 450;
 }
 
 @layer base {
   :focus-visible {
-    outline: 3px solid var(--indigo);
-    outline-offset: 3px;
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
   }
 }
 
-/*
- * The query reads as part of the sentence: it grows with what is typed and,
- * once it would overflow the line, shrinks so the whole query stays visible.
- * --chars is set from the input's length; bold glyphs average ~0.56em.
- */
-.search-sentence {
-  container-type: inline-size;
-}
-
-.search-input {
-  field-sizing: content;
-  max-width: 100%;
-  font-size: min(1em, calc(100cqw / (max(var(--chars, 1), 6) * 0.58)));
-  border-bottom-width: 0.06em;
-  transition: border-bottom-width 120ms ease-out;
-}
-
-.search-input:focus-visible {
-  outline: none;
-  border-bottom-width: 0.1em;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .search-input {
-    transition: none;
+@layer components {
+  /* Links and text buttons: dotted underline, solid on hover. */
+  .link {
+    text-decoration-line: underline;
+    text-decoration-style: dotted;
+    text-decoration-color: var(--muted);
+    text-underline-offset: 4px;
+  }
+  .link:hover {
+    text-decoration-style: solid;
+    text-decoration-color: var(--ink);
   }
 }

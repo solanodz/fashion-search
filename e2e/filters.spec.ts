@@ -54,7 +54,8 @@ test("filters narrow the current search", async ({ page }) => {
     page.getByText("1 closest matches for “a red dress”"),
   ).toBeVisible();
 
-  await page.getByRole("combobox", { name: "Type" }).selectOption("Dresses");
+  await page.getByRole("combobox", { name: "Type" }).click();
+  await page.getByRole("option", { name: "Dresses" }).click();
   await expect(
     page.getByText("1 closest matches for “a red dress” in Dresses"),
   ).toBeVisible();
