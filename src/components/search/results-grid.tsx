@@ -1,7 +1,9 @@
 import type { SearchResult } from "@/lib/search/schema";
 
+// R2 bucket in production (ADR 0005); local route otherwise. `||` so an empty
+// value copied from .env.example still falls back.
 export const IMAGE_BASE_URL =
-  process.env.NEXT_PUBLIC_IMAGE_BASE_URL ?? "/images";
+  process.env.NEXT_PUBLIC_IMAGE_BASE_URL || "/images";
 
 export function ResultsGrid({
   results,
