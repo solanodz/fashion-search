@@ -33,6 +33,9 @@ npm run setup   # creates .env.local and starts Qdrant
 npm run dev
 ```
 
+Before the first E2E run, install the browser with
+`npx playwright install --only-shell chromium`.
+
 Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 <http://localhost:6333/dashboard>. Environment variables are documented in
 [`.env.example`](.env.example) and validated at startup by `src/env.ts`.
@@ -47,6 +50,8 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run test`             | Unit tests (Vitest), single run            |
 | `npm run test:watch`       | Unit tests in watch mode                   |
 | `npm run test:integration` | Integration tests against a running Qdrant |
+| `npm run test:e2e`         | E2E tests (Playwright, Chromium)           |
+| `npm run test:e2e:ui`      | E2E tests in Playwright's UI mode          |
 | `npm run format`           | Format every file with Prettier            |
 | `npm run format:check`     | Check formatting without writing           |
 | `npm run build`            | Production build                           |
@@ -55,7 +60,8 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run db:reset`         | Stop Qdrant and delete its data            |
 
 Every pull request runs lint, format check, typecheck, unit and integration
-tests (against a Qdrant service container), dependency review and build on
+tests (against a Qdrant service container), E2E tests on a production build,
+dependency review and build on
 GitHub Actions. The PR title must follow Conventional Commits, since it becomes
 the squash commit on `main`.
 
