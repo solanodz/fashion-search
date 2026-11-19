@@ -39,16 +39,18 @@ Keep PRs small: one concern per PR is easier to review, test and revert.
 | ----------- | ------------------------ | ------------------------------ | ---------------------------------------------------- |
 | Unit        | Vitest + Testing Library | `src/**/*.test.ts(x)`          | Pure logic and client components                     |
 | Integration | Vitest + real Qdrant     | `src/**/*.integration.test.ts` | Server code against Qdrant with tiny fixture vectors |
+| Model       | Vitest + real CLIP model | `src/**/*.model.test.ts`       | Embedding sanity checks; local only, never in CI     |
 | E2E         | Playwright (Chromium)    | `e2e/`                         | User flows on a production build                     |
 
 Async Server Components can't be unit tested yet; cover them with E2E tests.
-Tests never download the CLIP model: integration tests use precomputed vectors
+CI never downloads the CLIP model: integration tests use precomputed vectors
 and E2E tests will use a stub encoder.
 
 ```bash
 npm test                  # unit
 npm run db:up && npm run test:integration
 npm run test:e2e
+npm run test:model        # local only: downloads CLIP (153.6 MB) once into data/models
 ```
 
 ## Environment and secrets
