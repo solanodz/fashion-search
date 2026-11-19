@@ -22,7 +22,7 @@
       - any-glob-to-any-file: ["src/lib/search/**", "src/app/api/search/**"]
 "area:indexing":
   - changed-files:
-      - any-glob-to-any-file: ["scripts/**", "src/lib/indexing/**"]
+      - any-glob-to-any-file: ["scripts/indexing/**", "src/lib/indexing/**"]
 "area:ui":
   - changed-files:
       - any-glob-to-any-file:
@@ -30,7 +30,13 @@
 "area:infra":
   - changed-files:
       - any-glob-to-any-file:
-          [".github/**", "docker-compose.yml", "next.config.ts", "vercel.json"]
+          [
+            ".github/**",
+            "docker-compose.yml",
+            "next.config.ts",
+            "scripts/setup.mjs",
+            "vercel.json",
+          ]
 "area:docs":
   - changed-files:
       - any-glob-to-any-file: ["docs/**", "*.md"]
