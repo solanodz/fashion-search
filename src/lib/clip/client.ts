@@ -58,17 +58,33 @@ export function onModelProgress(
  */
 const STUB = process.env.NEXT_PUBLIC_CLIP_STUB === "1";
 
-export function encodeText(text: string): Promise<Float32Array> {
-  if (STUB) {
-    const vector = new Float32Array(512);
-    vector[0] = 1;
-    return Promise.resolve(vector);
-  }
+function stubVector(axis: number): Promise<Float32Array> {
+  const vector = new Float32Array(512);
+  vector[axis] = 1;
+  return Promise.resolve(vector);
+}
+
+type Request = WorkerRequest extends infer R
+  ? R extends { id: number }
+    ? Omit<R, "id">
+    : never
+  : never;
+
+function send(request: Request): Promise<Float32Array> {
   const id = nextId++;
   return new Promise((resolve, reject) => {
     pending.set(id, { resolve, reject });
-    getWorker().postMessage({ id, type: "text", text } satisfies WorkerRequest);
+    getWorker().postMessage({ id, ...request } as WorkerRequest);
   });
+}
+
+export function encodeText(text: string): Promise<Float32Array> {
+  return STUB ? stubVector(0) : send({ type: "text", text });
+}
+
+/** Encodes a photo (any format the browser can decode). Loads the vision model on first use. */
+export function encodeImage(image: Blob): Promise<Float32Array> {
+  return STUB ? stubVector(1) : send({ type: "image", image });
 }
 
 /** Starts downloading the text model before the first search. */
