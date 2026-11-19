@@ -5,8 +5,8 @@
 
 ## Context
 
-Results show product images from the dataset: 44,072 JPEGs, about 563 MB in
-total (12.8 KB on average). They must be served fast and for free from a
+Results show product images from the dataset: 42,426 JPEGs of up to
+384×512, about 655 MB in total (15.4 KB on average, see ADR 0008). They must be served fast and for free from a
 stable URL. Local development serves them from disk through `/images/[id]`.
 
 The browser also downloads a product's image with `fetch` for "More like
@@ -19,7 +19,7 @@ this", so the store must send CORS headers for the site's origin.
    billed.
 2. **Cloudflare R2:** 10 GB free storage, 1 million free writes a month and no
    egress fees. Needs a separate account and a public bucket.
-3. **Commit images to `public/`:** simplest, but adds 563 MB to the repository
+3. **Commit images to `public/`:** simplest, but adds 655 MB to the repository
    and to every deploy.
 
 ## Decision

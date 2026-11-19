@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { isJpeg, normalizeRow } from "./catalog";
+import { isJpeg, normalizeRow, parseImageId } from "./catalog";
 
 const validRow = {
   id: BigInt(15970),
@@ -68,5 +68,20 @@ describe("isJpeg", () => {
     expect(isJpeg(new Uint8Array([0xff, 0xd8, 0xff, 0xe0, 0x00]))).toBe(true);
     expect(isJpeg(new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d]))).toBe(false);
     expect(isJpeg(undefined)).toBe(false);
+  });
+});
+
+describe("parseImageId", () => {
+  test("reads ids stored as text, numbers or bigints", () => {
+    expect(parseImageId("15970")).toBe(15970);
+    expect(parseImageId(" 39386 ")).toBe(39386);
+    expect(parseImageId(15970)).toBe(15970);
+    expect(parseImageId(BigInt(15970))).toBe(15970);
+  });
+
+  test("rejects anything else", () => {
+    for (const value of ["", "12a", "-3", "0", null, undefined, 1.5]) {
+      expect(parseImageId(value)).toBeNull();
+    }
   });
 });

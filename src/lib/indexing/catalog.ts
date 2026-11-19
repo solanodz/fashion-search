@@ -81,6 +81,15 @@ export function normalizeRow(row: RawRow): NormalizeResult {
   };
 }
 
+/** Product id of a photo row; the image dataset stores it as text ("15970"). */
+export function parseImageId(value: unknown): number | null {
+  const id =
+    typeof value === "string" && /^\d+$/.test(value.trim())
+      ? Number(value.trim())
+      : integer(value);
+  return id !== null && Number.isSafeInteger(id) && id > 0 ? id : null;
+}
+
 /** JPEG files start with the SOI marker FF D8 FF. */
 export function isJpeg(
   bytes: Uint8Array | undefined | null,

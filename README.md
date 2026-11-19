@@ -26,9 +26,14 @@ and color.
 
 ## Data
 
-[Fashion Product Images (Small)](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small),
-44,072 products with images and metadata, MIT license. Loaded from the
-[Hugging Face mirror](https://huggingface.co/datasets/ashraq/fashion-product-images-small).
+[Fashion Product Images](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-dataset)
+by Param Aggarwal, MIT license: 42,426 products with photos and metadata.
+Names, categories and colours come from the
+[`ashraq/fashion-product-images-small`](https://huggingface.co/datasets/ashraq/fashion-product-images-small)
+mirror, and the photos (up to 384×512) from
+[`ceyda/fashion-products-small`](https://huggingface.co/datasets/ceyda/fashion-products-small)
+([ADR 0008](docs/adr/0008-catalog-photos.md)). The 1,646 products without a
+photo there are left out.
 
 ## Development
 
@@ -90,7 +95,7 @@ The catalog is indexed locally in stages; outputs go to the git-ignored
 `data/` directory (see [ADR 0006](docs/adr/0006-indexing-pipeline.md)).
 
 ```bash
-npm run index:prepare   # download the dataset (271.5 MB), write data/catalog.jsonl and data/images/
+npm run index:prepare   # download both datasets (868 MB), write data/catalog.jsonl and data/images/
 npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
 npm run index:upload    # versioned Qdrant collection behind the "products" alias
 npm run index:eval      # retrieval quality report (precision@10)
@@ -141,7 +146,7 @@ live in a public Cloudflare R2 bucket
    `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` and
    `R2_SECRET_ACCESS_KEY` in `.env.local` (never in Vercel).
 
-Then upload the 44,072 images (about 563 MB). Objects already in the bucket
+Then upload the 42,426 images (about 655 MB). Objects already in the bucket
 are skipped, so Ctrl+C and rerun is safe; `--dry-run` only counts:
 
 ```bash
