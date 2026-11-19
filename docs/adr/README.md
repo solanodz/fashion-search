@@ -7,3 +7,4 @@
 | [0003](0003-encode-queries-in-the-browser.md) | Encode queries in the browser with CLIP | Accepted |
 | [0004](0004-qdrant-vector-database.md)        | Use Qdrant as the vector database       | Accepted |
 | [0005](0005-image-hosting.md)                 | Host catalog images in production       | Proposed |
+| [0006](0006-indexing-pipeline.md)             | Local, staged indexing pipeline         | Accepted |
