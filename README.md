@@ -13,6 +13,8 @@ and color.
 - **Model:** CLIP (`Xenova/clip-vit-base-patch32`, MIT) through Transformers.js.
   The same model indexes the catalog and encodes queries, so images and text
   share one vector space.
+- **Photo + text** ("this, but in blue") combines both vectors with the text
+  weighted twice ([ADR 0007](docs/adr/0007-combined-queries.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server
   and no model API keys.

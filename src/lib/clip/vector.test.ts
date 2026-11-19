@@ -1,6 +1,6 @@
 import { describe, expect, test } from "vitest";
 
-import { dot, l2Normalize, splitRows } from "./vector";
+import { combine, dot, l2Normalize, splitRows } from "./vector";
 
 describe("l2Normalize", () => {
   test("returns a unit vector with the same direction", () => {
@@ -25,5 +25,22 @@ describe("splitRows", () => {
 
   test("fails when the buffer does not match the shape", () => {
     expect(() => splitRows(new Float32Array(3), 2, 2)).toThrow(/2×2/);
+  });
+});
+
+describe("combine", () => {
+  test("returns the normalized weighted sum", () => {
+    const result = combine([
+      { vector: new Float32Array([1, 0]), weight: 1 },
+      { vector: new Float32Array([0, 1]), weight: 2 },
+    ]);
+    expect(result[0]).toBeCloseTo(1 / Math.sqrt(5), 6);
+    expect(result[1]).toBeCloseTo(2 / Math.sqrt(5), 6);
+  });
+
+  test("a single part is just normalized", () => {
+    expect(
+      Array.from(combine([{ vector: new Float32Array([0, 3]), weight: 1 }])),
+    ).toEqual([0, 1]);
   });
 });

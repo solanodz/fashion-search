@@ -9,3 +9,10 @@ export const CLIP_MODEL_ID = "Xenova/clip-vit-base-patch32";
 export const CLIP_DTYPE = "q8";
 
 export const CLIP_DIMENSIONS = 512;
+
+/**
+ * Weight of the text vector when a photo and text are combined ("this, but in
+ * blue"). Chosen experimentally, see ADR 0007: at 1 the colour barely moves,
+ * at 2 the article type holds while the colour follows the text.
+ */
+export const COMBINED_TEXT_WEIGHT = 2;

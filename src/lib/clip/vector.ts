@@ -43,3 +43,18 @@ export function dot(a: Float32Array, b: Float32Array): number {
   for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
   return sum;
 }
+
+/** Weighted sum of vectors, normalized. Used to combine a photo with a text refinement. */
+export function combine(
+  parts: { vector: Float32Array; weight: number }[],
+): Float32Array {
+  if (parts.length === 0) throw new Error("Nothing to combine");
+  const length = parts[0].vector.length;
+  const sum = new Float32Array(length);
+  for (const { vector, weight } of parts) {
+    if (vector.length !== length)
+      throw new Error("Vectors must have the same length");
+    for (let i = 0; i < length; i++) sum[i] += weight * vector[i];
+  }
+  return l2Normalize(sum);
+}
