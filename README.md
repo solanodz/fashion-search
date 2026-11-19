@@ -25,25 +25,37 @@ and color.
 
 ## Development
 
-Requires Node 22 (see `.nvmrc`).
+Requires Node 22 (see `.nvmrc`) and Docker.
 
 ```bash
 npm install
+npm run setup   # creates .env.local and starts Qdrant
 npm run dev
 ```
 
-| Script                 | What it does                     |
-| ---------------------- | -------------------------------- |
-| `npm run dev`          | Development server               |
-| `npm run lint`         | ESLint, fails on warnings        |
-| `npm run test`         | Unit tests (Vitest), single run  |
-| `npm run test:watch`   | Unit tests in watch mode         |
-| `npm run typecheck`    | TypeScript, no emit              |
-| `npm run format`       | Format every file with Prettier  |
-| `npm run format:check` | Check formatting without writing |
-| `npm run build`        | Production build                 |
+Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
+<http://localhost:6333/dashboard>. Environment variables are documented in
+[`.env.example`](.env.example) and validated at startup by `src/env.ts`.
 
-Every pull request runs lint, format check, typecheck, tests and build on
+| Script                     | What it does                               |
+| -------------------------- | ------------------------------------------ |
+| `npm run setup`            | Create `.env.local` and start Qdrant       |
+| `npm run dev`              | Development server                         |
+| `npm run dev:all`          | Start Qdrant, then the development server  |
+| `npm run lint`             | ESLint, fails on warnings                  |
+| `npm run typecheck`        | Generate route types, then TypeScript      |
+| `npm run test`             | Unit tests (Vitest), single run            |
+| `npm run test:watch`       | Unit tests in watch mode                   |
+| `npm run test:integration` | Integration tests against a running Qdrant |
+| `npm run format`           | Format every file with Prettier            |
+| `npm run format:check`     | Check formatting without writing           |
+| `npm run build`            | Production build                           |
+| `npm run db:up`            | Start Qdrant                               |
+| `npm run db:down`          | Stop Qdrant, keep its data                 |
+| `npm run db:reset`         | Stop Qdrant and delete its data            |
+
+Every pull request runs lint, format check, typecheck, unit and integration
+tests (against a Qdrant service container), dependency review and build on
 GitHub Actions. The PR title must follow Conventional Commits, since it becomes
 the squash commit on `main`.
 
