@@ -1,0 +1,19 @@
+name: Labeler
+
+# pull_request_target is safe here: actions/labeler only reads the config
+# from the base branch and never checks out or runs PR code.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  label:
+    name: Label PR
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    steps:
+      - uses: actions/labeler@v7

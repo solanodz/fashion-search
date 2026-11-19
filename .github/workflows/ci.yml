@@ -75,16 +75,28 @@ jobs:
             nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
       - run: npm run build
 
+  dependency-review:
+    name: Dependency review
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/dependency-review-action@v5
+        with:
+          fail-on-severity: high
+
   # Single required check for the main branch ruleset. Add new jobs to
   # `needs` instead of editing the ruleset.
   ci-ok:
     name: CI OK
     if: always()
-    needs: [lint, typecheck, test, build]
+    needs: [lint, typecheck, test, build, dependency-review]
     runs-on: ubuntu-latest
     timeout-minutes: 2
     steps:
       - name: Fail if any required job did not succeed
-        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') || contains(needs.*.result, 'skipped')
+        # dependency-review is skipped on pushes to main, so "skipped" is OK.
+        if: contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled')
         run: exit 1
       - run: echo "All required jobs passed."

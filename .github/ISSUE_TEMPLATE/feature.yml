@@ -1,0 +1,27 @@
+name: Feature
+description: A new user-facing capability
+labels: ["type:feature"]
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Problem
+      description: Who needs this and why.
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: Proposal
+      description: What we build. Keep it small enough for one PR when possible.
+    validations:
+      required: true
+  - type: textarea
+    id: done
+    attributes:
+      label: Done when
+      description: Acceptance criteria as a checklist.
+      placeholder: |
+        - [ ] ...
+    validations:
+      required: true

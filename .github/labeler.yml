@@ -1,0 +1,36 @@
+# Applied to pull requests by .github/workflows/labeler.yml.
+
+"type:feature":
+  - head-branch: ["^feat/"]
+"type:bug":
+  - head-branch: ["^fix/"]
+"type:chore":
+  - head-branch: ["^chore/", "^build/"]
+"type:docs":
+  - head-branch: ["^docs/"]
+"type:test":
+  - head-branch: ["^test/"]
+"type:ci":
+  - head-branch: ["^ci/"]
+"type:refactor":
+  - head-branch: ["^refactor/"]
+"type:perf":
+  - head-branch: ["^perf/"]
+
+"area:search":
+  - changed-files:
+      - any-glob-to-any-file: ["src/lib/search/**", "src/app/api/search/**"]
+"area:indexing":
+  - changed-files:
+      - any-glob-to-any-file: ["scripts/**", "src/lib/indexing/**"]
+"area:ui":
+  - changed-files:
+      - any-glob-to-any-file:
+          ["src/app/**/*.tsx", "src/components/**", "src/app/**/*.css"]
+"area:infra":
+  - changed-files:
+      - any-glob-to-any-file:
+          [".github/**", "docker-compose.yml", "next.config.ts", "vercel.json"]
+"area:docs":
+  - changed-files:
+      - any-glob-to-any-file: ["docs/**", "*.md"]
