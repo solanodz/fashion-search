@@ -59,6 +59,16 @@ npm run test:e2e
   blocks known credential formats.
 - Server-only variables must not use the `NEXT_PUBLIC_` prefix.
 
+## Releases
+
+Versions follow [SemVer](https://semver.org/) and stay at `0.x` until launch.
+[release-please](https://github.com/googleapis/release-please) reads the
+Conventional Commits on `main` and keeps a release PR open with the next
+version and `CHANGELOG.md`. `feat` bumps the minor version (while `0.x`) and
+`fix` the patch. Merging the release PR tags it and publishes a GitHub
+Release. Commits of type `docs`, `test`, `build`, `ci` and `chore` are hidden
+from the changelog.
+
 ## Architecture decisions
 
 Significant decisions are recorded as ADRs in [`docs/adr/`](docs/adr/). Copy
