@@ -3,6 +3,13 @@
 import type { Facets, FacetValue } from "@/lib/search/facets";
 import { COLOUR_SWATCHES, swatchFor } from "@/lib/search/colours";
 import type { SearchFilters } from "@/lib/search/schema";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const number = new Intl.NumberFormat("en");
 
@@ -29,8 +36,20 @@ export function Filters({ facets, filters, onChange }: Props) {
   const active = Object.values(filters).some(Boolean);
 
   return (
-    <div className="mt-8 flex flex-col gap-4">
-      <div className="flex flex-wrap items-center gap-2">
+    <div className="flex flex-col gap-5">
+      <div className="flex items-baseline justify-between">
+        <h2 className="font-medium">Filters</h2>
+        {active && (
+          <button
+            type="button"
+            className="link text-sm text-muted hover:text-ink"
+            onClick={() => onChange({})}
+          >
+            Clear filters
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-2 lg:flex-col">
         <FacetSelect
           label="Gender"
           anyLabel="Any gender"
@@ -55,20 +74,11 @@ export function Filters({ facets, filters, onChange }: Props) {
           selected={filters.articleType}
           onSelect={(articleType) => set({ articleType })}
         />
-        {active && (
-          <button
-            type="button"
-            className="ml-1 text-base text-graphite underline underline-offset-4 hover:text-indigo"
-            onClick={() => onChange({})}
-          >
-            Clear filters
-          </button>
-        )}
       </div>
 
       <fieldset>
-        <legend className="sr-only">Colour</legend>
-        <div className="flex flex-wrap items-center gap-2">
+        <legend className="mb-2 text-sm text-muted">Colour</legend>
+        <div className="flex flex-wrap items-center gap-1.5">
           {colours.map(({ value, count }) => {
             const selected = filters.baseColour === value;
             const empty = count === 0 && !selected;
@@ -83,9 +93,9 @@ export function Filters({ facets, filters, onChange }: Props) {
                 onClick={() =>
                   set({ baseColour: selected ? undefined : value })
                 }
-                className={`size-7 rounded-full border border-rule transition-transform enabled:hover:scale-110 disabled:cursor-not-allowed disabled:opacity-25 motion-reduce:transition-none ${
+                className={`size-4 rounded-full border border-rule transition-transform enabled:hover:scale-125 disabled:cursor-not-allowed disabled:opacity-25 motion-reduce:transition-none ${
                   selected
-                    ? "ring-3 ring-indigo ring-offset-2 ring-offset-lining"
+                    ? "ring-1 ring-ink ring-offset-2 ring-offset-paper"
                     : ""
                 }`}
                 style={{ background: swatchFor(value) }}
@@ -93,7 +103,7 @@ export function Filters({ facets, filters, onChange }: Props) {
             );
           })}
           {filters.baseColour && (
-            <span className="ml-1 text-base text-graphite" aria-live="polite">
+            <span className="ml-1 text-sm text-muted" aria-live="polite">
               {filters.baseColour}
             </span>
           )}
@@ -102,6 +112,9 @@ export function Filters({ facets, filters, onChange }: Props) {
     </div>
   );
 }
+
+// Radix Select items can't have an empty value, so "any" gets a sentinel.
+const ANY = "__any__";
 
 function FacetSelect({
   label,
@@ -122,30 +135,26 @@ function FacetSelect({
       ? [{ value: selected, count: 0 }, ...values]
       : values;
   return (
-    <label className="relative">
-      <span className="sr-only">{label}</span>
-      <select
-        value={selected ?? ""}
-        onChange={(event) => onSelect(event.target.value || undefined)}
-        className={`appearance-none rounded-full border py-1.5 pr-8 pl-4 text-base transition-colors ${
-          selected
-            ? "border-indigo bg-indigo text-lining"
-            : "border-rule bg-transparent text-ink hover:border-indigo"
-        }`}
+    <div className="min-w-36 flex-1 lg:flex-none">
+      <Select
+        value={selected ?? ANY}
+        onValueChange={(value) => onSelect(value === ANY ? undefined : value)}
       >
-        <option value="">{anyLabel}</option>
-        {options.map(({ value, count }) => (
-          <option key={value} value={value}>
-            {value} ({number.format(count)})
-          </option>
-        ))}
-      </select>
-      <span
-        aria-hidden
-        className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xs"
-      >
-        ▾
-      </span>
-    </label>
+        <SelectTrigger
+          aria-label={label}
+          className={selected ? "border-ink" : ""}
+        >
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={ANY}>{anyLabel}</SelectItem>
+          {options.map(({ value, count }) => (
+            <SelectItem key={value} value={value} detail={number.format(count)}>
+              {value}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

@@ -25,8 +25,8 @@ import type {
 } from "@/lib/search/schema";
 
 import { Filters } from "./filters";
-
 import { PhotoChip } from "./photo-chip";
+import { Pipeline, type Trace } from "./pipeline";
 import { IMAGE_BASE_URL, ResultsGrid } from "./results-grid";
 
 const SUGGESTIONS = [
@@ -53,7 +53,9 @@ export function SearchExperience() {
   const [dragging, setDragging] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({});
   const [facets, setFacets] = useState<Facets | null>(null);
+  const [trace, setTrace] = useState<Trace | null>(null);
   const latest = useRef(0);
+  const usedEncoders = useRef(new Set<string>());
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
   const fileInput = useRef<HTMLInputElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
@@ -97,6 +99,7 @@ export function SearchExperience() {
     const run = ++latest.current;
     setStatus({ kind: "searching" });
     try {
+      const encodeStart = performance.now();
       const parts = await Promise.all([
         currentPhoto
           ? photoVector(currentPhoto).then((vector) => ({ vector, weight: 1 }))
@@ -109,6 +112,8 @@ export function SearchExperience() {
           : null,
       ]);
       const vector = combine(parts.filter((part) => part !== null));
+      const encodeMs = performance.now() - encodeStart;
+      const searchStart = performance.now();
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -123,6 +128,7 @@ export function SearchExperience() {
       };
       if (!response.ok) throw new Error(body.error ?? "Search failed.");
       if (run !== latest.current) return;
+      const searchMs = performance.now() - searchStart;
       const description = [currentPhoto?.label, trimmed && `“${trimmed}”`]
         .filter(Boolean)
         .join(" + ");
@@ -131,6 +137,21 @@ export function SearchExperience() {
         kind: "done",
         description: scope ? `${description} in ${scope}` : description,
         results: body.results,
+      });
+      const encoders = [
+        ...(currentPhoto ? (["image"] as const) : []),
+        ...(trimmed ? (["text"] as const) : []),
+      ];
+      const firstRun = encoders.some((e) => !usedEncoders.current.has(e));
+      encoders.forEach((e) => usedEncoders.current.add(e));
+      setTrace({
+        query: description,
+        encoders,
+        encodeMs,
+        firstRun,
+        vector,
+        searchMs,
+        results: body.results.length,
       });
     } catch (error) {
       if (run === latest.current) {
@@ -248,23 +269,25 @@ export function SearchExperience() {
     if (file) selectPhoto(file, "your photo");
   }
 
-  const downloading = progress && progress.loaded < progress.total;
-  const placeholder = photo ? "in blue" : "a red dress";
+  const placeholder = photo
+    ? "Describe a change, e.g. in blue"
+    : "Describe a product, e.g. a red dress";
 
   return (
-    <section aria-label="Search the catalog">
-      <form onSubmit={onSubmit} role="search">
-        <label className="search-sentence block text-[clamp(2.6rem,7.5vw,6.5rem)] leading-[0.95] font-bold tracking-[-0.035em]">
-          <span>Show me </span>
+    <div className="grid gap-x-10 gap-y-6 lg:grid-cols-[12rem_minmax(0,1fr)_17rem] lg:grid-rows-[auto_1fr] xl:grid-cols-[13rem_minmax(0,1fr)_19rem]">
+      <section
+        aria-label="Search the catalog"
+        className="lg:col-start-2 lg:row-start-1"
+      >
+        <form
+          onSubmit={onSubmit}
+          role="search"
+          className="flex h-11 items-center gap-1 rounded-md border border-rule bg-paper pr-1 transition-colors focus-within:border-muted"
+        >
           {photo && <PhotoChip photo={photo} onRemove={removePhoto} />}
           <input
             ref={textInput}
-            className="search-input min-w-[4ch] border-indigo bg-transparent text-indigo caret-indigo placeholder:text-rule"
-            style={
-              {
-                "--chars": (query || placeholder).length + (photo ? 2 : 0),
-              } as React.CSSProperties
-            }
+            className="h-full min-w-0 flex-1 bg-transparent px-3 placeholder:text-muted/70 focus-visible:outline-none"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
             onFocus={warmUpTextModel}
@@ -278,95 +301,106 @@ export function SearchExperience() {
             spellCheck={false}
             enterKeyHint="search"
           />
-        </label>
-      </form>
+          <button
+            type="button"
+            className="shrink-0 px-2 text-sm text-muted hover:text-ink"
+            onClick={() => fileInput.current?.click()}
+          >
+            <span className="sm:hidden">Photo</span>
+            <span className="hidden sm:inline">
+              {photo ? "Use another photo" : "Search with a photo"}
+            </span>
+          </button>
+          <button
+            type="submit"
+            className="shrink-0 rounded bg-ink px-3 py-1.5 text-sm text-paper hover:opacity-85"
+          >
+            Search
+          </button>
+          <input
+            ref={fileInput}
+            type="file"
+            accept="image/*"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={onFileChosen}
+          />
+        </form>
 
-      <div className="mt-6 flex min-h-8 flex-wrap items-center gap-x-4 gap-y-2 text-base text-graphite">
-        <button
-          type="button"
-          className="font-medium text-indigo underline decoration-2 underline-offset-4 hover:decoration-4"
-          onClick={() => fileInput.current?.click()}
-        >
-          {photo ? "Use another photo" : "Search with a photo"}
-        </button>
-        <input
-          ref={fileInput}
-          type="file"
-          accept="image/*"
-          className="sr-only"
-          tabIndex={-1}
-          onChange={onFileChosen}
-        />
+        <div className="mt-3 min-h-6 text-sm text-muted">
+          {status.kind === "idle" ? (
+            <p>
+              Try{" "}
+              {SUGGESTIONS.map((suggestion, index) => (
+                <span key={suggestion}>
+                  <button
+                    type="button"
+                    className="link hover:text-ink"
+                    onClick={() => {
+                      setQuery(suggestion);
+                      void search(suggestion, photo);
+                    }}
+                  >
+                    {suggestion}
+                  </button>
+                  {index < SUGGESTIONS.length - 1 ? ", " : ""}
+                </span>
+              ))}
+              , or drop a photo anywhere.
+            </p>
+          ) : status.kind === "searching" ? (
+            <p aria-live="polite">Searching…</p>
+          ) : status.kind === "done" ? (
+            <p aria-live="polite">
+              {status.results.length} closest matches for {status.description}
+            </p>
+          ) : (
+            <p role="alert" className="text-ink">
+              {status.message}
+            </p>
+          )}
+        </div>
+      </section>
 
-        {downloading ? (
-          <ModelDownload progress={progress} />
-        ) : status.kind === "idle" ? (
-          <div className="flex flex-wrap gap-2">
-            {SUGGESTIONS.map((suggestion) => (
-              <button
-                key={suggestion}
-                type="button"
-                className="rounded-full border border-rule px-3 py-1 transition-colors hover:border-indigo hover:text-indigo"
-                onClick={() => {
-                  setQuery(suggestion);
-                  void search(suggestion, photo);
-                }}
-              >
-                {suggestion}
-              </button>
-            ))}
-          </div>
-        ) : status.kind === "searching" ? (
-          <p aria-live="polite">Searching…</p>
-        ) : status.kind === "done" ? (
-          <p aria-live="polite">
-            {status.results.length} closest matches for {status.description}
-          </p>
-        ) : (
-          <p role="alert" className="text-ink">
-            {status.message}
-          </p>
+      <aside
+        aria-label="Filters"
+        className="lg:sticky lg:top-8 lg:col-start-1 lg:row-span-2 lg:row-start-1 lg:self-start"
+      >
+        {facets && (
+          <Filters facets={facets} filters={filters} onChange={changeFilters} />
+        )}
+      </aside>
+
+      <div className="lg:col-start-2 lg:row-start-2">
+        {status.kind === "done" && (
+          <ResultsGrid results={status.results} onMoreLikeThis={moreLikeThis} />
         )}
       </div>
 
-      {facets && (
-        <Filters facets={facets} filters={filters} onChange={changeFilters} />
-      )}
-
-      {status.kind === "done" && (
-        <ResultsGrid results={status.results} onMoreLikeThis={moreLikeThis} />
-      )}
+      <aside className="lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:self-start">
+        <Pipeline
+          trace={trace}
+          progress={progress}
+          matching={facets ? matchingCount(facets, filters) : null}
+        />
+      </aside>
 
       {dragging && (
-        <div className="pointer-events-none fixed inset-3 z-10 flex items-center justify-center rounded-lg border-4 border-dashed border-indigo bg-lining/90 text-3xl font-bold text-indigo">
+        <div className="pointer-events-none fixed inset-4 z-10 flex items-center justify-center rounded-lg border border-dashed border-muted bg-paper/90">
           Drop a photo to search with it
         </div>
       )}
-    </section>
+    </div>
   );
 }
 
-function ModelDownload({ progress }: { progress: ModelProgress }) {
-  const mb = (bytes: number) => Math.round(bytes / 1_000_000);
-  const percent = Math.round((progress.loaded / progress.total) * 100);
-  return (
-    <div className="w-full max-w-md" aria-live="polite">
-      <p>
-        Downloading the search model, {mb(progress.loaded)} of{" "}
-        {mb(progress.total)} MB. This happens once.
-      </p>
-      <div
-        className="mt-2 h-1 w-full bg-rule"
-        role="progressbar"
-        aria-valuenow={percent}
-        aria-valuemin={0}
-        aria-valuemax={100}
-      >
-        <div
-          className="h-full bg-indigo transition-[width]"
-          style={{ width: `${percent}%` }}
-        />
-      </div>
-    </div>
-  );
+/**
+ * Products matching the current filters. Each facet is counted with every
+ * other filter applied, so the gender facet (every product has one) gives
+ * the total, narrowed to the selected gender if there is one.
+ */
+function matchingCount(facets: Facets, filters: SearchFilters): number {
+  return facets.gender
+    .filter(({ value }) => !filters.gender || value === filters.gender)
+    .reduce((sum, { count }) => sum + count, 0);
 }

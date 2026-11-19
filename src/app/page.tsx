@@ -2,23 +2,27 @@ import { SearchExperience } from "@/components/search/search-experience";
 
 export default function Home() {
   return (
-    <div className="mx-auto flex w-full max-w-7xl flex-1 flex-col px-4 pt-6 pb-16 sm:px-8">
-      <header className="flex items-baseline justify-between text-sm text-graphite">
-        <h1 className="font-semibold text-ink">fashion-search</h1>
+    <div className="flex w-full flex-1 flex-col px-5 pt-8 pb-12 sm:px-8 lg:px-10">
+      <header className="flex items-baseline justify-between gap-4">
+        <h1 className="font-medium">fashion-search</h1>
         <a
-          className="underline-offset-4 hover:underline"
+          className="link text-sm text-muted"
           href="https://github.com/solanodz/fashion-search"
         >
-          Source on GitHub
+          Source
         </a>
       </header>
-      <main className="mt-14 flex flex-1 flex-col sm:mt-20">
+      <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
+        Search a catalog of fashion products by text, by photo, or both. A CLIP
+        model turns your query into a vector in this browser; the server returns
+        the products whose image vectors are closest to it.
+      </p>
+      <main className="mt-8 flex flex-1 flex-col">
         <SearchExperience />
       </main>
-      <footer className="mt-20 max-w-xl text-sm leading-relaxed text-graphite">
-        Searches are encoded by CLIP in this browser; only the resulting vector
-        reaches the server. Catalog: Fashion Product Images (Small), 44,072
-        products, MIT license.
+      <footer className="mt-20 text-sm text-muted">
+        Catalog: Fashion Product Images by Param Aggarwal, 42,426 products, MIT
+        license.
       </footer>
     </div>
   );

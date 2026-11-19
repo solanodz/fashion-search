@@ -60,6 +60,19 @@ test("searching by text shows matching products", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("Casual Shoes, white")).toBeVisible();
   expect(request?.vector).toHaveLength(512);
+
+  // Each result shows its cosine similarity to the query.
+  await expect(page.getByText("0.310", { exact: true })).toBeVisible();
+  await expect(page.getByText("0.300", { exact: true })).toBeVisible();
+
+  // The pipeline shows what the search did.
+  const pipeline = page.getByRole("region", { name: "How it works" });
+  await expect(pipeline.getByText("“white running shoes”")).toBeVisible();
+  await expect(pipeline.getByText("Text encoder")).toBeVisible();
+  await expect(
+    pipeline.getByRole("img", { name: "Query vector, 512 dimensions" }),
+  ).toBeVisible();
+  await expect(pipeline.getByText(/^Top 2 of /)).toBeVisible();
 });
 
 test("a suggestion runs a search", async ({ page }) => {
