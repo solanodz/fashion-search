@@ -62,6 +62,7 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
 | `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
 | `npm run index:upload`     | Vectors → Qdrant, then move the alias       |
+| `npm run index:eval`       | Retrieval quality report                    |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
 | `npm run db:reset`         | Stop Qdrant and delete its data             |
@@ -87,6 +88,7 @@ The catalog is indexed locally in stages; outputs go to the git-ignored
 npm run index:prepare   # download the dataset (271.5 MB), write data/catalog.jsonl and data/images/
 npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
 npm run index:upload    # versioned Qdrant collection behind the "products" alias
+npm run index:eval      # retrieval quality report (precision@10)
 ```
 
 `index:embed` downloads the CLIP model once (153.6 MB, cached in
@@ -107,6 +109,12 @@ access only for this command (the app itself uses a read-only key):
 QDRANT_URL=https://<cluster>.cloud.qdrant.io QDRANT_API_KEY=<write key> npm run index:upload -- --yes
 ```
 
+### Retrieval quality
+
+Baseline precision@10 over 27 text queries, without filters: article type
+79%, colour 75%, gender 93%, all attributes 57%. Details and known weak spots
+in [docs/evaluation.md](docs/evaluation.md).
+
 ## Contributing
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for the workflow, testing strategy and
@@ -115,8 +123,8 @@ Security issues: [SECURITY.md](SECURITY.md).
 
 ## Status
 
-Development workflow, CI and local environment are in place. Indexing and
-search are next ([project board](https://github.com/users/solanodz/projects/1)).
+Development workflow, CI, local environment and catalog indexing are in
+place. The search UI is next ([project board](https://github.com/users/solanodz/projects/1)).
 
 ## License
 

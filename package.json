@@ -20,6 +20,7 @@
     "index:prepare": "node scripts/indexing/prepare.ts",
     "index:embed": "node scripts/indexing/embed.ts",
     "index:upload": "node --env-file-if-exists=.env.local scripts/indexing/upload.ts",
+    "index:eval": "node --env-file-if-exists=.env.local scripts/indexing/eval.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:up": "docker compose up -d --wait",

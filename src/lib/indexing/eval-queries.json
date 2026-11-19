@@ -1,0 +1,181 @@
+[
+  {
+    "query": "a red dress",
+    "expect": { "articleType": ["Dresses"], "baseColour": ["Red"] }
+  },
+  {
+    "query": "men's blue jeans",
+    "expect": {
+      "articleType": ["Jeans"],
+      "baseColour": ["Blue"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "white t-shirt for men",
+    "expect": {
+      "articleType": ["Tshirts"],
+      "baseColour": ["White"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "navy blue shirt for men",
+    "expect": {
+      "articleType": ["Shirts"],
+      "baseColour": ["Navy Blue"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "black casual sneakers",
+    "expect": {
+      "articleType": ["Casual Shoes", "Sports Shoes"],
+      "baseColour": ["Black"]
+    }
+  },
+  {
+    "query": "brown leather formal shoes for men",
+    "expect": {
+      "articleType": ["Formal Shoes"],
+      "baseColour": ["Brown"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "white running shoes",
+    "expect": { "articleType": ["Sports Shoes"], "baseColour": ["White"] }
+  },
+  {
+    "query": "gold watch for women",
+    "expect": {
+      "articleType": ["Watches"],
+      "baseColour": ["Gold"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "silver watch for men",
+    "expect": {
+      "articleType": ["Watches"],
+      "baseColour": ["Silver"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "black leather handbag",
+    "expect": {
+      "articleType": ["Handbags"],
+      "baseColour": ["Black"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "black sunglasses",
+    "expect": { "articleType": ["Sunglasses"], "baseColour": ["Black"] }
+  },
+  {
+    "query": "pink kurta for women",
+    "expect": {
+      "articleType": ["Kurtas"],
+      "baseColour": ["Pink"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "green saree",
+    "expect": {
+      "articleType": ["Sarees"],
+      "baseColour": ["Green"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "black high heels",
+    "expect": {
+      "articleType": ["Heels"],
+      "baseColour": ["Black"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "blue flip flops",
+    "expect": { "articleType": ["Flip Flops"], "baseColour": ["Blue"] }
+  },
+  {
+    "query": "black backpack",
+    "expect": { "articleType": ["Backpacks"], "baseColour": ["Black"] }
+  },
+  {
+    "query": "brown leather belt for men",
+    "expect": {
+      "articleType": ["Belts"],
+      "baseColour": ["Brown"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "yellow top for women",
+    "expect": {
+      "articleType": ["Tops"],
+      "baseColour": ["Yellow"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "grey track pants for men",
+    "expect": {
+      "articleType": ["Track Pants"],
+      "baseColour": ["Grey"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "black jacket for men",
+    "expect": {
+      "articleType": ["Jackets"],
+      "baseColour": ["Black"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "gold earrings",
+    "expect": {
+      "articleType": ["Earrings"],
+      "baseColour": ["Gold"],
+      "gender": ["Women"]
+    }
+  },
+  {
+    "query": "red sweatshirt",
+    "expect": { "articleType": ["Sweatshirts"], "baseColour": ["Red"] }
+  },
+  {
+    "query": "blue baseball cap",
+    "expect": { "articleType": ["Caps"], "baseColour": ["Blue"] }
+  },
+  {
+    "query": "brown sandals",
+    "expect": { "articleType": ["Sandals"], "baseColour": ["Brown"] }
+  },
+  {
+    "query": "black leather wallet for men",
+    "expect": {
+      "articleType": ["Wallets"],
+      "baseColour": ["Black"],
+      "gender": ["Men"]
+    }
+  },
+  {
+    "query": "red lipstick",
+    "expect": { "articleType": ["Lipstick"], "baseColour": ["Red"] }
+  },
+  {
+    "query": "blue tie",
+    "expect": {
+      "articleType": ["Ties"],
+      "baseColour": ["Blue"],
+      "gender": ["Men"]
+    }
+  }
+]
