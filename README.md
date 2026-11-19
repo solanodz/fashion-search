@@ -30,12 +30,20 @@ npm install
 npm run dev
 ```
 
-| Script | What it does |
-| --- | --- |
-| `npm run dev` | Development server |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript, no emit |
-| `npm run build` | Production build |
+| Script                 | What it does                     |
+| ---------------------- | -------------------------------- |
+| `npm run dev`          | Development server               |
+| `npm run lint`         | ESLint, fails on warnings        |
+| `npm run typecheck`    | TypeScript, no emit              |
+| `npm run format`       | Format every file with Prettier  |
+| `npm run format:check` | Check formatting without writing |
+| `npm run build`        | Production build                 |
+
+Git hooks (installed by `npm install` through Husky):
+
+- **pre-commit:** ESLint and Prettier on staged files (lint-staged).
+- **commit-msg:** commit messages must follow
+  [Conventional Commits](https://www.conventionalcommits.org/) (commitlint).
 
 ## Status
 
