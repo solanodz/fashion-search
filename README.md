@@ -2,6 +2,8 @@
 
 [![CI](https://github.com/solanodz/fashion-search/actions/workflows/ci.yml/badge.svg)](https://github.com/solanodz/fashion-search/actions/workflows/ci.yml)
 
+**Live:** <https://fashion-search-mu.vercel.app>
+
 Multimodal product search over a public fashion catalog: search by text, by
 photo, or both at once ("this, but in blue"), with filters by gender, category
 and color.
@@ -15,7 +17,8 @@ and color.
   into a vector; the server only queries the vector database. No GPU server
   and no model API keys.
 - **Vector database:** Qdrant. Local through Docker in development.
-- **App:** Next.js (App Router), TypeScript, Tailwind CSS.
+- **App:** Next.js (App Router), TypeScript, Tailwind CSS, deployed on Vercel
+  (a preview per pull request, production on every merge to `main`).
 
 ## Data
 
