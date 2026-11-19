@@ -3,7 +3,12 @@ import { expect, test } from "vitest";
 
 import Home from "./page";
 
-test("home page renders its main heading", () => {
+test("home page shows the title and the search sentence", () => {
   render(<Home />);
-  expect(screen.getByRole("heading", { level: 1 })).toBeDefined();
+  expect(
+    screen.getByRole("heading", { level: 1, name: "fashion-search" }),
+  ).toBeDefined();
+  expect(
+    screen.getByRole("textbox", { name: "Describe what you are looking for" }),
+  ).toBeDefined();
 });

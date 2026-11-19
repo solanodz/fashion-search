@@ -144,6 +144,9 @@ jobs:
           restore-keys: |
             nextjs-${{ runner.os }}-${{ hashFiles('package-lock.json') }}-
       - run: npm run build
+        env:
+          # Inline the stub encoder: E2E tests never download the CLIP model.
+          NEXT_PUBLIC_CLIP_STUB: "1"
       - run: npm run test:e2e
       - uses: actions/upload-artifact@v7
         if: failure()
