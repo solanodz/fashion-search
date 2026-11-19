@@ -61,6 +61,7 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run build`            | Production build                            |
 | `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
 | `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
+| `npm run index:upload`     | Vectors → Qdrant, then move the alias       |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
 | `npm run db:reset`         | Stop Qdrant and delete its data             |
@@ -85,6 +86,7 @@ The catalog is indexed locally in stages; outputs go to the git-ignored
 ```bash
 npm run index:prepare   # download the dataset (271.5 MB), write data/catalog.jsonl and data/images/
 npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
+npm run index:upload    # versioned Qdrant collection behind the "products" alias
 ```
 
 `index:embed` downloads the CLIP model once (153.6 MB, cached in
@@ -92,6 +94,18 @@ npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
 the full catalog takes roughly 9 minutes. Press Ctrl+C to stop after the
 current batch; running it again continues where it stopped. Use `--fresh` to
 start over.
+
+`index:upload` creates the next `products_vN` collection, verifies the point
+count, then moves the `products` alias to it in one atomic step; the app
+always queries the alias. The previous version is kept for rollback and older
+ones are deleted.
+
+To index Qdrant Cloud, reuse the local vectors and pass a key with write
+access only for this command (the app itself uses a read-only key):
+
+```bash
+QDRANT_URL=https://<cluster>.cloud.qdrant.io QDRANT_API_KEY=<write key> npm run index:upload -- --yes
+```
 
 ## Contributing
 
