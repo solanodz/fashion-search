@@ -55,7 +55,7 @@
     "vitest": "^5.1.1"
   },
   "engines": {
-    "node": ">=22"
+    "node": "22.x"
   },
   "overrides": {
     "@qdrant/js-client-rest": {
