@@ -11,3 +11,4 @@
 | [0007](0007-combined-queries.md)              | Combine photo and text queries with a weighted vector sum | Accepted |
 | [0008](0008-catalog-photos.md)                | Take catalog photos from a 384×512 mirror                 | Accepted |
 | [0009](0009-hybrid-search.md)                 | Hybrid search with keyword vectors                        | Accepted |
+| [0010](0010-embedding-map.md)                 | Show a 2D map of the embedding space                      | Accepted |

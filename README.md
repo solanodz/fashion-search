@@ -21,6 +21,8 @@ and color.
   vectors, fused with the CLIP results by rank
   ([ADR 0009](docs/adr/0009-hybrid-search.md)). Precision@10 on all
   attributes goes from 59% to 79%.
+- **Embedding map:** every product projected to 2D with UMAP, with the query
+  and its results highlighted ([ADR 0010](docs/adr/0010-embedding-map.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server
   and no model API keys.
@@ -76,6 +78,7 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
 | `npm run index:upload`     | Vectors → Qdrant, then move the alias       |
 | `npm run index:images`     | Catalog images → Cloudflare R2 (resumable)  |
+| `npm run index:map`        | 2D map of the embedding space (UMAP)        |
 | `npm run index:eval`       | Retrieval quality report                    |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
@@ -102,6 +105,7 @@ The catalog is indexed locally in stages; outputs go to the git-ignored
 npm run index:prepare   # download both datasets (868 MB), write data/catalog.jsonl and data/images/
 npm run index:embed     # CLIP image vectors into data/embeddings/ (resumable)
 npm run index:upload    # versioned Qdrant collection behind the "products" alias
+npm run index:map       # 2D UMAP map of the image vectors into public/ (about 1 minute)
 npm run index:eval      # retrieval quality report (precision@10)
 ```
 
