@@ -170,8 +170,12 @@ export function SearchExperience() {
   }
 
   async function moreLikeThis(result: SearchResult) {
-    const response = await fetch(`${IMAGE_BASE_URL}/${result.id}`);
-    if (!response.ok) {
+    let blob: Blob;
+    try {
+      const response = await fetch(`${IMAGE_BASE_URL}/${result.id}`);
+      if (!response.ok) throw new Error(String(response.status));
+      blob = await response.blob();
+    } catch {
       setStatus({
         kind: "error",
         message: "That product's photo is not available.",
@@ -180,7 +184,6 @@ export function SearchExperience() {
     }
     setQuery("");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const blob = await response.blob();
     const next = {
       blob,
       url: URL.createObjectURL(blob),

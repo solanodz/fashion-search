@@ -66,6 +66,7 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
 | `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
 | `npm run index:upload`     | Vectors → Qdrant, then move the alias       |
+| `npm run index:images`     | Catalog images → Cloudflare R2 (resumable)  |
 | `npm run index:eval`       | Retrieval quality report                    |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
@@ -113,6 +114,44 @@ access only for this command (the app itself uses a read-only key):
 QDRANT_URL=https://<cluster>.cloud.qdrant.io QDRANT_API_KEY=<write key> npm run index:upload -- --yes
 ```
 
+### Images in production
+
+Locally the app serves `data/images/` at `/images`. In production the images
+live in a public Cloudflare R2 bucket
+([ADR 0005](docs/adr/0005-image-hosting.md)), one object per product keyed
+`<id>`. One-time setup in the Cloudflare dashboard:
+
+1. Create a bucket and enable its public `r2.dev` URL (Settings → Public
+   access).
+2. Add a CORS rule so the browser can fetch images for "More like this":
+
+   ```json
+   [
+     {
+       "AllowedOrigins": [
+         "https://fashion-search-mu.vercel.app",
+         "http://localhost:3000"
+       ],
+       "AllowedMethods": ["GET"]
+     }
+   ]
+   ```
+
+3. Create an R2 API token with Object Read & Write on that bucket, and put
+   `R2_ACCOUNT_ID`, `R2_BUCKET`, `R2_ACCESS_KEY_ID` and
+   `R2_SECRET_ACCESS_KEY` in `.env.local` (never in Vercel).
+
+Then upload the 44,072 images (about 563 MB). Objects already in the bucket
+are skipped, so Ctrl+C and rerun is safe; `--dry-run` only counts:
+
+```bash
+npm run index:images
+```
+
+Finally set `NEXT_PUBLIC_IMAGE_BASE_URL` in Vercel to the bucket's public URL
+(no trailing slash) and redeploy, since `NEXT_PUBLIC_*` values are inlined at
+build time.
+
 ### Retrieval quality
 
 Baseline precision@10 over 27 text queries, without filters: article type
@@ -127,8 +166,8 @@ Security issues: [SECURITY.md](SECURITY.md).
 
 ## Status
 
-Development workflow, CI, local environment and catalog indexing are in
-place. The search UI is next ([project board](https://github.com/users/solanodz/projects/1)).
+Search by text, by photo and combined, with filters, works locally. Next is
+the production launch: Qdrant Cloud and image hosting ([project board](https://github.com/users/solanodz/projects/1)).
 
 ## License
 
