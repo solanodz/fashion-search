@@ -1,5 +1,7 @@
 # Fashion Search
 
+[![CI](https://github.com/solanodz/fashion-search/actions/workflows/ci.yml/badge.svg)](https://github.com/solanodz/fashion-search/actions/workflows/ci.yml)
+
 Multimodal product search over a public fashion catalog: search by text, by
 photo, or both at once ("this, but in blue"), with filters by gender, category
 and color.
@@ -34,10 +36,16 @@ npm run dev
 | ---------------------- | -------------------------------- |
 | `npm run dev`          | Development server               |
 | `npm run lint`         | ESLint, fails on warnings        |
+| `npm run test`         | Unit tests (Vitest), single run  |
+| `npm run test:watch`   | Unit tests in watch mode         |
 | `npm run typecheck`    | TypeScript, no emit              |
 | `npm run format`       | Format every file with Prettier  |
 | `npm run format:check` | Check formatting without writing |
 | `npm run build`        | Production build                 |
+
+Every pull request runs lint, format check, typecheck, tests and build on
+GitHub Actions. The PR title must follow Conventional Commits, since it becomes
+the squash commit on `main`.
 
 Git hooks (installed by `npm install` through Husky):
 
