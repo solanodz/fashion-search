@@ -5,15 +5,18 @@ import { Readable } from "node:stream";
 import { pipeline } from "node:stream/promises";
 import type { ReadableStream as NodeReadableStream } from "node:stream/web";
 
-import { DATASET, datasetFileUrl } from "../../src/lib/indexing/dataset.ts";
+import {
+  datasetFileUrl,
+  type HfDataset,
+} from "../../src/lib/indexing/dataset.ts";
 import { RAW_DIR } from "../../src/lib/indexing/paths.ts";
 
-/** Downloads the pinned parquet files into data/raw, skipping files already complete. */
-export async function downloadDataset(): Promise<string[]> {
+/** Downloads a dataset's pinned parquet files into data/raw, skipping files already complete. */
+export async function downloadDataset(dataset: HfDataset): Promise<string[]> {
   await mkdir(RAW_DIR, { recursive: true });
   const paths: string[] = [];
 
-  for (const file of DATASET.files) {
+  for (const file of dataset.files) {
     const target = join(RAW_DIR, basename(file.path));
     paths.push(target);
 
@@ -24,7 +27,7 @@ export async function downloadDataset(): Promise<string[]> {
 
     const mb = (file.size / 1e6).toFixed(1);
     console.log(`→ Downloading ${basename(target)} (${mb} MB)…`);
-    const response = await fetch(datasetFileUrl(file.path));
+    const response = await fetch(datasetFileUrl(dataset, file.path));
     if (!response.ok || !response.body) {
       throw new Error(`Download failed (${response.status}) for ${file.path}`);
     }

@@ -10,7 +10,26 @@ The full report is written to `data/eval/latest.json`.
 Run it after any change to the model, quantization, preprocessing or indexing,
 and compare against the baseline below.
 
-## Baseline (2026-11-19)
+## Current: 384×512 photos (2026-11-19)
+
+Same model and queries, catalog photos at up to 384×512 instead of 60×80
+([ADR 0008](adr/0008-catalog-photos.md)); 42,426 products.
+
+| Metric       | 60×80 | 384×512 |
+| ------------ | ----: | ------: |
+| Article type |   79% |     81% |
+| Colour       |   75% |     79% |
+| Gender       |   93% |     94% |
+| All          |   57% |     60% |
+
+Largest changes in "all": men's blue jeans 60% → 100%, blue tie 70% → 100%,
+black jacket for men 20% → 60%, black leather handbag 70% → 90%, blue
+baseball cap 70% → 90%, yellow top for women 30% → 50%. Worse: gold watch for
+women 40% → 0% (the watches are right, the catalog colour is not), pink kurta
+for women 80% → 60%, black high heels 80% → 60%. "a red dress" goes from 0% to
+10%; it still needs the Dresses filter.
+
+## Baseline: 60×80 thumbnails (2026-11-19)
 
 Model `Xenova/clip-vit-base-patch32`, `q8`, image vectors only, no filters.
 
