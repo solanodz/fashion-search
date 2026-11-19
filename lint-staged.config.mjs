@@ -1,6 +1,6 @@
 /** @type {import('lint-staged').Configuration} */
 const config = {
-  "*.{js,mjs,cjs,ts,tsx}": [
+  "*.{js,mjs,cjs,ts,mts,tsx}": [
     "eslint --fix --max-warnings=0",
     "prettier --write",
   ],
