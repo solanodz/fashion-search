@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.0](https://github.com/solanodz/fashion-search/compare/v0.2.0...v0.3.0) (2026-11-19)
+
+
+### Features
+
+* **search:** filter by gender, category, type and colour ([#33](https://github.com/solanodz/fashion-search/issues/33)) ([2fc117a](https://github.com/solanodz/fashion-search/commit/2fc117ab81dfa9eee3e5c820e578f7b0969e8a26))
+* **search:** search the catalog by text ([#28](https://github.com/solanodz/fashion-search/issues/28)) ([9930512](https://github.com/solanodz/fashion-search/commit/99305126aa5185a203f49bdfd809fd87683e3c1c))
+* **search:** search with a photo, alone or refined by text ([#31](https://github.com/solanodz/fashion-search/issues/31)) ([f0947d4](https://github.com/solanodz/fashion-search/commit/f0947d4b8c191c345f7b188fa58bb6ce38895e16))
+
 ## [0.2.0](https://github.com/solanodz/fashion-search/compare/v0.1.0...v0.2.0) (2026-11-19)
 
 
