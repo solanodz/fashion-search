@@ -1,6 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-const port = 3000;
+// Not 3000: E2E tests need a build with the stub encoder, separate from a
+// running `npm run dev` (Next allows one dev server per project).
+const port = 3100;
 const baseURL = process.env.E2E_BASE_URL ?? `http://localhost:${port}`;
 
 /**
@@ -22,9 +24,12 @@ export default defineConfig({
   webServer: process.env.E2E_BASE_URL
     ? undefined
     : {
-        command: process.env.CI ? "npm run start" : "npm run dev",
+        command: process.env.CI
+          ? `npm run start -- --port ${port}`
+          : `npm run build && npm run start -- --port ${port}`,
         url: baseURL,
+        env: { NEXT_PUBLIC_CLIP_STUB: "1" },
         reuseExistingServer: !process.env.CI,
-        timeout: 120_000,
+        timeout: 240_000,
       },
 });

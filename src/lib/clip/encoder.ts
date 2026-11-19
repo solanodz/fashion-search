@@ -18,19 +18,30 @@ import { splitRows } from "./vector.ts";
 
 export { RawImage };
 
-/** Reports model file download progress (0-100) per file. */
+/** Reports model file download progress, in bytes, per file. */
 export type ProgressCallback = (event: {
   file: string;
-  progress: number;
+  loaded: number;
+  total: number;
 }) => void;
 
 type LoadOptions = { onProgress?: ProgressCallback };
 
 function progressHandler(onProgress?: ProgressCallback) {
   if (!onProgress) return undefined;
-  return (info: { status: string; file?: string; progress?: number }) => {
-    if (info.status === "progress" && info.file)
-      onProgress({ file: info.file, progress: info.progress ?? 0 });
+  return (info: {
+    status: string;
+    file?: string;
+    loaded?: number;
+    total?: number;
+  }) => {
+    if (info.status === "progress" && info.file && info.total) {
+      onProgress({
+        file: info.file,
+        loaded: info.loaded ?? 0,
+        total: info.total,
+      });
+    }
   };
 }
 
