@@ -12,6 +12,9 @@
   --rule: #e6e6e2;
   --tile: #f3f3f1;
   --line-strong: #cfceca;
+  /* Evaluation charts: one hue, two shades (validated light and dark). */
+  --viz-before: #86b6ef;
+  --viz-after: #104281;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -23,6 +26,8 @@
     /* Tiles stay light: the photos are shot on white. */
     --tile: #ededeb;
     --line-strong: #494844;
+    --viz-before: #256abf;
+    --viz-after: #86b6ef;
   }
 }
 
