@@ -1,6 +1,18 @@
+"use client";
+
+import { useEffect, useRef } from "react";
+
 import type { Photo } from "./search-experience";
 
-/** The query photo, shown as a thumbnail at the start of the search bar. */
+/** Thumbnail size in CSS pixels. */
+const WIDTH = 24;
+const HEIGHT = 32;
+
+/**
+ * The query photo, shown as a thumbnail at the start of the search bar. It is
+ * drawn from the file's bytes onto a canvas, so no URL built from page data
+ * ever reaches an `src` attribute.
+ */
 export function PhotoChip({
   photo,
   onRemove,
@@ -8,18 +20,53 @@ export function PhotoChip({
   photo: Photo;
   onRemove: () => void;
 }) {
-  // Only object URLs created by this page (URL.createObjectURL) are rendered,
-  // never a string that came from elsewhere.
-  const src = photo.url.startsWith("blob:") ? photo.url : undefined;
+  const canvas = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const element = canvas.current;
+    if (!element) return;
+    let cancelled = false;
+    createImageBitmap(photo.blob)
+      .then((bitmap) => {
+        if (cancelled) return bitmap.close();
+        const ratio = window.devicePixelRatio || 1;
+        element.width = WIDTH * ratio;
+        element.height = HEIGHT * ratio;
+        const context = element.getContext("2d");
+        if (!context) return bitmap.close();
+        // Contain: the whole photo, centred, keeping its proportions.
+        const scale = Math.min(
+          element.width / bitmap.width,
+          element.height / bitmap.height,
+        );
+        const w = bitmap.width * scale;
+        const h = bitmap.height * scale;
+        context.drawImage(
+          bitmap,
+          (element.width - w) / 2,
+          (element.height - h) / 2,
+          w,
+          h,
+        );
+        bitmap.close();
+      })
+      .catch(() => {});
+    return () => {
+      cancelled = true;
+    };
+  }, [photo.blob]);
+
   return (
     <span className="flex shrink-0 items-center gap-1 pl-1">
-      {/* Blob URL of a local photo; next/image can't optimize it. */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        src={src}
-        alt={`Search photo: ${photo.label.replace(/[“”]/g, "")}`}
-        className="h-8 w-6 rounded-sm bg-tile object-contain mix-blend-multiply"
-      />
+      {/* isolate: the multiply blend mixes with the tile, not the search bar. */}
+      <span className="isolate flex h-8 w-6 rounded-sm bg-tile">
+        <canvas
+          ref={canvas}
+          role="img"
+          aria-label={`Search photo: ${photo.label.replace(/[“”]/g, "")}`}
+          className="h-full w-full mix-blend-multiply"
+        />
+      </span>
       <button
         type="button"
         onClick={onRemove}

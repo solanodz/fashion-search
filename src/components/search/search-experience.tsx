@@ -46,7 +46,6 @@ const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 /** The query photo. `productId` is set for a catalog product's photo, which can be shared by URL. */
 export type Photo = {
   blob: Blob;
-  url: string;
   label: string;
   productId?: number;
 };
@@ -97,12 +96,6 @@ export function SearchExperience() {
     return () => controller.abort();
   }, [filters]);
 
-  // Free the previous preview URL when the photo changes or the page unmounts.
-  useEffect(
-    () => () => (photo ? URL.revokeObjectURL(photo.url) : undefined),
-    [photo],
-  );
-
   async function photoVector(current: Photo): Promise<Float32Array> {
     const cached = photoVectors.current.get(current.blob);
     if (cached) return cached;
@@ -142,6 +135,7 @@ export function SearchExperience() {
             }))
           : null,
       ]);
+      const [photoPart, textPart] = parts;
       const vector = combine(parts.filter((part) => part !== null));
       const encodeMs = performance.now() - encodeStart;
       const searchStart = performance.now();
@@ -152,6 +146,16 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
+          // A combined query also sends its parts, to score each result
+          // against the photo and the text separately.
+          ...(photoPart && textPart
+            ? {
+                parts: [
+                  { name: "photo", vector: Array.from(photoPart.vector) },
+                  { name: "text", vector: Array.from(textPart.vector) },
+                ],
+              }
+            : {}),
         }),
       });
       const body = (await response.json()) as SearchResponse & {
@@ -209,7 +213,7 @@ export function SearchExperience() {
       });
       return;
     }
-    const next = { blob, url: URL.createObjectURL(blob), label };
+    const next = { blob, label };
     setPhoto(next);
     void search(query, next);
   }
@@ -233,7 +237,7 @@ export function SearchExperience() {
       const response = await fetch(`${IMAGE_BASE_URL}/${id}`);
       if (!response.ok) throw new Error(String(response.status));
       const blob = await response.blob();
-      return { blob, url: URL.createObjectURL(blob), label, productId: id };
+      return { blob, label, productId: id };
     } catch {
       setStatus({
         kind: "error",
