@@ -14,6 +14,11 @@ const serverEnvSchema = z.object({
     .optional()
     .transform((value) => value || undefined),
   QDRANT_COLLECTION: z.string().min(1).default("products"),
+  // Set in Vercel to make /api/keepalive accept only Vercel Cron's calls.
+  CRON_SECRET: z
+    .string()
+    .optional()
+    .transform((value) => value || undefined),
 });
 
 export type ServerEnv = z.infer<typeof serverEnvSchema>;
