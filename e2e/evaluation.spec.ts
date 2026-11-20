@@ -32,11 +32,10 @@ test("the evaluation page shows every version and each search", async ({
   await page.getByText("Show all 27 searches").click();
   await expect(lastSearch).toBeVisible();
 
-  // The charts summarise the two big changes.
+  // The chart summarises each version in one bar.
   await expect(
-    page.getByRole("img", { name: /^English: image only → hybrid search/ }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("img", { name: /^Spanish: as typed → with the glossary/ }),
+    page.getByRole("img", {
+      name: /^Results with everything right: .*Hybrid 80%/,
+    }),
   ).toBeVisible();
 });
