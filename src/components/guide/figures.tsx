@@ -1,6 +1,6 @@
 import { COLOUR_SWATCHES, swatchFor } from "@/lib/search/colours";
 
-import { IMAGE_BASE_URL } from "../search/results-grid";
+import { IMAGE_BASE_URL } from "@/lib/images";
 import { VectorStrip } from "../search/vector-strip";
 
 /**

@@ -18,6 +18,7 @@ import {
 } from "@/lib/clip/client";
 import { COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 import { combine } from "@/lib/clip/vector";
+import { IMAGE_BASE_URL } from "@/lib/images";
 import type { Facets } from "@/lib/search/facets";
 import { queryKeywords, tokenize } from "@/lib/search/keywords";
 import { translateQuery } from "@/lib/search/spanish";
@@ -37,7 +38,7 @@ import { CompareView } from "./compare-view";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
 import { Pipeline, type Trace } from "./pipeline";
-import { IMAGE_BASE_URL, ResultsGrid } from "./results-grid";
+import { ResultsGrid } from "./results-grid";
 
 const SUGGESTIONS = [
   "white running shoes",
@@ -498,6 +499,7 @@ export function SearchExperience() {
             <ResultsGrid
               results={status.results}
               onMoreLikeThis={moreLikeThis}
+              query={trace?.vector ?? null}
             />
           ))}
       </div>
