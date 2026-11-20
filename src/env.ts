@@ -16,6 +16,11 @@ const serverEnvSchema = z.object({
     .optional()
     .transform((value) => value || undefined),
   QDRANT_COLLECTION: z.string().min(1).default("products"),
+  // Set in Vercel to make /api/keepalive accept only Vercel Cron's calls.
+  CRON_SECRET: z
+    .string()
+    .optional()
+    .transform((value) => value || undefined),
   // Optional: enables outfit descriptions (ADR 0013). Empty means off.
   OPENAI_API_KEY: z
     .string()

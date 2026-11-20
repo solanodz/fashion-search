@@ -176,6 +176,11 @@ are skipped, so Ctrl+C and rerun is safe; `--dry-run` only counts:
 npm run index:images
 ```
 
+A daily Vercel Cron Job (`vercel.json`) calls `/api/keepalive`, which runs a
+small search so the free Qdrant Cloud cluster is never idle long enough to be
+suspended ([ADR 0012](docs/adr/0012-qdrant-keepalive.md)). Set `CRON_SECRET`
+in Vercel to make that endpoint accept only Vercel Cron.
+
 Finally set `NEXT_PUBLIC_IMAGE_BASE_URL` in Vercel to the bucket's public URL
 (no trailing slash) and redeploy, since `NEXT_PUBLIC_*` values are inlined at
 build time.
