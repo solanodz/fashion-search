@@ -39,7 +39,13 @@ test.beforeEach(async ({ page }) => {
 });
 
 test("searching by text shows matching products", async ({ page }) => {
-  let request: { vector: number[]; limit: number } | undefined;
+  let request:
+    | {
+        vector: number[];
+        limit: number;
+        keywords?: { indices: number[]; values: number[] };
+      }
+    | undefined;
   await page.route("**/api/search", async (route) => {
     request = route.request().postDataJSON();
     await route.fulfill({ json: { results } });
@@ -60,6 +66,9 @@ test("searching by text shows matching products", async ({ page }) => {
   ).toBeVisible();
   await expect(page.getByText("Casual Shoes, white")).toBeVisible();
   expect(request?.vector).toHaveLength(512);
+  // Hybrid search: the query's words go as hashed keywords, not as text.
+  expect(request?.keywords?.values).toEqual([1, 1, 1]);
+  expect(JSON.stringify(request)).not.toContain("running");
 
   // Each result shows its cosine similarity to the query.
   await expect(page.getByText("0.310", { exact: true })).toBeVisible();
@@ -72,6 +81,7 @@ test("searching by text shows matching products", async ({ page }) => {
   await expect(
     pipeline.getByRole("img", { name: "Query vector, 512 dimensions" }),
   ).toBeVisible();
+  await expect(pipeline.getByText("white, running, shoe")).toBeVisible();
   await expect(pipeline.getByText(/^Top 2 of /)).toBeVisible();
 });
 

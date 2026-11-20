@@ -56,6 +56,14 @@ export function ResultsGrid({
             >
               <span className="text-muted">{index + 1}</span>
               <span>{score.toFixed(3)}</span>
+              {result.signals?.includes("keywords") && (
+                <span
+                  className="text-xs text-muted"
+                  title="Also found by the keyword search"
+                >
+                  keyword
+                </span>
+              )}
               <span aria-hidden className="h-px flex-1 bg-rule">
                 <span
                   className="block h-full bg-ink"

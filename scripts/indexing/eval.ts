@@ -2,7 +2,7 @@
  * Retrieval quality baseline: embeds each query in src/lib/indexing/eval-queries.json,
  * searches the Qdrant alias and reports precision@k per attribute.
  *
- * Usage: npm run index:eval [-- --k 10] [-- --out data/eval/latest.json]
+ * Usage: npm run index:eval [-- --k 10] [-- --mode hybrid|image] [-- --out data/eval/latest.json]
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -20,14 +20,20 @@ import {
   summarize,
 } from "../../src/lib/indexing/eval.ts";
 import { DATA_DIR } from "../../src/lib/indexing/paths.ts";
+import { queryKeywords } from "../../src/lib/search/keywords.ts";
+import { runSearch } from "../../src/lib/search/query.ts";
 
 const { values: args } = parseArgs({
   options: {
     k: { type: "string", default: "10" },
+    mode: { type: "string", default: "hybrid" },
     out: { type: "string", default: join(DATA_DIR, "eval", "latest.json") },
   },
 });
 const k = Number(args.k);
+if (args.mode !== "hybrid" && args.mode !== "image") {
+  throw new Error(`--mode must be "hybrid" or "image", got "${args.mode}"`);
+}
 
 const url = process.env.QDRANT_URL;
 const alias = process.env.QDRANT_COLLECTION || "products";
@@ -50,12 +56,14 @@ const vectors = await embedTexts(queries.map((q) => q.query));
 
 const results: { query: string; score: QueryScore; top: string[] }[] = [];
 for (const [index, { query, expect }] of queries.entries()) {
-  const { points } = await client.query(alias, {
-    query: Array.from(vectors[index]),
+  const found = await runSearch(client, alias, {
+    vector: Array.from(vectors[index]),
+    filters: {},
     limit: k,
-    with_payload: true,
+    keywords:
+      args.mode === "hybrid" ? (queryKeywords(query) ?? undefined) : undefined,
   });
-  const items = points.map((point) => point.payload as CatalogItem);
+  const items: CatalogItem[] = found.map((result) => result.product);
   results.push({
     query,
     score: scoreQuery(expect, items, k),
@@ -68,7 +76,7 @@ for (const [index, { query, expect }] of queries.entries()) {
 const percent = (value?: number) =>
   value === undefined ? "  -" : `${Math.round(value * 100)}%`.padStart(4);
 console.log(
-  `\nPrecision@${k} on "${alias}" (${CLIP_MODEL_ID}, ${CLIP_DTYPE})\n`,
+  `\nPrecision@${k} on "${alias}" (${CLIP_MODEL_ID}, ${CLIP_DTYPE}, ${args.mode})\n`,
 );
 console.log(`${"query".padEnd(36)} type colour gender  all`);
 for (const { query, score } of results) {
@@ -85,7 +93,15 @@ await mkdir(dirname(args.out), { recursive: true });
 await writeFile(
   args.out,
   JSON.stringify(
-    { model: CLIP_MODEL_ID, dtype: CLIP_DTYPE, alias, k, summary, results },
+    {
+      model: CLIP_MODEL_ID,
+      dtype: CLIP_DTYPE,
+      mode: args.mode,
+      alias,
+      k,
+      summary,
+      results,
+    },
     null,
     2,
   ) + "\n",

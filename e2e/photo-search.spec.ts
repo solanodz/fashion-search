@@ -30,7 +30,10 @@ test.beforeEach(async ({ page }) => {
 
 test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
   const vectors: number[][] = [];
-  const bodies: { parts?: { name: string; vector: number[] }[] }[] = [];
+  const bodies: {
+    parts?: { name: string; vector: number[] }[];
+    keywords?: unknown;
+  }[] = [];
   await page.route("**/api/search", async (route) => {
     const body = route.request().postDataJSON();
     vectors.push(body.vector);
@@ -57,6 +60,7 @@ test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
   ).toBeVisible();
   expect(vectors[0].slice(0, 2)).toEqual([0, 1]);
   expect(bodies[0].parts).toBeUndefined();
+  expect(bodies[0]).not.toHaveProperty("keywords");
 
   const refinement = page.getByRole("textbox", {
     name: "Describe how it should differ from the photo",
@@ -77,6 +81,8 @@ test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
     ["text", [1, 0]],
   ]);
   await expect(page.getByText("photo 0.900 · text 0.270")).toBeVisible();
+  // With a photo, the refinement doesn't run a keyword search (ADR 0009).
+  expect(bodies[1].keywords).toBeUndefined();
 });
 
 test("'More like this' searches with a product's photo, and the photo can be removed", async ({

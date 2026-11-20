@@ -33,11 +33,13 @@ describe("buildPoints", () => {
       ],
     );
     expect(
-      points.map((point) => [point.id, point.vector, point.payload.name]),
+      points.map((point) => [point.id, point.vector.image, point.payload.name]),
     ).toEqual([
       [1, [1, 0], "Product 1"],
       [2, [0, 1], "Product 2"],
     ]);
+    // Each point also gets a keyword vector from its text.
+    expect(points[0].vector.keywords.indices.length).toBeGreaterThan(0);
   });
 
   test("fails when a catalog item has no vector", () => {

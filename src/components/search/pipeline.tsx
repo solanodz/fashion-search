@@ -11,8 +11,12 @@ export type Trace = {
   /** The encoder was used for the first time, so encodeMs includes loading it. */
   firstRun: boolean;
   vector: Float32Array;
+  /** Distinct query tokens sent as a keyword vector; empty for photo-only searches. */
+  keywords: string[];
   searchMs: number;
   results: number;
+  /** Results that the keyword search also found. */
+  keywordHits: number;
 };
 
 const number = new Intl.NumberFormat("en");
@@ -98,16 +102,32 @@ export function Pipeline({
           />
         </Step>
         <Step
-          title="Qdrant, cosine similarity"
+          title="Keywords, BM25"
           detail={
-            trace ? ms(trace.searchMs) : "Nearest neighbours to the query"
+            trace && trace.keywords.length === 0
+              ? trace.encoders.includes("image")
+                ? "Not used with a photo"
+                : "No usable words"
+              : "Hashed in this browser"
+          }
+        >
+          {trace?.keywords.length
+            ? trace.keywords.join(", ")
+            : "Words of the query, matched against product names"}
+        </Step>
+        <Step
+          title="Qdrant, hybrid search"
+          detail={
+            trace
+              ? `${ms(trace.searchMs)}${trace.keywords.length ? `, ${trace.keywordHits} of ${trace.results} also matched by keywords` : ""}`
+              : "Image and keyword results, fused by rank (RRF)"
           }
         >
           {trace
             ? `Top ${trace.results} of ${matching === null ? "the catalog" : number.format(matching)}`
             : matching
-              ? `${number.format(matching)} product images`
-              : "Product image vectors"}
+              ? `${number.format(matching)} products`
+              : "Product vectors"}
         </Step>
       </ol>
     </section>

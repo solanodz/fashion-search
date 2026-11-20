@@ -19,6 +19,7 @@ import {
 import { COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 import { combine } from "@/lib/clip/vector";
 import type { Facets } from "@/lib/search/facets";
+import { queryKeywords, tokenize } from "@/lib/search/keywords";
 import type {
   SearchFilters,
   SearchResponse,
@@ -136,6 +137,10 @@ export function SearchExperience() {
           : null,
       ]);
       const [photoPart, textPart] = parts;
+      // Keyword vector for hybrid search: token hashes, not the text itself.
+      // Text-only searches use it; with a photo, a refinement like "in blue"
+      // would match thousands of unrelated blue products (ADR 0009).
+      const keywords = trimmed && !currentPhoto ? queryKeywords(trimmed) : null;
       const vector = combine(parts.filter((part) => part !== null));
       const encodeMs = performance.now() - encodeStart;
       const searchStart = performance.now();
@@ -146,6 +151,7 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
+          ...(keywords ? { keywords } : {}),
           // A combined query also sends its parts, to score each result
           // against the photo and the text separately.
           ...(photoPart && textPart
@@ -185,8 +191,11 @@ export function SearchExperience() {
         encodeMs,
         firstRun,
         vector,
+        keywords: keywords ? [...new Set(tokenize(trimmed))] : [],
         searchMs,
         results: body.results.length,
+        keywordHits: body.results.filter((r) => r.signals?.includes("keywords"))
+          .length,
       });
     } catch (error) {
       if (run === latest.current) {

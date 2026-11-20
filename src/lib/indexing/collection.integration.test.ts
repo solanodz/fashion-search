@@ -7,6 +7,7 @@ import { qdrant } from "@/lib/qdrant";
 import type { CatalogItem } from "./catalog";
 import {
   aliasTarget,
+  buildPoints,
   createCollection,
   pruneVersions,
   swapAlias,
@@ -17,10 +18,8 @@ import {
 // Real Qdrant, fake 3-dim vectors: no model needed.
 const alias = `test_${randomUUID().slice(0, 8)}`;
 
-const point = (id: number, vector: number[], baseColour: string): Point => ({
-  id,
-  vector,
-  payload: {
+const point = (id: number, vector: number[], baseColour: string): Point => {
+  const item: CatalogItem = {
     id,
     name: `Product ${id}`,
     gender: "Women",
@@ -31,8 +30,9 @@ const point = (id: number, vector: number[], baseColour: string): Point => ({
     season: null,
     year: null,
     usage: null,
-  } satisfies CatalogItem,
-});
+  };
+  return buildPoints([item], [{ id, vector: Float32Array.from(vector) }])[0];
+};
 
 afterAll(async () => {
   await pruneVersions(qdrant(), alias, []);
@@ -61,6 +61,7 @@ describe("versioned collections behind an alias", () => {
     // Queries through the alias see v2, with payload filters on indexed fields.
     const { points } = await client.query(alias, {
       query: [1, 0, 0],
+      using: "image",
       filter: { must: [{ key: "baseColour", match: { value: "Blue" } }] },
       with_payload: true,
     });
