@@ -27,7 +27,7 @@ export type ProgressCallback = (event: {
 
 type LoadOptions = { onProgress?: ProgressCallback };
 
-function progressHandler(onProgress?: ProgressCallback) {
+export function progressHandler(onProgress?: ProgressCallback) {
   if (!onProgress) return undefined;
   return (info: {
     status: string;
