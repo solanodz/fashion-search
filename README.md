@@ -25,6 +25,9 @@ and color.
   are rewritten in English with a fashion glossary before searching; on the
   evaluation they score 78% vs 80% in English
   ([ADR 0011](docs/adr/0011-spanish-queries.md)).
+- **Compare mode** shows the image, keyword and hybrid lists side by side,
+  and **[/evaluation](https://fashion-search-mu.vercel.app/evaluation)** shows
+  how precision changed with each decision, search by search.
 - **Embedding map:** every product projected to 3D with UMAP, with the query
   and its results highlighted ([ADR 0010](docs/adr/0010-embedding-map.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo
