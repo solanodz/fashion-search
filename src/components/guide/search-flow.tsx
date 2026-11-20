@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   BrowserIcon,
@@ -16,10 +16,8 @@ import {
 /**
  * The path of a search as a flowchart of text and hairlines, adapted from
  * the workflow chart on the author's portfolio: each stage is a name and a
- * sentence; thin arrows connect them, each carrying a beam (dark head,
- * fading tail) that runs its length, all out of step, so the chart reads as
- * a search in motion. The stage under the pointer darkens. Motion rests off
- * screen and for visitors who ask for reduced motion.
+ * sentence, and still hairline arrows connect them. The stage under the
+ * pointer darkens.
  */
 
 type StageId = "query" | "encode" | "keywords" | "search" | "fuse" | "results";
@@ -95,7 +93,6 @@ const WIDE_CELL: Record<StageId, string> = {
   results: "sm:col-start-3 sm:row-start-2",
 };
 
-const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
 const CORNER = 10;
 /** How far in from a stage's left edge vertical lines run. */
 const SPINE = 32;
@@ -105,7 +102,6 @@ const GAP = 10;
 const RAIL = 12;
 /** How far above the first row the return line crosses. */
 const OVERHEAD = 26;
-const BEAM_LAYERS = 12;
 
 type Rect = {
   left: number;
@@ -123,24 +119,10 @@ type Edge = {
   id: string;
   points: Point[];
   arrow: Direction;
-  /** Draw as a smooth curve between the last two points, without a beam. */
+  /** Draw as a smooth S-curve (see curvedPath) instead of rounded corners. */
   curve?: boolean;
   label?: { text: string; at: Point };
 };
-
-function subscribeToReducedMotion(onChange: () => void) {
-  const media = window.matchMedia(REDUCED_MOTION);
-  media.addEventListener("change", onChange);
-  return () => media.removeEventListener("change", onChange);
-}
-
-function usePrefersReducedMotion() {
-  return useSyncExternalStore(
-    subscribeToReducedMotion,
-    () => window.matchMedia(REDUCED_MOTION).matches,
-    () => false,
-  );
-}
 
 /** Snap to the pixel grid so 1px strokes stay crisp. */
 const snap = (value: number) => Math.round(value) + 0.5;
@@ -183,39 +165,6 @@ function curvedPath(points: Point[]) {
     `C ${mid} ${from[1]} ${mid} ${join[1]} ${join[0]} ${join[1]}` +
     tail
   );
-}
-
-function routeLength(points: Point[]) {
-  let total = 0;
-  for (let i = 1; i < points.length; i++) {
-    total += Math.hypot(
-      points[i][0] - points[i - 1][0],
-      points[i][1] - points[i - 1][1],
-    );
-  }
-  return total;
-}
-
-/**
- * A beam per connector, drawn as stacked dashes that share one head and get
- * shorter and more opaque towards it, so the tail fades along bent paths.
- */
-function beamLayers(points: Point[], index: number): React.CSSProperties[] {
-  const length = routeLength(points);
-  if (length < 1) return [];
-  const beam = Math.min(130, Math.max(28, length * 0.5)) / length;
-  const seconds = Math.min(3, Math.max(0.9, length / 160));
-  return Array.from({ length: BEAM_LAYERS }, (_, layer) => {
-    const progress = layer / (BEAM_LAYERS - 1);
-    const dash = beam * (1 - progress * 0.92);
-    return {
-      "--beam": `${dash}px`,
-      strokeDasharray: `${dash} ${1 - dash}`,
-      strokeOpacity: 0.06 + 0.5 * progress * progress,
-      animationDuration: `${seconds}s`,
-      animationDelay: `${-0.37 * (index + 1)}s`,
-    } as React.CSSProperties;
-  });
 }
 
 function arrowPath([x, y]: Point, direction: Direction) {
@@ -310,7 +259,7 @@ function buildEdges(
       // Both lists run straight a little, curve towards each other, meet
       // most of the way to the results and finish as one short arrow.
       const startX = Math.max(image.right, words.right) + GAP * 2;
-      const into: Point = [merged.left - GAP * 1.5, snap(merged.cy)];
+      const into: Point = [merged.left - GAP * 3, snap(merged.cy)];
       const span = into[0] - startX;
       const curveFrom = snap(startX + span * 0.2);
       const join: Point = [snap(startX + span * 0.72), into[1]];
@@ -387,9 +336,6 @@ export function SearchFlow() {
     width: number;
   } | null>(null);
   const [hovered, setHovered] = useState<StageId | null>(null);
-  const [inView, setInView] = useState(false);
-  const reducedMotion = usePrefersReducedMotion();
-  const running = inView && !reducedMotion;
 
   useEffect(() => {
     const list = listRef.current;
@@ -434,15 +380,7 @@ export function SearchFlow() {
     }
     const resize = new ResizeObserver(measure);
     resize.observe(list);
-    const visibility = new IntersectionObserver(
-      ([entry]) => setInView(entry.isIntersecting),
-      { threshold: 0.2 },
-    );
-    visibility.observe(list);
-    return () => {
-      resize.disconnect();
-      visibility.disconnect();
-    };
+    return () => resize.disconnect();
   }, []);
 
   const edges = geometry
@@ -489,11 +427,8 @@ export function SearchFlow() {
 
       {geometry && (
         <li aria-hidden className="contents">
-          <svg
-            data-running={running}
-            className="pointer-events-none absolute inset-0 size-full overflow-visible"
-          >
-            {edges.map((edge, index) => {
+          <svg className="pointer-events-none absolute inset-0 size-full overflow-visible">
+            {edges.map((edge) => {
               const d = edge.curve
                 ? curvedPath(edge.points)
                 : roundedPath(edge.points);
@@ -508,17 +443,6 @@ export function SearchFlow() {
                     )}
                     className="flow-edge flow-arrow"
                   />
-                  {(edge.curve ? [] : beamLayers(edge.points, index)).map(
-                    (style, layer) => (
-                      <path
-                        key={layer}
-                        d={d}
-                        pathLength={1}
-                        className="flow-beam"
-                        style={style}
-                      />
-                    ),
-                  )}
                 </g>
               );
             })}

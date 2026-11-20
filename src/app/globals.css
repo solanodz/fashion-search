@@ -65,9 +65,7 @@ body {
 
   /*
     The search flow on /how-it-works (SearchFlow), after the workflow chart
-    on the author's portfolio. Each connector carries one beam: a stack of
-    dashes on a path normalised to length 1, so one loop moves the beam
-    exactly once along it.
+    on the author's portfolio: text stages joined by still hairline arrows.
   */
   .flow-detail {
     color: var(--muted);
@@ -84,29 +82,5 @@ body {
   .flow-arrow {
     stroke-linecap: round;
     stroke-linejoin: round;
-  }
-  .flow-beam {
-    fill: none;
-    stroke: var(--ink);
-    stroke-width: 1.5;
-    stroke-dashoffset: var(--beam);
-    animation: flow-beam 1500ms linear infinite;
-    animation-play-state: paused;
-  }
-  [data-running="true"] > g > .flow-beam {
-    animation-play-state: running;
-  }
-  @keyframes flow-beam {
-    from {
-      stroke-dashoffset: var(--beam);
-    }
-    to {
-      stroke-dashoffset: calc(var(--beam) - 1px);
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .flow-beam {
-      display: none;
-    }
   }
 }
