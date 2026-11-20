@@ -21,3 +21,31 @@ test("home page loads without errors", async ({ page }) => {
   ).toBeVisible();
   expect(errors).toEqual([]);
 });
+
+test("the embedding map opens large, searches and closes", async ({ page }) => {
+  await page.route("**/api/search", (route) =>
+    route.fulfill({ json: { results: [] } }),
+  );
+  await page.goto("/");
+  await page.getByRole("button", { name: "Expand" }).click();
+
+  const dialog = page.getByRole("dialog", { name: "Embedding space" });
+  await expect(dialog).toBeVisible();
+  await expect(
+    dialog.getByRole("img", { name: /^Map of [\d,]+ products/ }),
+  ).toBeVisible();
+
+  const search = dialog.getByRole("textbox", {
+    name: "Search and show the results on the map",
+  });
+  await search.fill("gold earrings");
+  await search.press("Enter");
+  await expect(
+    dialog.getByText("0 closest matches for “gold earrings”"),
+  ).toBeVisible();
+  // The main search follows the map's search.
+  await expect(page).toHaveURL(/\?q=gold\+earrings$/);
+
+  await dialog.getByRole("button", { name: "Close" }).click();
+  await expect(dialog).toBeHidden();
+});

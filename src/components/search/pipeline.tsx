@@ -64,7 +64,7 @@ export function Pipeline({
           Read more
         </Link>
       </div>
-      <ol className="mt-4 flex flex-col gap-5">
+      <ol className="mt-3 flex flex-col gap-3">
         <Step title="Query" detail="Stays in this browser">
           <span className="block truncate" title={trace?.query}>
             {trace ? trace.query : "Text, a photo, or both"}
@@ -108,7 +108,7 @@ export function Pipeline({
         >
           <VectorStrip
             vector={trace?.vector ?? null}
-            className="mt-1 block h-4 w-full"
+            className="mt-0.5 block h-3 w-full"
           />
         </Step>
         <Step
@@ -123,14 +123,14 @@ export function Pipeline({
         >
           {trace?.keywords.length
             ? trace.keywords.join(", ")
-            : "Words of the query, matched against product names"}
+            : "Words matched against product names"}
         </Step>
         <Step
           title="Qdrant, hybrid search"
           detail={
             trace
               ? `${ms(trace.searchMs)}${trace.keywords.length ? `, ${trace.keywordHits} of ${trace.results} also matched by keywords` : ""}`
-              : "Image and keyword results, fused by rank (RRF)"
+              : "Image and keyword matches, fused by rank"
           }
         >
           {trace
@@ -154,11 +154,13 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <li className="flex flex-col gap-0.5">
-      <span className="text-sm text-muted">{title}</span>
-      <span className="min-w-0">
-        <span className="block">{children}</span>
-        <span className="block text-sm text-muted tabular-nums">{detail}</span>
+    <li className="flex flex-col">
+      <span className="text-xs text-muted">{title}</span>
+      <span className="min-w-0 text-sm">
+        <span className="block truncate">{children}</span>
+        <span className="block truncate text-xs text-muted tabular-nums">
+          {detail}
+        </span>
       </span>
     </li>
   );
