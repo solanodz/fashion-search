@@ -4,6 +4,7 @@ import {
   type ChangeEvent,
   type FormEvent,
   useEffect,
+  useEffectEvent,
   useRef,
   useState,
 } from "react";
@@ -23,6 +24,11 @@ import type {
   SearchResponse,
   SearchResult,
 } from "@/lib/search/schema";
+import {
+  parseSearchState,
+  type SearchState,
+  serializeSearchState,
+} from "@/lib/search/url-state";
 
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
@@ -37,7 +43,23 @@ const SUGGESTIONS = [
 ];
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
 
-export type Photo = { blob: Blob; url: string; label: string };
+/** The query photo. `productId` is set for a catalog product's photo, which can be shared by URL. */
+export type Photo = {
+  blob: Blob;
+  url: string;
+  label: string;
+  productId?: number;
+};
+
+/** How a search changes the browser history. */
+type HistoryMode = "push" | "replace" | "none";
+
+function writeUrl(state: SearchState, mode: HistoryMode) {
+  if (mode === "none") return;
+  const url = `${window.location.pathname}${serializeSearchState(state)}`;
+  if (url === `${window.location.pathname}${window.location.search}`) return;
+  window.history[mode === "push" ? "pushState" : "replaceState"](null, "", url);
+}
 
 type Status =
   | { kind: "idle" }
@@ -93,9 +115,18 @@ export function SearchExperience() {
     text: string,
     currentPhoto: Photo | null,
     currentFilters: SearchFilters = filters,
+    history: HistoryMode = "push",
   ) {
     const trimmed = text.trim();
     if (!trimmed && !currentPhoto) return;
+    writeUrl(
+      {
+        q: trimmed,
+        filters: currentFilters,
+        like: currentPhoto?.productId ?? null,
+      },
+      history,
+    );
     const run = ++latest.current;
     setStatus({ kind: "searching" });
     try {
@@ -187,32 +218,66 @@ export function SearchExperience() {
     setPhoto(null);
     textInput.current?.focus();
     if (query.trim()) void search(query, null);
-    else setStatus({ kind: "idle" });
+    else {
+      setStatus({ kind: "idle" });
+      writeUrl({ q: "", filters, like: null }, "push");
+    }
   }
 
-  async function moreLikeThis(result: SearchResult) {
-    let blob: Blob;
+  /** Downloads a catalog product's photo to search with it. */
+  async function productPhoto(
+    id: number,
+    label: string,
+  ): Promise<Photo | null> {
     try {
-      const response = await fetch(`${IMAGE_BASE_URL}/${result.id}`);
+      const response = await fetch(`${IMAGE_BASE_URL}/${id}`);
       if (!response.ok) throw new Error(String(response.status));
-      blob = await response.blob();
+      const blob = await response.blob();
+      return { blob, url: URL.createObjectURL(blob), label, productId: id };
     } catch {
       setStatus({
         kind: "error",
         message: "That product's photo is not available.",
       });
-      return;
+      return null;
     }
+  }
+
+  async function moreLikeThis(result: SearchResult) {
+    const next = await productPhoto(result.id, `“${result.product.name}”`);
+    if (!next) return;
     setQuery("");
     window.scrollTo({ top: 0, behavior: "smooth" });
-    const next = {
-      blob,
-      url: URL.createObjectURL(blob),
-      label: `“${result.product.name}”`,
-    };
     setPhoto(next);
     void search("", next);
   }
+
+  /** Shows the search described by a URL: on load and on back/forward. */
+  const restore = useEffectEvent(async (state: SearchState) => {
+    setQuery(state.q);
+    setFilters(state.filters);
+    const next =
+      state.like === null
+        ? null
+        : await productPhoto(state.like, `product ${state.like}`);
+    if (state.like !== null && !next) return;
+    setPhoto(next);
+    if (state.q || next) void search(state.q, next, state.filters, "none");
+    else {
+      latest.current++;
+      setStatus({ kind: "idle" });
+    }
+  });
+
+  useEffect(() => {
+    const fromUrl = () =>
+      void restore(
+        parseSearchState(new URLSearchParams(window.location.search)),
+      );
+    if (window.location.search) fromUrl();
+    window.addEventListener("popstate", fromUrl);
+    return () => window.removeEventListener("popstate", fromUrl);
+  }, []);
 
   // Drop or paste a photo anywhere on the page.
   useEffect(() => {
@@ -256,6 +321,7 @@ export function SearchExperience() {
   function changeFilters(next: SearchFilters) {
     setFilters(next);
     if (query.trim() || photo) void search(query, photo, next);
+    else writeUrl({ q: "", filters: next, like: null }, "replace");
   }
 
   function onSubmit(event: FormEvent) {
