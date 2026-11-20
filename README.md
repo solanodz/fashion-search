@@ -35,7 +35,8 @@ and color.
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server
   and no model API keys.
-- **Vector database:** Qdrant. Local through Docker in development.
+- **Vector database:** Qdrant: Docker in development, Qdrant Cloud in
+  production (read-only key in the app).
 - **App:** Next.js (App Router), TypeScript, Tailwind CSS, deployed on Vercel
   (a preview per pull request, production on every merge to `main`).
 
@@ -189,8 +190,13 @@ Security issues: [SECURITY.md](SECURITY.md).
 
 ## Status
 
-Search by text, by photo and combined, with filters, works locally. Next is
-the production launch: Qdrant Cloud and image hosting ([project board](https://github.com/users/solanodz/projects/1)).
+Live at <https://fashion-search-mu.vercel.app> (v0.4.0): search by text
+(English or Spanish), by photo or both, with filters, compare mode, "Why?",
+the 3D embedding map, a guide at `/how-it-works` and the measurements at
+`/evaluation`. Production runs on free tiers: Vercel for the app, Qdrant
+Cloud (AWS us-east-1) for the vectors, Cloudflare R2 for the photos. Next
+on the [project board](https://github.com/users/solanodz/projects/1): rate
+limiting for the public API and a link preview image.
 
 ## License
 
