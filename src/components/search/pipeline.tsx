@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 import type { ModelProgress } from "@/lib/clip/client";
 import { CLIP_DIMENSIONS, COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 
@@ -51,9 +53,17 @@ export function Pipeline({
 
   return (
     <section aria-labelledby="pipeline-title">
-      <h2 id="pipeline-title" className="font-medium">
-        How it works
-      </h2>
+      <div className="flex items-baseline justify-between gap-4">
+        <h2 id="pipeline-title" className="font-medium">
+          How it works
+        </h2>
+        <Link
+          className="link text-sm text-muted hover:text-ink"
+          href="/how-it-works"
+        >
+          Read more
+        </Link>
+      </div>
       <ol className="mt-4 flex flex-col gap-5">
         <Step title="Query" detail="Stays in this browser">
           <span className="block truncate" title={trace?.query}>

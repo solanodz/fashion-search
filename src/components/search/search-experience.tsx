@@ -457,7 +457,7 @@ export function SearchExperience() {
         )}
       </div>
 
-      <aside className="lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-4rem)] lg:[scrollbar-width:thin] lg:self-start lg:overflow-y-auto">
+      <aside className="lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:self-start">
         <Pipeline
           trace={trace}
           progress={progress}

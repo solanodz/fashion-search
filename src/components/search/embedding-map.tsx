@@ -3,22 +3,16 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 
 import {
+  CATEGORY_COLOURS,
   decodeMap,
   type EmbeddingMap,
   MAP_FILES,
   type MapMeta,
+  OTHER_COLOUR,
   placeQuery,
 } from "@/lib/indexing/embedding-map";
 import type { SearchResult } from "@/lib/search/schema";
 
-/** Muted hue per master category; the map stays quiet next to the photos. */
-const CATEGORY_COLOURS: Record<string, string> = {
-  Apparel: "#7f8fb5",
-  Accessories: "#c3a35e",
-  Footwear: "#7ea58b",
-  "Personal Care": "#c58c9d",
-};
-const OTHER_COLOUR = "#a1a19b";
 const LABELLED_TYPES = 9;
 
 type Hover = { x: number; y: number; text: string } | null;

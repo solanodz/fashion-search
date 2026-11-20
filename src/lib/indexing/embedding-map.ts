@@ -8,6 +8,15 @@
  * Types index into `types` in the JSON metadata next to it.
  */
 
+/** Muted hue per master category; the map stays quiet next to the photos. */
+export const CATEGORY_COLOURS: Record<string, string> = {
+  Apparel: "#7f8fb5",
+  Accessories: "#c3a35e",
+  Footwear: "#7ea58b",
+  "Personal Care": "#c58c9d",
+};
+export const OTHER_COLOUR = "#a1a19b";
+
 export const MAP_FILES = {
   points: "embedding-map.bin",
   meta: "embedding-map.json",
