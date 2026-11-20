@@ -2,9 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-  DumbbellChart,
-  type DumbbellRow,
-} from "@/components/evaluation/dumbbell-chart";
+  type VersionBar,
+  VersionChart,
+} from "@/components/evaluation/version-chart";
 import { SiteHeader } from "@/components/site-header";
 import evaluation from "@/content/evaluation.json";
 
@@ -28,12 +28,24 @@ const METRICS = [
   ["all", "All"],
 ] as const;
 
-/** One chart row per test search: "all" precision in two runs, in percent. */
-function chartRows(before: Run, after: Run, lang: "en" | "es"): DumbbellRow[] {
-  return evaluation.queries.map((query, q) => ({
-    label: query[lang],
-    before: Math.round(before.results[q].all * 100),
-    after: Math.round(after.results[q].all * 100),
+/** Short names for the chart's axis, keyed by run id. */
+const SHORT_LABELS: Record<string, string> = {
+  thumbnails: "60×80 photos",
+  photos: "384×512 photos",
+  hybrid: "Hybrid",
+  "spanish-raw": "As typed",
+  spanish: "Glossary",
+};
+
+function versionBars(runs: Run[]): VersionBar[] {
+  const pct = (value: number) => Math.round(value * 100);
+  return runs.map((run) => ({
+    label: SHORT_LABELS[run.id] ?? run.label,
+    language: run.id.startsWith("spanish") ? "Spanish" : "English",
+    all: pct(run.summary.all),
+    type: pct(run.summary.articleType),
+    colour: pct(run.summary.baseColour),
+    gender: pct(run.summary.gender),
   }));
 }
 
@@ -228,21 +240,8 @@ export default function EvaluationPage() {
               </details>
             </div>
           </div>
-          <div className="mt-14 grid gap-12 lg:grid-cols-2">
-            <DumbbellChart
-              title="English: image only → hybrid search"
-              description="Precision on all attributes per search, before and after adding keywords."
-              beforeLabel="Image only"
-              afterLabel="Hybrid"
-              rows={chartRows(runs[1], runs[2], "en")}
-            />
-            <DumbbellChart
-              title="Spanish: as typed → with the glossary"
-              description="The same searches in Spanish, before and after the glossary."
-              beforeLabel="As typed"
-              afterLabel="Glossary"
-              rows={chartRows(runs[3], runs[4], "es")}
-            />
+          <div className="mt-14">
+            <VersionChart bars={versionBars(runs)} />
           </div>
         </section>
 
