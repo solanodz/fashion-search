@@ -140,3 +140,36 @@ test("a Spanish search is read in English first", async ({ page }) => {
   // The keywords are the English words: white, tshirt, men.
   expect(keywords).toHaveLength(3);
 });
+
+test("compare mode shows the image, keyword and hybrid lists", async ({
+  page,
+}) => {
+  let compare: boolean | undefined;
+  await page.route("**/api/search", async (route) => {
+    compare = route.request().postDataJSON().compare;
+    await route.fulfill({
+      json: {
+        results: [
+          { ...results[1], ranks: { image: 3, keywords: 1 } },
+          { ...results[0], ranks: { image: 1 } },
+        ],
+        lists: {
+          image: [results[0], results[1]],
+          keywords: [{ ...results[1], keywordScore: 9.5 }],
+        },
+      },
+    });
+  });
+  await page.goto("/?q=white+sneakers");
+  await page
+    .getByRole("tab", { name: "Compare image, keywords and hybrid" })
+    .click();
+  // Text searches ask for the unfused lists.
+  expect(compare).toBe(true);
+  await expect(page.getByRole("heading", { name: "Image only" })).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Keywords only" }),
+  ).toBeVisible();
+  await expect(page.getByText("BM25 9.50 · cosine 0.300")).toBeVisible();
+  await expect(page.getByText("image #3 + keywords #1")).toBeVisible();
+});

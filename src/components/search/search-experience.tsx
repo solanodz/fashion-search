@@ -33,6 +33,7 @@ import {
 } from "@/lib/search/url-state";
 
 import { EmbeddingMapView, ExpandedMap } from "./embedding-map";
+import { CompareView } from "./compare-view";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
 import { Pipeline, type Trace } from "./pipeline";
@@ -66,7 +67,12 @@ function writeUrl(state: SearchState, mode: HistoryMode) {
 type Status =
   | { kind: "idle" }
   | { kind: "searching" }
-  | { kind: "done"; description: string; results: SearchResult[] }
+  | {
+      kind: "done";
+      description: string;
+      results: SearchResult[];
+      lists?: SearchResponse["lists"];
+    }
   | { kind: "error"; message: string };
 
 export function SearchExperience() {
@@ -79,6 +85,7 @@ export function SearchExperience() {
   const [facets, setFacets] = useState<Facets | null>(null);
   const [trace, setTrace] = useState<Trace | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
+  const [view, setView] = useState<"results" | "compare">("results");
   const latest = useRef(0);
   const usedEncoders = useRef(new Set<string>());
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
@@ -156,7 +163,8 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
-          ...(keywords ? { keywords } : {}),
+          // Text searches also ask for the unfused lists, for compare mode.
+          ...(keywords ? { keywords, compare: true } : {}),
           // A combined query also sends its parts, to score each result
           // against the photo and the text separately.
           ...(photoPart && textPart
@@ -183,6 +191,7 @@ export function SearchExperience() {
         kind: "done",
         description: scope ? `${description} in ${scope}` : description,
         results: body.results,
+        lists: body.lists,
       });
       const encoders = [
         ...(currentPhoto ? (["image"] as const) : []),
@@ -457,9 +466,40 @@ export function SearchExperience() {
       </aside>
 
       <div className="lg:col-start-2 lg:row-start-2">
-        {status.kind === "done" && (
-          <ResultsGrid results={status.results} onMoreLikeThis={moreLikeThis} />
+        {status.kind === "done" && status.lists && (
+          <div
+            role="tablist"
+            aria-label="Results view"
+            className="mb-5 flex gap-4 border-b border-rule text-sm"
+          >
+            {(
+              [
+                ["results", "Results"],
+                ["compare", "Compare image, keywords and hybrid"],
+              ] as const
+            ).map(([id, label]) => (
+              <button
+                key={id}
+                type="button"
+                role="tab"
+                aria-selected={view === id}
+                className={`-mb-px border-b py-2 ${view === id ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
+                onClick={() => setView(id)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
         )}
+        {status.kind === "done" &&
+          (view === "compare" && status.lists ? (
+            <CompareView lists={status.lists} results={status.results} />
+          ) : (
+            <ResultsGrid
+              results={status.results}
+              onMoreLikeThis={moreLikeThis}
+            />
+          ))}
       </div>
 
       {/* Fits the viewport below the page header, so nothing in it scrolls. */}

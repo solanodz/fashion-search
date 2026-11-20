@@ -29,6 +29,7 @@ export const searchRequestSchema = z.object({
     .max(QUERY_PARTS.length)
     .optional(),
   /** Keyword vector of the query text, hashed in the browser (ADR 0009). */
+  compare: z.boolean().optional(),
   keywords: z
     .object({
       indices: z
@@ -63,5 +64,13 @@ export type SearchResult = {
   parts?: Partial<Record<QueryPart, number>>;
   /** Present on hybrid searches. */
   signals?: Signal[];
+  /** BM25 score, in the keyword list of compare mode. */
+  keywordScore?: number;
+  /** Compare mode: the result's rank in each list before fusion (1-based). */
+  ranks?: Partial<Record<Signal, number>>;
 };
-export type SearchResponse = { results: SearchResult[] };
+export type SearchResponse = {
+  results: SearchResult[];
+  /** Compare mode: the image and keyword lists before fusion. */
+  lists?: { image: SearchResult[]; keywords: SearchResult[] };
+};

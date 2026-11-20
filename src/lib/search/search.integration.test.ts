@@ -11,7 +11,7 @@ import {
 import { qdrant } from "@/lib/qdrant";
 
 import { queryKeywords } from "./keywords";
-import { searchProducts } from "./search";
+import { runSearchWithLists, searchProducts } from "./search";
 
 const collection = `test_search_${randomUUID().slice(0, 8)}`;
 const axis = (index: number) =>
@@ -89,6 +89,31 @@ describe("searchProducts", () => {
     // Its score is still the cosine similarity to the image query.
     expect(scarf.score).toBeCloseTo(0);
     expect(results.find((r) => r.id === 1)?.signals).toEqual(["image"]);
+  });
+
+  test("compare mode returns the image and keyword lists before fusion", async () => {
+    const { results, lists } = await runSearchWithLists(qdrant(), collection, {
+      vector: axis(0),
+      filters: {},
+      limit: 3,
+      keywords: queryKeywords("polka scarf")!,
+      compare: true,
+    });
+    expect(results[0].id).toBe(3);
+    expect(lists?.image[0].id).toBe(1);
+    expect(lists?.keywords.map((r) => r.id)).toEqual([3]);
+    expect(lists?.keywords[0].keywordScore).toBeGreaterThan(0);
+    // Products 2 and 3 tie on the image search, so the scarf is 2nd or 3rd.
+    expect(results[0].ranks?.keywords).toBe(1);
+    expect([2, 3]).toContain(results[0].ranks?.image);
+    // Without compare, or without keywords, there are no lists.
+    const plain = await runSearchWithLists(qdrant(), collection, {
+      vector: axis(0),
+      filters: {},
+      limit: 3,
+      compare: true,
+    });
+    expect(plain.lists).toBeUndefined();
   });
 
   test("applies filters", async () => {
