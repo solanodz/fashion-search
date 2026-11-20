@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.5.0](https://github.com/solanodz/fashion-search/compare/v0.4.0...v0.5.0) (2026-11-20)
+
+
+### Features
+
+* **infra:** keep the free Qdrant Cloud cluster in use ([#59](https://github.com/solanodz/fashion-search/issues/59)) ([0f401c2](https://github.com/solanodz/fashion-search/commit/0f401c2656ecc0825683b03aff03400af103a171))
+* **outfit:** shop the look from a photo of a person ([#60](https://github.com/solanodz/fashion-search/issues/60)) ([4d8f892](https://github.com/solanodz/fashion-search/commit/4d8f892697502bfcfbc5e23d6ba91453300aa844))
+
 ## [0.4.0](https://github.com/solanodz/fashion-search/compare/v0.3.0...v0.4.0) (2026-11-20)
 
 
