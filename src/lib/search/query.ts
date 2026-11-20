@@ -94,6 +94,16 @@ export type SearchRequestData = {
   limit: number;
   keywords?: SparseVector;
   parts?: { name: QueryPart; vector: number[] }[];
+  /** Also return the image and keyword lists before fusion (compare mode). */
+  compare?: boolean;
+};
+
+/** How many products each unfused list returns in compare mode. */
+export const COMPARE_LIMIT = 12;
+
+export type SearchOutput = {
+  results: SearchResult[];
+  lists?: { image: SearchResult[]; keywords: SearchResult[] };
 };
 
 type Hit = { id: number; payload: CatalogItem; vector: number[] | null };
@@ -101,8 +111,17 @@ type Hit = { id: number; payload: CatalogItem; vector: number[] | null };
 export async function runSearch(
   client: QdrantClient,
   collection: string,
-  { vector, filters, limit, keywords, parts }: SearchRequestData,
+  request: SearchRequestData,
 ): Promise<SearchResult[]> {
+  return (await runSearchWithLists(client, collection, request)).results;
+}
+
+/** The fused results and, in compare mode, the two lists they came from. */
+export async function runSearchWithLists(
+  client: QdrantClient,
+  collection: string,
+  { vector, filters, limit, keywords, parts, compare }: SearchRequestData,
+): Promise<SearchOutput> {
   const filter = toQdrantFilter(filters);
   const hybrid = !!keywords && keywords.indices.length > 0;
   const breakdown = !!parts && parts.length > 1;
@@ -154,7 +173,7 @@ export async function runSearch(
     responses[0].points.map((point) => [Number(point.id), point.score]),
   );
 
-  return fuseRanks(lists)
+  const results = fuseRanks(lists)
     .slice(0, limit)
     .map(({ id, signals }) => {
       const hit = hits.get(id)!;
@@ -172,4 +191,29 @@ export async function runSearch(
       }
       return result;
     });
+
+  if (!compare || !hybrid) return { results };
+  // Where each fused result sat in the full candidate lists.
+  for (const result of results) {
+    result.ranks = {};
+    lists.forEach(({ signal, ids }) => {
+      const rank = ids.indexOf(result.id);
+      if (rank !== -1) result.ranks![signal] = rank + 1;
+    });
+  }
+  // Each list as it was before fusion, every product with its cosine to the
+  // query; keyword hits also carry their BM25 score.
+  const unfused = (index: number): SearchResult[] =>
+    responses[index].points.slice(0, COMPARE_LIMIT).map((point) => {
+      const hit = hits.get(Number(point.id))!;
+      return {
+        id: hit.id,
+        score:
+          imageScores.get(hit.id) ??
+          (hit.vector ? cosine(vector, hit.vector) : 0),
+        product: hit.payload,
+        ...(index === 1 ? { keywordScore: point.score } : {}),
+      };
+    });
+  return { results, lists: { image: unfused(0), keywords: unfused(1) } };
 }

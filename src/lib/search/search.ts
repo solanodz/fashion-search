@@ -5,5 +5,6 @@ export {
   cosine,
   denseVector,
   runSearch as searchProducts,
+  runSearchWithLists,
   toQdrantFilter,
 } from "./query";

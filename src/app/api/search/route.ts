@@ -3,7 +3,7 @@ import { z } from "zod";
 import { serverEnv } from "@/env";
 import { qdrant } from "@/lib/qdrant";
 import { searchRequestSchema, type SearchResponse } from "@/lib/search/schema";
-import { searchProducts } from "@/lib/search/search";
+import { runSearchWithLists } from "@/lib/search/search";
 
 /**
  * Vector search. The browser encodes the query with CLIP and sends only the
@@ -29,12 +29,12 @@ export async function POST(request: Request) {
   }
 
   try {
-    const results = await searchProducts(
+    const output = await runSearchWithLists(
       qdrant(),
       serverEnv().QDRANT_COLLECTION,
       parsed.data,
     );
-    return Response.json({ results } satisfies SearchResponse);
+    return Response.json(output satisfies SearchResponse);
   } catch (error) {
     console.error("Search failed", error);
     return Response.json(
