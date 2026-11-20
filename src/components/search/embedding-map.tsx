@@ -34,7 +34,7 @@ import { IMAGE_BASE_URL } from "./results-grid";
 
 /** Results joined to the query by a line in the expanded view. */
 const LINKED_RESULTS = 10;
-/** Camera distance from the cube's centre, in cube widths. */
+/** Camera distance from the cloud's centre, in cloud widths. */
 const CAMERA = 2.4;
 const AUTO_TURN = 0.0022;
 const DEFAULT_VIEW = { yaw: -0.6, pitch: 0.35, zoom: 1 };
@@ -218,7 +218,6 @@ function MapCanvas({
     element.height = size * ratio;
     const styles = getComputedStyle(element);
     const ink = styles.getPropertyValue("--ink").trim() || "#21201c";
-    const line = styles.getPropertyValue("--line-strong").trim() || "#cfceca";
     const colours = [
       ...CATEGORY_NAMES.map((n) => CATEGORY_COLOURS[n]),
       OTHER_COLOUR,
@@ -252,7 +251,7 @@ function MapCanvas({
       const cp = Math.cos(pitch);
       const sp = Math.sin(pitch);
       const half = size / 2;
-      const scale = size * 0.5 * zoom;
+      const scale = size * 0.78 * zoom;
       const project = (x: number, y: number, z: number) => {
         const px = x - 0.5;
         const py = 0.5 - y;
@@ -267,24 +266,6 @@ function MapCanvas({
 
       context.setTransform(ratio, 0, 0, ratio, 0, 0);
       context.clearRect(0, 0, size, size);
-
-      // The unit cube's edges, as a depth cue.
-      context.globalAlpha = 0.5;
-      context.strokeStyle = line;
-      context.lineWidth = 1;
-      context.beginPath();
-      const corners = [0, 1].flatMap((x) =>
-        [0, 1].flatMap((y) => [0, 1].map((z) => project(x, y, z))),
-      );
-      for (let a = 0; a < 8; a++) {
-        for (const bit of [1, 2, 4]) {
-          const b = a | bit;
-          if (b === a) continue;
-          context.moveTo(corners[a][0], corners[a][1]);
-          context.lineTo(corners[b][0], corners[b][1]);
-        }
-      }
-      context.stroke();
 
       // Project every point and sort it into (depth band, colour) batches.
       starts.fill(0);
@@ -462,7 +443,7 @@ function MapCanvas({
         role="img"
         aria-label={description}
         style={{ width: size, height: size }}
-        className={`block cursor-grab rounded-sm border border-rule active:cursor-grabbing ${detailed ? "mx-auto touch-none" : ""}`}
+        className={`block cursor-grab active:cursor-grabbing ${detailed ? "mx-auto touch-none" : ""}`}
         onPointerEnter={() => {
           pointerInside.current = true;
         }}

@@ -36,7 +36,7 @@ production can't regenerate them without the local vectors.
 
 The browser draws the cloud on a 2D canvas with its own perspective
 projection, no 3D library: points are batched by colour and depth band
-(further is smaller and fainter), with the cube's edges as a depth cue. It
+(further is smaller and fainter), which with the rotation gives depth. It
 turns slowly until touched (not for visitors who prefer reduced motion);
 dragging rotates it, and the expanded view adds zoom and a search box. The
 query is drawn at the similarity-weighted average position of its top 10
