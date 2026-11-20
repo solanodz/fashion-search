@@ -31,6 +31,7 @@ import {
   serializeSearchState,
 } from "@/lib/search/url-state";
 
+import { EmbeddingMapView } from "./embedding-map";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
 import { Pipeline, type Trace } from "./pipeline";
@@ -456,11 +457,14 @@ export function SearchExperience() {
         )}
       </div>
 
-      <aside className="lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:self-start">
+      <aside className="lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-4rem)] lg:[scrollbar-width:thin] lg:self-start lg:overflow-y-auto">
         <Pipeline
           trace={trace}
           progress={progress}
           matching={facets ? matchingCount(facets, filters) : null}
+        />
+        <EmbeddingMapView
+          results={status.kind === "done" ? status.results : null}
         />
       </aside>
 
