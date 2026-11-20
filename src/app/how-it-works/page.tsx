@@ -114,7 +114,7 @@ function Section({
 }) {
   return (
     <section aria-labelledby={id} className="mt-24">
-      <h2 id={id} className="font-medium">
+      <h2 id={id} className="text-xl font-medium tracking-tight">
         {title}
       </h2>
       {children}
@@ -131,7 +131,7 @@ function Step({
 }) {
   return (
     <li className="mt-16 first:mt-8">
-      <h3 className="font-medium">{title}</h3>
+      <h3 className="text-lg font-medium">{title}</h3>
       <div className="mt-2 leading-relaxed text-muted">{children}</div>
     </li>
   );
@@ -142,7 +142,9 @@ export default function HowItWorks() {
     <div className="flex w-full flex-1 flex-col px-5 pt-8 pb-16 sm:px-8 lg:px-10">
       <SiteHeader />
       <main className="mx-auto mt-16 w-full max-w-3xl flex-1">
-        <h1 className="font-medium">How fashion-search works</h1>
+        <h1 className="text-2xl font-medium tracking-tight">
+          How fashion-search works
+        </h1>
         <p className="mt-3 leading-relaxed text-muted">
           fashion-search finds products in a catalog of 42,426 fashion items by
           what they look like. You can describe what you want, show a photo, or

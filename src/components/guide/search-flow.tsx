@@ -408,7 +408,7 @@ export function SearchFlow() {
           className={`flow-node sm:self-start ${WIDE_CELL[stage.id]}`}
         >
           <p>
-            <span data-flow-label className="font-medium">
+            <span data-flow-label className="text-lg font-medium">
               {stage.label}
             </span>
           </p>
