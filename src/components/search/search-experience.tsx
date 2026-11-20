@@ -20,6 +20,7 @@ import { COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 import { combine } from "@/lib/clip/vector";
 import type { Facets } from "@/lib/search/facets";
 import { queryKeywords, tokenize } from "@/lib/search/keywords";
+import { translateQuery } from "@/lib/search/spanish";
 import type {
   SearchFilters,
   SearchResponse,
@@ -124,6 +125,8 @@ export function SearchExperience() {
       history,
     );
     const run = ++latest.current;
+    // Spanish queries are rewritten in English with the glossary (ADR 0011).
+    const { text: english, translated } = translateQuery(trimmed);
     setStatus({ kind: "searching" });
     try {
       const encodeStart = performance.now();
@@ -132,7 +135,7 @@ export function SearchExperience() {
           ? photoVector(currentPhoto).then((vector) => ({ vector, weight: 1 }))
           : null,
         trimmed
-          ? encodeText(trimmed).then((vector) => ({
+          ? encodeText(english).then((vector) => ({
               vector,
               weight: currentPhoto ? COMBINED_TEXT_WEIGHT : 1,
             }))
@@ -142,7 +145,7 @@ export function SearchExperience() {
       // Keyword vector for hybrid search: token hashes, not the text itself.
       // Text-only searches use it; with a photo, a refinement like "in blue"
       // would match thousands of unrelated blue products (ADR 0009).
-      const keywords = trimmed && !currentPhoto ? queryKeywords(trimmed) : null;
+      const keywords = english && !currentPhoto ? queryKeywords(english) : null;
       const vector = combine(parts.filter((part) => part !== null));
       const encodeMs = performance.now() - encodeStart;
       const searchStart = performance.now();
@@ -193,7 +196,8 @@ export function SearchExperience() {
         encodeMs,
         firstRun,
         vector,
-        keywords: keywords ? [...new Set(tokenize(trimmed))] : [],
+        keywords: keywords ? [...new Set(tokenize(english))] : [],
+        readAs: translated ? english : null,
         searchMs,
         results: body.results.length,
         keywordHits: body.results.filter((r) => r.signals?.includes("keywords"))

@@ -12,3 +12,4 @@
 | [0008](0008-catalog-photos.md)                | Take catalog photos from a 384×512 mirror                 | Accepted |
 | [0009](0009-hybrid-search.md)                 | Hybrid search with keyword vectors                        | Accepted |
 | [0010](0010-embedding-map.md)                 | Show a 3D map of the embedding space                      | Accepted |
+| [0011](0011-spanish-queries.md)               | Search in Spanish with a fashion glossary                 | Accepted |

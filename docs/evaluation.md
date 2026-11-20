@@ -10,7 +10,20 @@ The full report is written to `data/eval/latest.json`.
 Run it after any change to the model, quantization, preprocessing or indexing,
 and compare against the baseline below.
 
-## Current: hybrid search (2026-11-19)
+## Spanish (2026-11-20)
+
+The same 27 queries in Rioplatense Spanish (`es` in the queries file),
+rewritten in English with the glossary of
+[ADR 0011](adr/0011-spanish-queries.md):
+`npm run index:eval -- --lang es --translate`.
+
+| Approach                         | Type | Colour | Gender | All |
+| -------------------------------- | ---: | -----: | -----: | --: |
+| English, hybrid                  |  89% |    91% |    95% | 80% |
+| Spanish without glossary, hybrid |  46% |    43% |    84% | 17% |
+| Spanish with glossary, hybrid    |  87% |    92% |    94% | 78% |
+
+## Hybrid search (2026-11-19)
 
 Text queries search the CLIP image vectors and BM25 keyword vectors, fused by
 rank ([ADR 0009](adr/0009-hybrid-search.md)). `npm run index:eval` uses

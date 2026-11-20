@@ -118,3 +118,25 @@ test("a failing search explains what happened", async ({ page }) => {
     "Search is unavailable right now. Try again in a moment.",
   );
 });
+
+test("a Spanish search is read in English first", async ({ page }) => {
+  let keywords: number[] = [];
+  await page.route("**/api/search", async (route) => {
+    keywords = route.request().postDataJSON().keywords?.indices ?? [];
+    await route.fulfill({ json: { results } });
+  });
+  await page.goto("/");
+  const input = page.getByRole("textbox", {
+    name: "Describe what you are looking for",
+  });
+  await input.fill("remera blanca para hombre");
+  await input.press("Enter");
+
+  const pipeline = page.getByRole("region", { name: "How it works" });
+  await expect(
+    pipeline.getByText("Read as “white t-shirt for men”, in this browser"),
+  ).toBeVisible();
+  await expect(pipeline.getByText("white, tshirt, men")).toBeVisible();
+  // The keywords are the English words: white, tshirt, men.
+  expect(keywords).toHaveLength(3);
+});

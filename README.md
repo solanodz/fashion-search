@@ -21,6 +21,10 @@ and color.
   vectors, fused with the CLIP results by rank
   ([ADR 0009](docs/adr/0009-hybrid-search.md)). Precision@10 on all
   attributes goes from 59% to 79%.
+- **Spanish and English:** Spanish queries ("remera blanca para hombre")
+  are rewritten in English with a fashion glossary before searching; on the
+  evaluation they score 78% vs 80% in English
+  ([ADR 0011](docs/adr/0011-spanish-queries.md)).
 - **Embedding map:** every product projected to 3D with UMAP, with the query
   and its results highlighted ([ADR 0010](docs/adr/0010-embedding-map.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo
