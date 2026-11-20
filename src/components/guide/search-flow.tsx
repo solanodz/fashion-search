@@ -170,15 +170,15 @@ function roundedPath(route: Point[]) {
   return `${d} L ${lastX} ${lastY}`;
 }
 
-/** Straight to the second-to-last point, then a horizontal S-curve to the end. */
+/** A horizontal S-curve from the first point to the second, then straight on. */
 function curvedPath(points: Point[]) {
-  const [start, ...rest] = points;
-  const end = rest[rest.length - 1];
-  const bend = rest.length > 1 ? rest[rest.length - 2] : start;
-  const mid = bend[0] + (end[0] - bend[0]) / 2;
+  const [start, join, ...rest] = points;
+  const mid = start[0] + (join[0] - start[0]) / 2;
+  const tail = rest.map(([x, y]) => ` L ${x} ${y}`).join("");
   return (
-    `M ${start[0]} ${start[1]} L ${bend[0]} ${bend[1]} ` +
-    `C ${mid} ${bend[1]} ${mid} ${end[1]} ${end[0]} ${end[1]}`
+    `M ${start[0]} ${start[1]} ` +
+    `C ${mid} ${start[1]} ${mid} ${join[1]} ${join[0]} ${join[1]}` +
+    tail
   );
 }
 
@@ -304,17 +304,18 @@ function buildEdges(
     const words = anchors["fuse-keywords"];
     const merged = anchors["results-row"];
     if (image && words && merged) {
-      // Straight out to the edge of the Fusion column, then a curve through
-      // the gap into the results; both curves end on the same arrow.
+      // Both lists curve right away towards a point halfway to the results,
+      // meet there, and continue together as one straight arrow.
+      const startX = Math.max(image.right, words.right) + GAP * 2;
       const into: Point = [merged.left - GAP * 1.5, snap(merged.cy)];
+      const join: Point = [snap(startX + (into[0] - startX) / 2), into[1]];
       for (const [id, row] of [
         ["image", image],
         ["keywords", words],
       ] as const) {
-        const y = snap(row.cy);
         edges.push({
           id: `fuse-${id}-results`,
-          points: [[row.right + GAP * 2, y], [snap(fuse.right), y], into],
+          points: [[startX, snap(row.cy)], join, into],
           arrow: "right",
           curve: true,
         });
