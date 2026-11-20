@@ -1,10 +1,15 @@
 [
   {
     "query": "a red dress",
-    "expect": { "articleType": ["Dresses"], "baseColour": ["Red"] }
+    "es": "un vestido rojo",
+    "expect": {
+      "articleType": ["Dresses"],
+      "baseColour": ["Red"]
+    }
   },
   {
     "query": "men's blue jeans",
+    "es": "jeans azules de hombre",
     "expect": {
       "articleType": ["Jeans"],
       "baseColour": ["Blue"],
@@ -13,6 +18,7 @@
   },
   {
     "query": "white t-shirt for men",
+    "es": "remera blanca para hombre",
     "expect": {
       "articleType": ["Tshirts"],
       "baseColour": ["White"],
@@ -21,6 +27,7 @@
   },
   {
     "query": "navy blue shirt for men",
+    "es": "camisa azul marino para hombre",
     "expect": {
       "articleType": ["Shirts"],
       "baseColour": ["Navy Blue"],
@@ -29,6 +36,7 @@
   },
   {
     "query": "black casual sneakers",
+    "es": "zapatillas urbanas negras",
     "expect": {
       "articleType": ["Casual Shoes", "Sports Shoes"],
       "baseColour": ["Black"]
@@ -36,6 +44,7 @@
   },
   {
     "query": "brown leather formal shoes for men",
+    "es": "zapatos de vestir de cuero marrón para hombre",
     "expect": {
       "articleType": ["Formal Shoes"],
       "baseColour": ["Brown"],
@@ -44,10 +53,15 @@
   },
   {
     "query": "white running shoes",
-    "expect": { "articleType": ["Sports Shoes"], "baseColour": ["White"] }
+    "es": "zapatillas blancas para correr",
+    "expect": {
+      "articleType": ["Sports Shoes"],
+      "baseColour": ["White"]
+    }
   },
   {
     "query": "gold watch for women",
+    "es": "reloj dorado para mujer",
     "expect": {
       "articleType": ["Watches"],
       "baseColour": ["Gold"],
@@ -56,6 +70,7 @@
   },
   {
     "query": "silver watch for men",
+    "es": "reloj plateado para hombre",
     "expect": {
       "articleType": ["Watches"],
       "baseColour": ["Silver"],
@@ -64,6 +79,7 @@
   },
   {
     "query": "black leather handbag",
+    "es": "cartera de cuero negra",
     "expect": {
       "articleType": ["Handbags"],
       "baseColour": ["Black"],
@@ -72,10 +88,15 @@
   },
   {
     "query": "black sunglasses",
-    "expect": { "articleType": ["Sunglasses"], "baseColour": ["Black"] }
+    "es": "anteojos de sol negros",
+    "expect": {
+      "articleType": ["Sunglasses"],
+      "baseColour": ["Black"]
+    }
   },
   {
     "query": "pink kurta for women",
+    "es": "kurta rosa para mujer",
     "expect": {
       "articleType": ["Kurtas"],
       "baseColour": ["Pink"],
@@ -84,6 +105,7 @@
   },
   {
     "query": "green saree",
+    "es": "sari verde",
     "expect": {
       "articleType": ["Sarees"],
       "baseColour": ["Green"],
@@ -92,6 +114,7 @@
   },
   {
     "query": "black high heels",
+    "es": "zapatos de taco alto negros",
     "expect": {
       "articleType": ["Heels"],
       "baseColour": ["Black"],
@@ -100,14 +123,23 @@
   },
   {
     "query": "blue flip flops",
-    "expect": { "articleType": ["Flip Flops"], "baseColour": ["Blue"] }
+    "es": "ojotas azules",
+    "expect": {
+      "articleType": ["Flip Flops"],
+      "baseColour": ["Blue"]
+    }
   },
   {
     "query": "black backpack",
-    "expect": { "articleType": ["Backpacks"], "baseColour": ["Black"] }
+    "es": "mochila negra",
+    "expect": {
+      "articleType": ["Backpacks"],
+      "baseColour": ["Black"]
+    }
   },
   {
     "query": "brown leather belt for men",
+    "es": "cinturón de cuero marrón para hombre",
     "expect": {
       "articleType": ["Belts"],
       "baseColour": ["Brown"],
@@ -116,6 +148,7 @@
   },
   {
     "query": "yellow top for women",
+    "es": "top amarillo para mujer",
     "expect": {
       "articleType": ["Tops"],
       "baseColour": ["Yellow"],
@@ -124,6 +157,7 @@
   },
   {
     "query": "grey track pants for men",
+    "es": "pantalón deportivo gris para hombre",
     "expect": {
       "articleType": ["Track Pants"],
       "baseColour": ["Grey"],
@@ -132,6 +166,7 @@
   },
   {
     "query": "black jacket for men",
+    "es": "campera negra para hombre",
     "expect": {
       "articleType": ["Jackets"],
       "baseColour": ["Black"],
@@ -140,6 +175,7 @@
   },
   {
     "query": "gold earrings",
+    "es": "aros dorados",
     "expect": {
       "articleType": ["Earrings"],
       "baseColour": ["Gold"],
@@ -148,18 +184,31 @@
   },
   {
     "query": "red sweatshirt",
-    "expect": { "articleType": ["Sweatshirts"], "baseColour": ["Red"] }
+    "es": "buzo rojo",
+    "expect": {
+      "articleType": ["Sweatshirts"],
+      "baseColour": ["Red"]
+    }
   },
   {
     "query": "blue baseball cap",
-    "expect": { "articleType": ["Caps"], "baseColour": ["Blue"] }
+    "es": "gorra azul",
+    "expect": {
+      "articleType": ["Caps"],
+      "baseColour": ["Blue"]
+    }
   },
   {
     "query": "brown sandals",
-    "expect": { "articleType": ["Sandals"], "baseColour": ["Brown"] }
+    "es": "sandalias marrones",
+    "expect": {
+      "articleType": ["Sandals"],
+      "baseColour": ["Brown"]
+    }
   },
   {
     "query": "black leather wallet for men",
+    "es": "billetera de cuero negra para hombre",
     "expect": {
       "articleType": ["Wallets"],
       "baseColour": ["Black"],
@@ -168,10 +217,15 @@
   },
   {
     "query": "red lipstick",
-    "expect": { "articleType": ["Lipstick"], "baseColour": ["Red"] }
+    "es": "labial rojo",
+    "expect": {
+      "articleType": ["Lipstick"],
+      "baseColour": ["Red"]
+    }
   },
   {
     "query": "blue tie",
+    "es": "corbata azul",
     "expect": {
       "articleType": ["Ties"],
       "baseColour": ["Blue"],

@@ -10,6 +10,8 @@ export type EvalAttribute = (typeof EVAL_ATTRIBUTES)[number];
 
 export type EvalQuery = {
   query: string;
+  /** The same query in Spanish (Rioplatense), for the multilingual encoder. */
+  es: string;
   /** Accepted values per attribute; omitted attributes are not checked. */
   expect: Partial<Record<EvalAttribute, string[]>>;
 };

@@ -306,6 +306,13 @@ export default function HowItWorks() {
               keywords added.
             </li>
             <li>
+              <span className="text-ink">Spanish works too.</span> The model and
+              the product names are in English, so a Spanish search
+              (&ldquo;remera blanca para hombre&rdquo;) is first rewritten in
+              English with a fashion glossary, in your browser. It scores 78% on
+              the same test searches, against 80% in English.
+            </li>
+            <li>
               <span className="text-ink">Sharper photos, better matches.</span>{" "}
               Moving from 60×80 thumbnails to 384×512 photos made the catalog
               look right and improved every measure a little.

@@ -2,7 +2,8 @@
  * Retrieval quality baseline: embeds each query in src/lib/indexing/eval-queries.json,
  * searches the Qdrant alias and reports precision@k per attribute.
  *
- * Usage: npm run index:eval [-- --k 10] [-- --mode hybrid|image] [-- --out data/eval/latest.json]
+ * Usage: npm run index:eval [-- --k 10] [-- --mode hybrid|image]
+ *        [-- --lang en|es] [-- --translate] [-- --out data/eval/latest.json]
  */
 import { mkdir, readFile, writeFile } from "node:fs/promises";
 import { dirname, join } from "node:path";
@@ -22,17 +23,23 @@ import {
 import { DATA_DIR } from "../../src/lib/indexing/paths.ts";
 import { queryKeywords } from "../../src/lib/search/keywords.ts";
 import { runSearch } from "../../src/lib/search/query.ts";
+import { translateQuery } from "../../src/lib/search/spanish.ts";
 
 const { values: args } = parseArgs({
   options: {
     k: { type: "string", default: "10" },
     mode: { type: "string", default: "hybrid" },
+    lang: { type: "string", default: "en" },
+    translate: { type: "boolean", default: false },
     out: { type: "string", default: join(DATA_DIR, "eval", "latest.json") },
   },
 });
 const k = Number(args.k);
 if (args.mode !== "hybrid" && args.mode !== "image") {
   throw new Error(`--mode must be "hybrid" or "image", got "${args.mode}"`);
+}
+if (args.lang !== "en" && args.lang !== "es") {
+  throw new Error(`--lang must be "en" or "es"`);
 }
 
 const url = process.env.QDRANT_URL;
@@ -52,10 +59,19 @@ const queries = JSON.parse(
     "utf8",
   ),
 ) as EvalQuery[];
-const vectors = await embedTexts(queries.map((q) => q.query));
+// --translate rewrites Spanish queries in English with the glossary first.
+const texts = queries.map((q) =>
+  args.lang === "es"
+    ? args.translate
+      ? translateQuery(q.es).text
+      : q.es
+    : q.query,
+);
+const vectors = await embedTexts(texts);
 
 const results: { query: string; score: QueryScore; top: string[] }[] = [];
-for (const [index, { query, expect }] of queries.entries()) {
+for (const [index, { expect }] of queries.entries()) {
+  const query = texts[index];
   const found = await runSearch(client, alias, {
     vector: Array.from(vectors[index]),
     filters: {},
@@ -76,7 +92,7 @@ for (const [index, { query, expect }] of queries.entries()) {
 const percent = (value?: number) =>
   value === undefined ? "  -" : `${Math.round(value * 100)}%`.padStart(4);
 console.log(
-  `\nPrecision@${k} on "${alias}" (${CLIP_MODEL_ID}, ${CLIP_DTYPE}, ${args.mode})\n`,
+  `\nPrecision@${k} on "${alias}" (${CLIP_MODEL_ID}, ${args.mode}, ${args.lang}${args.translate ? ", glossary" : ""})\n`,
 );
 console.log(`${"query".padEnd(36)} type colour gender  all`);
 for (const { query, score } of results) {
@@ -97,6 +113,8 @@ await writeFile(
       model: CLIP_MODEL_ID,
       dtype: CLIP_DTYPE,
       mode: args.mode,
+      lang: args.lang,
+      translate: args.translate,
       alias,
       k,
       summary,

@@ -15,6 +15,8 @@ export type Trace = {
   vector: Float32Array;
   /** Distinct query tokens sent as a keyword vector; empty for photo-only searches. */
   keywords: string[];
+  /** The English the Spanish query was rewritten into, if it was. */
+  readAs: string | null;
   searchMs: number;
   results: number;
   /** Results that the keyword search also found. */
@@ -65,7 +67,14 @@ export function Pipeline({
         </Link>
       </div>
       <ol className="mt-3 flex flex-col gap-3">
-        <Step title="Query" detail="Stays in this browser">
+        <Step
+          title="Query"
+          detail={
+            trace?.readAs
+              ? `Read as “${trace.readAs}”, in this browser`
+              : "Stays in this browser"
+          }
+        >
           <span className="block truncate" title={trace?.query}>
             {trace ? trace.query : "Text, a photo, or both"}
           </span>
