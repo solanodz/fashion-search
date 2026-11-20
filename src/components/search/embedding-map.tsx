@@ -21,7 +21,7 @@ import {
 } from "@/lib/indexing/embedding-map";
 import type { SearchResult } from "@/lib/search/schema";
 
-import { IMAGE_BASE_URL } from "./results-grid";
+import { IMAGE_BASE_URL } from "@/lib/images";
 
 /**
  * Every product's image vector projected to 3D (UMAP, ADR 0010), drawn as a

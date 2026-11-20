@@ -1,6 +1,6 @@
 import type { SearchResult } from "@/lib/search/schema";
 
-import { IMAGE_BASE_URL } from "./results-grid";
+import { IMAGE_BASE_URL } from "@/lib/images";
 
 /**
  * The same search three ways, side by side: the image vectors alone (CLIP),
