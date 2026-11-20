@@ -146,16 +146,14 @@ export default function HowItWorks() {
         <p className="mt-3 leading-relaxed text-muted">
           fashion-search finds products in a catalog of 42,426 fashion items by
           what they look like. You can describe what you want, show a photo, or
-          both. This page shows how to use it, then what happens behind each
-          search and why it&apos;s built this way.
+          both. This page follows a search from your browser to the results,
+          explains what you see on screen and why it&apos;s built this way, and
+          ends with a short guide to every control.
         </p>
         <nav
           aria-label="On this page"
           className="mt-6 flex flex-wrap gap-x-5 gap-y-1 text-sm text-muted"
         >
-          <a className="link hover:text-ink" href="#using">
-            Using it
-          </a>
           <a className="link hover:text-ink" href="#behind">
             Behind a search
           </a>
@@ -165,99 +163,10 @@ export default function HowItWorks() {
           <a className="link hover:text-ink" href="#why">
             Why it&apos;s built this way
           </a>
+          <a className="link hover:text-ink" href="#using">
+            Using it
+          </a>
         </nav>
-
-        <Section id="using" title="Using it">
-          <ol className="list-none">
-            <Step title="1. Describe what you're looking for">
-              <p>
-                Type a few words, the way you&apos;d describe the item to a
-                friend: &ldquo;a red dress&rdquo;, &ldquo;white running
-                shoes&rdquo;, &ldquo;gold watch for women&rdquo;. Press Enter or
-                Search. The closest products come first, each with a number that
-                says how similar it is to your words.
-              </p>
-              <Figure caption="A text search. Every result shows its rank and similarity; “keyword” means the product's name also contains your words.">
-                <SearchBar text="a red dress" />
-                <ResultTiles results={RED_DRESSES} />
-              </Figure>
-            </Step>
-
-            <Step title="2. Or search with a photo">
-              <p>
-                Use <span className="text-ink">Search with a photo</span>, drop
-                an image anywhere on the page, or paste one. The photo appears
-                at the start of the search bar; the × removes it. Your photo is
-                processed in your browser and never uploaded.
-              </p>
-              <Figure caption="A photo in the search bar, and the drop zone that appears when you drag an image over the page.">
-                <SearchBar
-                  photoId={15970}
-                  placeholder="Describe a change, e.g. in blue"
-                  photoButton="Use another photo"
-                />
-                <DropZone />
-              </Figure>
-            </Step>
-
-            <Step title="3. Change the photo with words">
-              <p>
-                With a photo in the bar, type how the result should differ:
-                &ldquo;in red&rdquo;, &ldquo;with long sleeves&rdquo;. Your
-                words count twice as much as the photo. Each result shows how
-                close it is to the photo and to your words, so you can see why
-                it appeared.
-              </p>
-              <Figure caption="A check shirt plus “in red”: the shape comes from the photo (about 0.9), the colour from the words (about 0.2).">
-                <SearchBar
-                  photoId={15970}
-                  text="in red"
-                  photoButton="Use another photo"
-                />
-                <ResultTiles results={IN_RED} />
-              </Figure>
-            </Step>
-
-            <Step title="4. Find more like a result">
-              <p>
-                Hover a product (or tap it on a phone) and choose{" "}
-                <span className="text-ink">More like this</span>. Its photo
-                becomes the new search, so you can keep exploring from anything
-                you find.
-              </p>
-              <Figure caption="“More like this” on a result starts a new search with that product's photo.">
-                <ResultTiles
-                  results={RED_DRESSES.slice(0, 4)}
-                  moreLikeThis={1}
-                />
-              </Figure>
-            </Step>
-
-            <Step title="5. Narrow it down with filters">
-              <p>
-                Filters on the left keep only one gender, category, type or
-                colour. They apply to whatever you searched, and each option
-                shows how many products it has. Colours with no products in your
-                selection are dimmed.
-              </p>
-              <Figure caption="Women and Dresses selected, Red picked from the colour swatches; Gold is dimmed because no dress in this selection is gold.">
-                <FilterReplica />
-              </Figure>
-            </Step>
-
-            <Step title="6. Share a search">
-              <p>
-                The address bar keeps your words and filters, so you can copy it
-                to share or bookmark a search. Back and forward move between
-                your searches. &ldquo;More like this&rdquo; is shared by
-                product; photos you upload stay on your device.
-              </p>
-              <Figure caption="The address of a search for red dresses, ready to share.">
-                <UrlBar url="fashion-search-mu.vercel.app/?q=a+red+dress&colour=Red" />
-              </Figure>
-            </Step>
-          </ol>
-        </Section>
 
         <Section id="behind" title="Behind a search">
           <p className="mt-3 leading-relaxed text-muted">
@@ -418,6 +327,98 @@ export default function HowItWorks() {
               .
             </li>
           </ul>
+        </Section>
+
+        <Section id="using" title="Using it">
+          <ol className="list-none">
+            <Step title="1. Describe what you're looking for">
+              <p>
+                Type a few words, the way you&apos;d describe the item to a
+                friend: &ldquo;a red dress&rdquo;, &ldquo;white running
+                shoes&rdquo;, &ldquo;gold watch for women&rdquo;. Press Enter or
+                Search. The closest products come first, each with a number that
+                says how similar it is to your words.
+              </p>
+              <Figure caption="A text search. Every result shows its rank and similarity; “keyword” means the product's name also contains your words.">
+                <SearchBar text="a red dress" />
+                <ResultTiles results={RED_DRESSES} />
+              </Figure>
+            </Step>
+
+            <Step title="2. Or search with a photo">
+              <p>
+                Use <span className="text-ink">Search with a photo</span>, drop
+                an image anywhere on the page, or paste one. The photo appears
+                at the start of the search bar; the × removes it. Your photo is
+                processed in your browser and never uploaded.
+              </p>
+              <Figure caption="A photo in the search bar, and the drop zone that appears when you drag an image over the page.">
+                <SearchBar
+                  photoId={15970}
+                  placeholder="Describe a change, e.g. in blue"
+                  photoButton="Use another photo"
+                />
+                <DropZone />
+              </Figure>
+            </Step>
+
+            <Step title="3. Change the photo with words">
+              <p>
+                With a photo in the bar, type how the result should differ:
+                &ldquo;in red&rdquo;, &ldquo;with long sleeves&rdquo;. Your
+                words count twice as much as the photo. Each result shows how
+                close it is to the photo and to your words, so you can see why
+                it appeared.
+              </p>
+              <Figure caption="A check shirt plus “in red”: the shape comes from the photo (about 0.9), the colour from the words (about 0.2).">
+                <SearchBar
+                  photoId={15970}
+                  text="in red"
+                  photoButton="Use another photo"
+                />
+                <ResultTiles results={IN_RED} />
+              </Figure>
+            </Step>
+
+            <Step title="4. Find more like a result">
+              <p>
+                Hover a product (or tap it on a phone) and choose{" "}
+                <span className="text-ink">More like this</span>. Its photo
+                becomes the new search, so you can keep exploring from anything
+                you find.
+              </p>
+              <Figure caption="“More like this” on a result starts a new search with that product's photo.">
+                <ResultTiles
+                  results={RED_DRESSES.slice(0, 4)}
+                  moreLikeThis={1}
+                />
+              </Figure>
+            </Step>
+
+            <Step title="5. Narrow it down with filters">
+              <p>
+                Filters on the left keep only one gender, category, type or
+                colour. They apply to whatever you searched, and each option
+                shows how many products it has. Colours with no products in your
+                selection are dimmed.
+              </p>
+              <Figure caption="Women and Dresses selected, Red picked from the colour swatches; Gold is dimmed because no dress in this selection is gold.">
+                <FilterReplica />
+              </Figure>
+            </Step>
+
+            <Step title="6. Share a search">
+              <p>
+                The address bar keeps your words and filters, so you can copy it
+                to share or bookmark a search. Back and forward move between
+                your searches. &ldquo;More like this&rdquo; is shared by
+                product; photos you upload stay on your device.
+              </p>
+              <Figure caption="The address of a search for red dresses, ready to share.">
+                <UrlBar url="fashion-search-mu.vercel.app/?q=a+red+dress&colour=Red" />
+              </Figure>
+            </Step>
+          </ol>
           <p className="mt-10">
             <Link className="link" href="/">
               Try a search
