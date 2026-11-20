@@ -1,17 +1,10 @@
 import { SearchExperience } from "@/components/search/search-experience";
+import { SiteHeader } from "@/components/site-header";
 
 export default function Home() {
   return (
     <div className="flex w-full flex-1 flex-col px-5 pt-8 pb-12 sm:px-8 lg:px-10">
-      <header className="flex items-baseline justify-between gap-4">
-        <h1 className="font-medium">fashion-search</h1>
-        <a
-          className="link text-sm text-muted"
-          href="https://github.com/solanodz/fashion-search"
-        >
-          Source
-        </a>
-      </header>
+      <SiteHeader titleAs="h1" />
       <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted">
         Search a catalog of fashion products by text, by photo, or both. A CLIP
         model turns your query into a vector in this browser; the server returns

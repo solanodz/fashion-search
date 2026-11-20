@@ -31,7 +31,7 @@ import {
   serializeSearchState,
 } from "@/lib/search/url-state";
 
-import { EmbeddingMapView } from "./embedding-map";
+import { EmbeddingMapView, ExpandedMap } from "./embedding-map";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
 import { Pipeline, type Trace } from "./pipeline";
@@ -77,6 +77,7 @@ export function SearchExperience() {
   const [filters, setFilters] = useState<SearchFilters>({});
   const [facets, setFacets] = useState<Facets | null>(null);
   const [trace, setTrace] = useState<Trace | null>(null);
+  const [mapOpen, setMapOpen] = useState(false);
   const latest = useRef(0);
   const usedEncoders = useRef(new Set<string>());
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
@@ -354,7 +355,7 @@ export function SearchExperience() {
     : "Describe a product, e.g. a red dress";
 
   return (
-    <div className="grid gap-x-10 gap-y-6 lg:grid-cols-[12rem_minmax(0,1fr)_17rem] lg:grid-rows-[auto_1fr] xl:grid-cols-[13rem_minmax(0,1fr)_19rem]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-6 lg:grid-cols-[12rem_minmax(0,1fr)_17rem] lg:grid-rows-[auto_1fr] xl:grid-cols-[13rem_minmax(0,1fr)_19rem]">
       <section
         aria-label="Search the catalog"
         className="lg:col-start-2 lg:row-start-1"
@@ -457,7 +458,8 @@ export function SearchExperience() {
         )}
       </div>
 
-      <aside className="lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:max-h-[calc(100dvh-4rem)] lg:[scrollbar-width:thin] lg:self-start lg:overflow-y-auto">
+      {/* Fits the viewport below the page header, so nothing in it scrolls. */}
+      <aside className="flex flex-col gap-6 lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:h-[calc(100dvh-12rem)] lg:min-h-[34rem] lg:self-start">
         <Pipeline
           trace={trace}
           progress={progress}
@@ -465,6 +467,26 @@ export function SearchExperience() {
         />
         <EmbeddingMapView
           results={status.kind === "done" ? status.results : null}
+          onExpand={() => setMapOpen(true)}
+        />
+        <ExpandedMap
+          open={mapOpen}
+          onClose={() => setMapOpen(false)}
+          results={status.kind === "done" ? status.results : null}
+          query={query}
+          status={
+            status.kind === "done"
+              ? `${status.results.length} closest matches for ${status.description}`
+              : status.kind === "searching"
+                ? "Searching…"
+                : status.kind === "error"
+                  ? status.message
+                  : "Search to see where your query lands."
+          }
+          onSearch={(text) => {
+            setQuery(text);
+            void search(text, photo);
+          }}
         />
       </aside>
 

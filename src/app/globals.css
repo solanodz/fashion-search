@@ -11,6 +11,7 @@
   --muted: #63635e;
   --rule: #e6e6e2;
   --tile: #f3f3f1;
+  --line-strong: #cfceca;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,6 +22,7 @@
     --rule: #2e2e2b;
     /* Tiles stay light: the photos are shot on white. */
     --tile: #ededeb;
+    --line-strong: #494844;
   }
 }
 
@@ -59,5 +61,26 @@ body {
   .link:hover {
     text-decoration-style: solid;
     text-decoration-color: var(--ink);
+  }
+
+  /*
+    The search flow on /how-it-works (SearchFlow), after the workflow chart
+    on the author's portfolio: text stages joined by still hairline arrows.
+  */
+  .flow-detail {
+    color: var(--muted);
+    transition: color 200ms ease;
+  }
+  .flow-node[data-active="true"] .flow-detail {
+    color: var(--ink);
+  }
+  .flow-edge {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+  .flow-arrow {
+    stroke-linecap: round;
+    stroke-linejoin: round;
   }
 }

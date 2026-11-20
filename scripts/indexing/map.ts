@@ -1,5 +1,5 @@
 /**
- * Projects the catalog's CLIP image vectors to 2D with UMAP and writes the
+ * Projects the catalog's CLIP image vectors to 3D with UMAP and writes the
  * map the UI draws (ADR 0010): public/embedding-map.bin + .json.
  * Deterministic for the same embeddings (seeded random).
  *
@@ -19,6 +19,7 @@ import {
 import type { CatalogItem } from "../../src/lib/indexing/catalog.ts";
 import {
   encodeMap,
+  MAP_DIMENSIONS,
   MAP_FILES,
   type MapMeta,
   normalizePoints,
@@ -52,7 +53,7 @@ const random = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
 console.log(`→ UMAP on ${rows.length} vectors`);
 const started = Date.now();
 const umap = new UMAP({
-  nComponents: 2,
+  nComponents: MAP_DIMENSIONS,
   nNeighbors: 15,
   minDist: 0.1,
   random,
@@ -81,6 +82,7 @@ const meta: MapMeta = {
   model: CLIP_MODEL_ID,
   dtype: CLIP_DTYPE,
   count: rows.length,
+  dimensions: MAP_DIMENSIONS,
   types,
   categories,
 };

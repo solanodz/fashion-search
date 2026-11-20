@@ -27,7 +27,7 @@ export function ResultsGrid({
   const span = top - bottom || 1;
 
   return (
-    <ol className="grid grid-cols-[repeat(auto-fill,minmax(10rem,1fr))] gap-x-4 gap-y-8">
+    <ol className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-x-4 gap-y-8">
       {results.map((result, index) => {
         const { id, product, score } = result;
         return (

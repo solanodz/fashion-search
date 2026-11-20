@@ -2,6 +2,7 @@
   "model": "Xenova/clip-vit-base-patch32",
   "dtype": "q8",
   "count": 42426,
+  "dimensions": 3,
   "types": [
     "Accessory Gift Set",
     "Baby Dolls",
