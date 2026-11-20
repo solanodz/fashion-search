@@ -9,9 +9,12 @@ import { IMAGE_VECTOR } from "@/lib/search/query";
  * search and a count with the app's read-only key.
  */
 export async function GET(request: Request) {
+  // Read the request before anything else: with Cache Components the build
+  // prerenders a GET handler up to its first runtime data access, and the
+  // environment isn't there at build time.
+  const authorization = request.headers.get("authorization");
   const { CRON_SECRET, QDRANT_COLLECTION } = serverEnv();
-  // Reading the header also keeps this handler dynamic, never prerendered.
-  if (!isAuthorized(request.headers.get("authorization"), CRON_SECRET)) {
+  if (!isAuthorized(authorization, CRON_SECRET)) {
     return Response.json({ error: "Unauthorized" }, { status: 401 });
   }
 
