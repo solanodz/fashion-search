@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import {
-  ArchitectureDiagram,
   DropZone,
   FilterReplica,
   Figure,
@@ -12,6 +11,7 @@ import {
   UrlBar,
   VectorFigure,
 } from "@/components/guide/figures";
+import { SearchFlow } from "@/components/guide/search-flow";
 import { SiteHeader } from "@/components/site-header";
 import { CATEGORY_COLOURS, OTHER_COLOUR } from "@/lib/indexing/embedding-map";
 
@@ -265,9 +265,7 @@ export default function HowItWorks() {
             your words or photo, runs in your browser. The server only compares
             numbers.
           </p>
-          <div className="mt-6">
-            <ArchitectureDiagram />
-          </div>
+          <SearchFlow />
 
           <ol className="list-none">
             <Step title="Your browser turns the query into 512 numbers">

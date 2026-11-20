@@ -11,6 +11,7 @@
   --muted: #63635e;
   --rule: #e6e6e2;
   --tile: #f3f3f1;
+  --line-strong: #cfceca;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -21,6 +22,7 @@
     --rule: #2e2e2b;
     /* Tiles stay light: the photos are shot on white. */
     --tile: #ededeb;
+    --line-strong: #494844;
   }
 }
 
@@ -59,5 +61,52 @@ body {
   .link:hover {
     text-decoration-style: solid;
     text-decoration-color: var(--ink);
+  }
+
+  /*
+    The search flow on /how-it-works (SearchFlow), after the workflow chart
+    on the author's portfolio. Each connector carries one beam: a stack of
+    dashes on a path normalised to length 1, so one loop moves the beam
+    exactly once along it.
+  */
+  .flow-detail {
+    color: var(--muted);
+    transition: color 200ms ease;
+  }
+  .flow-node[data-active="true"] .flow-detail {
+    color: var(--ink);
+  }
+  .flow-edge {
+    fill: none;
+    stroke: var(--line-strong);
+    stroke-width: 1;
+  }
+  .flow-arrow {
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+  .flow-beam {
+    fill: none;
+    stroke: var(--ink);
+    stroke-width: 1.5;
+    stroke-dashoffset: var(--beam);
+    animation: flow-beam 1500ms linear infinite;
+    animation-play-state: paused;
+  }
+  [data-running="true"] > g > .flow-beam {
+    animation-play-state: running;
+  }
+  @keyframes flow-beam {
+    from {
+      stroke-dashoffset: var(--beam);
+    }
+    to {
+      stroke-dashoffset: calc(var(--beam) - 1px);
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .flow-beam {
+      display: none;
+    }
   }
 }
