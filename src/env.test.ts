@@ -12,6 +12,9 @@ describe("parseServerEnv", () => {
       QDRANT_URL: "http://localhost:6333",
       QDRANT_API_KEY: undefined,
       QDRANT_COLLECTION: "products",
+      CRON_SECRET: undefined,
+      OPENAI_API_KEY: undefined,
+      OPENAI_MODEL: "gpt-6-luna",
     });
   });
 

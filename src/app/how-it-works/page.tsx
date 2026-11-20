@@ -258,6 +258,20 @@ export default function HowItWorks() {
               </dd>
             </div>
             <div>
+              <dt>Shop the look</dt>
+              <dd className="text-muted">
+                Upload a photo of a person: a segmentation model finds each
+                garment in your browser, CLIP encodes its crop, and each one is
+                searched in its own part of the catalog. With &ldquo;Describe
+                with AI&rdquo; on, a small OpenAI model also names each garment
+                (&ldquo;maroon checked long wool coat&rdquo;), which steers
+                colour and type.{" "}
+                <Link className="link hover:text-ink" href="/outfit">
+                  Try it
+                </Link>
+              </dd>
+            </div>
+            <div>
               <dt>&ldquo;keyword&rdquo;</dt>
               <dd className="text-muted">
                 The keyword search also found this product: its name contains

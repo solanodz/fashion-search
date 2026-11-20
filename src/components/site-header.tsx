@@ -8,6 +8,9 @@ export function SiteHeader({ titleAs: Title = "p" }: { titleAs?: "h1" | "p" }) {
         <Link href="/">fashion-search</Link>
       </Title>
       <nav aria-label="Site" className="flex gap-5 text-sm text-muted">
+        <Link className="link hover:text-ink" href="/outfit">
+          Shop the look
+        </Link>
         <Link className="link hover:text-ink" href="/how-it-works">
           How it works
         </Link>

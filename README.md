@@ -32,9 +32,14 @@ and color.
   how precision changed with each decision, search by search.
 - **Embedding map:** every product projected to 3D with UMAP, with the query
   and its results highlighted ([ADR 0010](docs/adr/0010-embedding-map.md)).
+- **Shop the look** ([/outfit](https://fashion-search-mu.vercel.app/outfit)):
+  upload a photo of a person and every garment is segmented, cropped and
+  searched in its part of the catalog. An optional description by a small
+  OpenAI vision model adds colour and type as text
+  ([ADR 0013](docs/adr/0013-outfit-search.md)).
 - **Queries run in the visitor's browser.** The model turns the text or photo
-  into a vector; the server only queries the vector database. No GPU server
-  and no model API keys.
+  into a vector; the server only queries the vector database. No GPU server;
+  the only model API is the optional outfit description.
 - **Vector database:** Qdrant: Docker in development, Qdrant Cloud in
   production (read-only key in the app).
 - **App:** Next.js (App Router), TypeScript, Tailwind CSS, deployed on Vercel
@@ -179,6 +184,10 @@ in Vercel to make that endpoint accept only Vercel Cron.
 Finally set `NEXT_PUBLIC_IMAGE_BASE_URL` in Vercel to the bucket's public URL
 (no trailing slash) and redeploy, since `NEXT_PUBLIC_*` values are inlined at
 build time.
+
+For outfit descriptions on `/outfit` (optional), set `OPENAI_API_KEY` in Vercel
+as a Sensitive variable; `OPENAI_MODEL` defaults to `gpt-6-luna`. Without the
+key the page reads each garment with CLIP alone.
 
 ### Retrieval quality
 
