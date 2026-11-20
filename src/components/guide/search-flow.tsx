@@ -170,14 +170,17 @@ function roundedPath(route: Point[]) {
   return `${d} L ${lastX} ${lastY}`;
 }
 
-/** A horizontal S-curve from the first point to the second, then straight on. */
+/**
+ * Straight from the first point to the second, a horizontal S-curve from
+ * there to the third, then straight to the end.
+ */
 function curvedPath(points: Point[]) {
-  const [start, join, ...rest] = points;
-  const mid = start[0] + (join[0] - start[0]) / 2;
+  const [start, from, join, ...rest] = points;
+  const mid = from[0] + (join[0] - from[0]) / 2;
   const tail = rest.map(([x, y]) => ` L ${x} ${y}`).join("");
   return (
-    `M ${start[0]} ${start[1]} ` +
-    `C ${mid} ${start[1]} ${mid} ${join[1]} ${join[0]} ${join[1]}` +
+    `M ${start[0]} ${start[1]} L ${from[0]} ${from[1]} ` +
+    `C ${mid} ${from[1]} ${mid} ${join[1]} ${join[0]} ${join[1]}` +
     tail
   );
 }
@@ -304,18 +307,25 @@ function buildEdges(
     const words = anchors["fuse-keywords"];
     const merged = anchors["results-row"];
     if (image && words && merged) {
-      // Both lists curve right away towards a point halfway to the results,
-      // meet there, and continue together as one straight arrow.
+      // Both lists run straight a little, curve towards each other, meet
+      // most of the way to the results and finish as one short arrow.
       const startX = Math.max(image.right, words.right) + GAP * 2;
       const into: Point = [merged.left - GAP * 1.5, snap(merged.cy)];
-      const join: Point = [snap(startX + (into[0] - startX) / 2), into[1]];
+      const span = into[0] - startX;
+      const curveFrom = snap(startX + span * 0.2);
+      const join: Point = [snap(startX + span * 0.72), into[1]];
       for (const [id, row] of [
         ["image", image],
         ["keywords", words],
       ] as const) {
         edges.push({
           id: `fuse-${id}-results`,
-          points: [[startX, snap(row.cy)], join, into],
+          points: [
+            [startX, snap(row.cy)],
+            [curveFrom, snap(row.cy)],
+            join,
+            into,
+          ],
           arrow: "right",
           curve: true,
         });
