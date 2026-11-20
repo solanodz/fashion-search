@@ -123,6 +123,8 @@ type Edge = {
   id: string;
   points: Point[];
   arrow: Direction;
+  /** Draw as a smooth curve between the last two points, without a beam. */
+  curve?: boolean;
   label?: { text: string; at: Point };
 };
 
@@ -166,6 +168,18 @@ function roundedPath(route: Point[]) {
   }
   const [lastX, lastY] = points[points.length - 1];
   return `${d} L ${lastX} ${lastY}`;
+}
+
+/** Straight to the second-to-last point, then a horizontal S-curve to the end. */
+function curvedPath(points: Point[]) {
+  const [start, ...rest] = points;
+  const end = rest[rest.length - 1];
+  const bend = rest.length > 1 ? rest[rest.length - 2] : start;
+  const mid = bend[0] + (end[0] - bend[0]) / 2;
+  return (
+    `M ${start[0]} ${start[1]} L ${bend[0]} ${bend[1]} ` +
+    `C ${mid} ${bend[1]} ${mid} ${end[1]} ${end[0]} ${end[1]}`
+  );
 }
 
 function routeLength(points: Point[]) {
@@ -290,10 +304,9 @@ function buildEdges(
     const words = anchors["fuse-keywords"];
     const merged = anchors["results-row"];
     if (image && words && merged) {
-      const joinX = snap(
-        (Math.max(image.right, words.right) + merged.left) / 2,
-      );
-      const into: Point = [merged.left - GAP, snap(merged.cy)];
+      // Straight out to the edge of the Fusion column, then a curve through
+      // the gap into the results; both curves end on the same arrow.
+      const into: Point = [merged.left - GAP * 1.5, snap(merged.cy)];
       for (const [id, row] of [
         ["image", image],
         ["keywords", words],
@@ -301,8 +314,9 @@ function buildEdges(
         const y = snap(row.cy);
         edges.push({
           id: `fuse-${id}-results`,
-          points: [[row.right + GAP, y], [joinX, y], [joinX, into[1]], into],
+          points: [[row.right + GAP * 2, y], [snap(fuse.right), y], into],
           arrow: "right",
+          curve: true,
         });
       }
     }
@@ -469,7 +483,9 @@ export function SearchFlow() {
             className="pointer-events-none absolute inset-0 size-full overflow-visible"
           >
             {edges.map((edge, index) => {
-              const d = roundedPath(edge.points);
+              const d = edge.curve
+                ? curvedPath(edge.points)
+                : roundedPath(edge.points);
               if (!d) return null;
               return (
                 <g key={edge.id}>
@@ -481,15 +497,17 @@ export function SearchFlow() {
                     )}
                     className="flow-edge flow-arrow"
                   />
-                  {beamLayers(edge.points, index).map((style, layer) => (
-                    <path
-                      key={layer}
-                      d={d}
-                      pathLength={1}
-                      className="flow-beam"
-                      style={style}
-                    />
-                  ))}
+                  {(edge.curve ? [] : beamLayers(edge.points, index)).map(
+                    (style, layer) => (
+                      <path
+                        key={layer}
+                        d={d}
+                        pathLength={1}
+                        className="flow-beam"
+                        style={style}
+                      />
+                    ),
+                  )}
                 </g>
               );
             })}
