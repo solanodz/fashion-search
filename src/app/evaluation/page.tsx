@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
+import {
+  DumbbellChart,
+  type DumbbellRow,
+} from "@/components/evaluation/dumbbell-chart";
 import { SiteHeader } from "@/components/site-header";
 import evaluation from "@/content/evaluation.json";
 
@@ -11,6 +15,8 @@ export const metadata: Metadata = {
 };
 
 const REPO = "https://github.com/solanodz/fashion-search";
+/** Searches shown before "Show all". */
+const VISIBLE_ROWS = 6;
 const percent = (value: number | null | undefined) =>
   value === null || value === undefined ? "–" : `${Math.round(value * 100)}%`;
 
@@ -21,6 +27,15 @@ const METRICS = [
   ["gender", "Gender"],
   ["all", "All"],
 ] as const;
+
+/** One chart row per test search: "all" precision in two runs, in percent. */
+function chartRows(before: Run, after: Run, lang: "en" | "es"): DumbbellRow[] {
+  return evaluation.queries.map((query, q) => ({
+    label: query[lang],
+    before: Math.round(before.results[q].all * 100),
+    after: Math.round(after.results[q].all * 100),
+  }));
+}
 
 /** What each step taught, keyed by run id. */
 const LESSONS: Record<string, string> = {
@@ -65,6 +80,45 @@ function Cell({ value }: { value: number }) {
 export default function EvaluationPage() {
   const runs: Run[] = evaluation.runs;
   const columns = `minmax(10rem,1.6fr) repeat(${runs.length}, minmax(3.5rem,1fr))`;
+
+  const renderRow = (query: (typeof evaluation.queries)[number], q: number) => (
+    <li key={query.en}>
+      <details className="group">
+        <summary
+          className="grid cursor-pointer list-none items-center gap-1 py-1.5 [&::-webkit-details-marker]:hidden"
+          style={{ gridTemplateColumns: columns }}
+        >
+          <span className="min-w-0 pr-2 text-sm">
+            <span className="block truncate">{query.en}</span>
+            <span className="block truncate text-xs text-muted">
+              {query.es}
+            </span>
+          </span>
+          {runs.map((run) => (
+            <Cell key={run.id} value={run.results[q].all} />
+          ))}
+        </summary>
+        <div
+          className="grid gap-1 pb-4 text-xs text-muted"
+          style={{ gridTemplateColumns: columns }}
+        >
+          <span className="pr-2">
+            Expected: {Object.values(query.expect).flat().join(", ")}
+          </span>
+          {runs.map((run) => (
+            <ol key={run.id} className="space-y-1 px-1">
+              {/* Different products can share a name, so keys are positions. */}
+              {run.results[q].top.map((item, rank) => (
+                <li key={rank} className="leading-snug">
+                  {item}
+                </li>
+              ))}
+            </ol>
+          ))}
+        </div>
+      </details>
+    </li>
+  );
 
   return (
     <div className="flex w-full flex-1 flex-col px-5 pt-8 pb-16 sm:px-8 lg:px-10">
@@ -151,48 +205,44 @@ export default function EvaluationPage() {
                   </span>
                 ))}
               </div>
-              <ul className="divide-y divide-rule border-y border-rule">
-                {evaluation.queries.map((query, q) => (
-                  <li key={query.en}>
-                    <details className="group">
-                      <summary
-                        className="grid cursor-pointer list-none items-center gap-1 py-1.5 [&::-webkit-details-marker]:hidden"
-                        style={{ gridTemplateColumns: columns }}
-                      >
-                        <span className="min-w-0 pr-2 text-sm">
-                          <span className="block truncate">{query.en}</span>
-                          <span className="block truncate text-xs text-muted">
-                            {query.es}
-                          </span>
-                        </span>
-                        {runs.map((run) => (
-                          <Cell key={run.id} value={run.results[q].all} />
-                        ))}
-                      </summary>
-                      <div
-                        className="grid gap-1 pb-4 text-xs text-muted"
-                        style={{ gridTemplateColumns: columns }}
-                      >
-                        <span className="pr-2">
-                          Expected:{" "}
-                          {Object.values(query.expect).flat().join(", ")}
-                        </span>
-                        {runs.map((run) => (
-                          <ol key={run.id} className="space-y-1 px-1">
-                            {/* Different products can share a name, so keys are positions. */}
-                            {run.results[q].top.map((item, rank) => (
-                              <li key={rank} className="leading-snug">
-                                {item}
-                              </li>
-                            ))}
-                          </ol>
-                        ))}
-                      </div>
-                    </details>
-                  </li>
-                ))}
+              <ul className="divide-y divide-rule border-t border-rule">
+                {evaluation.queries
+                  .slice(0, VISIBLE_ROWS)
+                  .map((query, q) => renderRow(query, q))}
               </ul>
+              {/* The rest stays folded until asked for; no script needed. */}
+              <details className="group/more border-b border-rule">
+                <summary className="cursor-pointer list-none py-3 text-sm text-muted hover:text-ink [&::-webkit-details-marker]:hidden">
+                  <span className="link group-open/more:hidden">
+                    Show all {evaluation.queries.length} searches
+                  </span>
+                  <span className="link hidden group-open/more:inline">
+                    Show fewer
+                  </span>
+                </summary>
+                <ul className="divide-y divide-rule border-t border-rule">
+                  {evaluation.queries
+                    .slice(VISIBLE_ROWS)
+                    .map((query, i) => renderRow(query, i + VISIBLE_ROWS))}
+                </ul>
+              </details>
             </div>
+          </div>
+          <div className="mt-14 grid gap-12 lg:grid-cols-2">
+            <DumbbellChart
+              title="English: image only → hybrid search"
+              description="Precision on all attributes per search, before and after adding keywords."
+              beforeLabel="Image only"
+              afterLabel="Hybrid"
+              rows={chartRows(runs[1], runs[2], "en")}
+            />
+            <DumbbellChart
+              title="Spanish: as typed → with the glossary"
+              description="The same searches in Spanish, before and after the glossary."
+              beforeLabel="As typed"
+              afterLabel="Glossary"
+              rows={chartRows(runs[3], runs[4], "es")}
+            />
           </div>
         </section>
 

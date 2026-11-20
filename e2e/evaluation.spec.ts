@@ -22,6 +22,21 @@ test("the evaluation page shows every version and each search", async ({
   }
 
   // Opening a search shows what each version returned.
-  await page.getByText("a red dress", { exact: true }).click();
+  const table = page.locator("summary");
+  await table.getByText("a red dress", { exact: true }).click();
   await expect(page.getByText("Expected: Dresses, Red")).toBeVisible();
+
+  // Only the first searches show until asked for.
+  const lastSearch = table.getByText("blue tie", { exact: true });
+  await expect(lastSearch).toBeHidden();
+  await page.getByText("Show all 27 searches").click();
+  await expect(lastSearch).toBeVisible();
+
+  // The charts summarise the two big changes.
+  await expect(
+    page.getByRole("img", { name: /^English: image only → hybrid search/ }),
+  ).toBeVisible();
+  await expect(
+    page.getByRole("img", { name: /^Spanish: as typed → with the glossary/ }),
+  ).toBeVisible();
 });
