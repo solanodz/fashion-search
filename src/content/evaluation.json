@@ -1,0 +1,1801 @@
+{
+  "metric": "precision@10",
+  "k": 10,
+  "queries": [
+    {
+      "en": "a red dress",
+      "es": "un vestido rojo",
+      "expect": {
+        "articleType": ["Dresses"],
+        "baseColour": ["Red"]
+      }
+    },
+    {
+      "en": "men's blue jeans",
+      "es": "jeans azules de hombre",
+      "expect": {
+        "articleType": ["Jeans"],
+        "baseColour": ["Blue"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "white t-shirt for men",
+      "es": "remera blanca para hombre",
+      "expect": {
+        "articleType": ["Tshirts"],
+        "baseColour": ["White"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "navy blue shirt for men",
+      "es": "camisa azul marino para hombre",
+      "expect": {
+        "articleType": ["Shirts"],
+        "baseColour": ["Navy Blue"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "black casual sneakers",
+      "es": "zapatillas urbanas negras",
+      "expect": {
+        "articleType": ["Casual Shoes", "Sports Shoes"],
+        "baseColour": ["Black"]
+      }
+    },
+    {
+      "en": "brown leather formal shoes for men",
+      "es": "zapatos de vestir de cuero marrón para hombre",
+      "expect": {
+        "articleType": ["Formal Shoes"],
+        "baseColour": ["Brown"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "white running shoes",
+      "es": "zapatillas blancas para correr",
+      "expect": {
+        "articleType": ["Sports Shoes"],
+        "baseColour": ["White"]
+      }
+    },
+    {
+      "en": "gold watch for women",
+      "es": "reloj dorado para mujer",
+      "expect": {
+        "articleType": ["Watches"],
+        "baseColour": ["Gold"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "silver watch for men",
+      "es": "reloj plateado para hombre",
+      "expect": {
+        "articleType": ["Watches"],
+        "baseColour": ["Silver"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "black leather handbag",
+      "es": "cartera de cuero negra",
+      "expect": {
+        "articleType": ["Handbags"],
+        "baseColour": ["Black"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "black sunglasses",
+      "es": "anteojos de sol negros",
+      "expect": {
+        "articleType": ["Sunglasses"],
+        "baseColour": ["Black"]
+      }
+    },
+    {
+      "en": "pink kurta for women",
+      "es": "kurta rosa para mujer",
+      "expect": {
+        "articleType": ["Kurtas"],
+        "baseColour": ["Pink"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "green saree",
+      "es": "sari verde",
+      "expect": {
+        "articleType": ["Sarees"],
+        "baseColour": ["Green"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "black high heels",
+      "es": "zapatos de taco alto negros",
+      "expect": {
+        "articleType": ["Heels"],
+        "baseColour": ["Black"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "blue flip flops",
+      "es": "ojotas azules",
+      "expect": {
+        "articleType": ["Flip Flops"],
+        "baseColour": ["Blue"]
+      }
+    },
+    {
+      "en": "black backpack",
+      "es": "mochila negra",
+      "expect": {
+        "articleType": ["Backpacks"],
+        "baseColour": ["Black"]
+      }
+    },
+    {
+      "en": "brown leather belt for men",
+      "es": "cinturón de cuero marrón para hombre",
+      "expect": {
+        "articleType": ["Belts"],
+        "baseColour": ["Brown"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "yellow top for women",
+      "es": "top amarillo para mujer",
+      "expect": {
+        "articleType": ["Tops"],
+        "baseColour": ["Yellow"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "grey track pants for men",
+      "es": "pantalón deportivo gris para hombre",
+      "expect": {
+        "articleType": ["Track Pants"],
+        "baseColour": ["Grey"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "black jacket for men",
+      "es": "campera negra para hombre",
+      "expect": {
+        "articleType": ["Jackets"],
+        "baseColour": ["Black"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "gold earrings",
+      "es": "aros dorados",
+      "expect": {
+        "articleType": ["Earrings"],
+        "baseColour": ["Gold"],
+        "gender": ["Women"]
+      }
+    },
+    {
+      "en": "red sweatshirt",
+      "es": "buzo rojo",
+      "expect": {
+        "articleType": ["Sweatshirts"],
+        "baseColour": ["Red"]
+      }
+    },
+    {
+      "en": "blue baseball cap",
+      "es": "gorra azul",
+      "expect": {
+        "articleType": ["Caps"],
+        "baseColour": ["Blue"]
+      }
+    },
+    {
+      "en": "brown sandals",
+      "es": "sandalias marrones",
+      "expect": {
+        "articleType": ["Sandals"],
+        "baseColour": ["Brown"]
+      }
+    },
+    {
+      "en": "black leather wallet for men",
+      "es": "billetera de cuero negra para hombre",
+      "expect": {
+        "articleType": ["Wallets"],
+        "baseColour": ["Black"],
+        "gender": ["Men"]
+      }
+    },
+    {
+      "en": "red lipstick",
+      "es": "labial rojo",
+      "expect": {
+        "articleType": ["Lipstick"],
+        "baseColour": ["Red"]
+      }
+    },
+    {
+      "en": "blue tie",
+      "es": "corbata azul",
+      "expect": {
+        "articleType": ["Ties"],
+        "baseColour": ["Blue"],
+        "gender": ["Men"]
+      }
+    }
+  ],
+  "runs": [
+    {
+      "id": "thumbnails",
+      "label": "60×80 thumbnails",
+      "description": "Image vectors only, 44,072 products with the original 60×80 photos.",
+      "date": "2026-11-19",
+      "adr": "0006-indexing-pipeline.md",
+      "summary": {
+        "articleType": 0.7926,
+        "baseColour": 0.7519,
+        "gender": 0.9294,
+        "all": 0.5704
+      },
+      "results": [
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Red Rose Women Red Nightdress [Nightdress, Red]",
+            "W Women Round Bottom Red Kurta [Kurtas, Red]",
+            "Red Rose Red Nightdress [Nightdress, Red]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 0.6,
+          "top": [
+            "Gini and Jony Boys Karnel Jeans [Jeans, Blue]",
+            "Gini and Jony Boy's Karnel Jeans Kidswear [Jeans, Blue]",
+            "Spykar Men Style Essentials Spykar Jeans Rns Blue Jeans [Jeans, Blue]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.7,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "Nike Grey Legend Training Tshirts [Tshirts, Grey]",
+            "Hanes Men White Innerwear T-shirt [Innerwear Vests, White]",
+            "Reebok Men Excellence White T-shirt [Tshirts, White]"
+          ]
+        },
+        {
+          "all": 0.4,
+          "articleType": 0.9,
+          "baseColour": 0.4,
+          "gender": 1,
+          "top": [
+            "Reid & Taylor Men Stripes Blue Shirts [Shirts, Blue]",
+            "Locomotive Men Purple Shirt [Shirts, Purple]",
+            "Reid & Taylor Men Solid Blue Shirts [Shirts, Blue]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Vans Men Black Woessner Shoes [Casual Shoes, Black]",
+            "Vans Men Pro Classics Black Casual Shoes [Casual Shoes, Black]",
+            "Vans Unisex Black Casual Shoes [Casual Shoes, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.9,
+          "baseColour": 0.8,
+          "gender": 1,
+          "top": [
+            "Rockport Men's Aderner Friar Brown Shoe [Formal Shoes, Brown]",
+            "Rockport Men Jefford Brown Formal Shoes [Formal Shoes, Brown]",
+            "Rockport Men Drsp Wingtip Brown Formal Shoes [Formal Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.7,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Kalenji Ekiden 50 Women [Sports Shoes, Blue]",
+            "Puma Men White Caliber Shoes [Casual Shoes, White]",
+            "Kalenji Ekiden Junior Boy 2010 [Sports Shoes, Blue]"
+          ]
+        },
+        {
+          "all": 0.4,
+          "articleType": 1,
+          "baseColour": 0.4,
+          "gender": 0.8,
+          "top": [
+            "Miss Sixty Gold Dial Watch [Watches, Gold]",
+            "Guess Women White Dial Watch I11065L1 [Watches, White]",
+            "Titan Men White Dial Watch NB390YM14 [Watches, White]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.9,
+          "baseColour": 0.2,
+          "gender": 0.8,
+          "top": [
+            "Skagen Men Silver Dial Watch [Watches, White]",
+            "Titan Men White Dial Watch [Watches, Silver]",
+            "ADIDAS Unisex Cambridge Analogue Black Watch [Watches, Black]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 1,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Murcia Women Casual Black Handbag [Handbags, Black]",
+            "Lino Perros Women Polka Black Handbag [Handbags, Black]",
+            "Spice Art Black Shaded Handbag [Handbags, Black]"
+          ]
+        },
+        {
+          "all": 0.4,
+          "articleType": 0.9,
+          "baseColour": 0.4,
+          "gender": null,
+          "top": [
+            "Cat Men Sheet Sunglasses [Sunglasses, Brown]",
+            "United Colors of Benetton Men Black Sunglasses [Sunglasses, Black]",
+            "Fastrack Men Grey Sunglasses [Sunglasses, Grey]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Mother Earth Women Pink Printed Kurta [Kurtas, Pink]",
+            "Mother Earth Women Chogun Aug Collt Pink Kurtas [Kurtas, Pink]",
+            "Fabindia Women Pink & Orange Striped Kurta [Kurtas, Pink]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Fabindia Green Maheshwari Zari Saree [Sarees, Green]",
+            "Satya Paul Green Saree [Free Gifts, Green]",
+            "FNF Green Printed Sari [Sarees, Green]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Catwalk Women Black Heels [Heels, Black]",
+            "Carlton London Women Casual Black Casual Shoes [Casual Shoes, Black]",
+            "Catwalk Women Black Heels [Heels, Black]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.9,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Converse Men Blue Flip Flop [Flip Flops, Blue]",
+            "Puma Unisex Arizona Light Blue White Flip Flop [Flip Flops, Blue]",
+            "Numero Uno Men's Casual Blue Flip Flop [Flip Flops, Blue]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Wildcraft Unisex Black Backpack [Backpacks, Black]",
+            "Cabarelli Men Black Backpack [Backpacks, Black]",
+            "Wildcraft Unisex Gear for Life Black Backpack [Backpacks, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": 0.9,
+          "top": [
+            "Fossil Men Black & Brown Ethan Belt [Belts, Black]",
+            "Fastrack Unisex Non Leather Brown Belts [Belts, Black]",
+            "New Hide Men Brown Belt [Belts, Brown]"
+          ]
+        },
+        {
+          "all": 0.3,
+          "articleType": 0.4,
+          "baseColour": 0.9,
+          "gender": 0.8,
+          "top": [
+            "Nike Women Yellow T-shirt [Tshirts, Yellow]",
+            "United Colors of Benetton Women Mustard Top [Tops, Mustard]",
+            "Nike Women's Embossed Yellow T-shirt [Tshirts, Yellow]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.7,
+          "baseColour": 0.8,
+          "gender": 0.9,
+          "top": [
+            "ADIDAS Men's Woven Lead White Track Pant [Track Pants, Grey]",
+            "Nike Men Solid Grey Shorts [Shorts, Grey]",
+            "Nike Men Grey Track Pants [Track Pants, Grey]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.4,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Timberland Men Bonded Fleece Full Zip Blue Jacket [Jackets, Blue]",
+            "ADIDAS Men Badge P/O Black Sweaters [Sweaters, Black]",
+            "Puma Men Heroes Black Jackets [Jackets, Black]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 1,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Rreverie Women Silver Earrings [Earrings, Gold]",
+            "Royal Diadem White Earrings [Earrings, White]",
+            "Royal Diadem Green Earrings [Earrings, Green]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "United Colors of Benetton Men Red Sweater [Sweaters, Red]",
+            "Puma Men Solid Red Sweater [Sweaters, Red]",
+            "Roxy Women Red Sweater [Sweaters, Red]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 1,
+          "baseColour": 0.7,
+          "gender": null,
+          "top": [
+            "Nike Unisex Feather lite Blue Caps [Caps, Blue]",
+            "Nike Unisex Blue Tennis Cap [Caps, Blue]",
+            "Nike Women Stay Cool Blue Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.6,
+          "baseColour": 0.7,
+          "gender": null,
+          "top": [
+            "Catwalk Women Olive Sandals [Heels, Brown]",
+            "Lee Cooper Men Formal Leather Brown Sandal [Sandals, Brown]",
+            "U.S. Polo Assn. Men Brown Sandals [Sandals, Brown]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "JAG Men Black Leather Wallet [Wallets, Black]",
+            "JAG Men Black Leather Wallet [Wallets, Black]",
+            "American Tourister Men Black Organisation Wallet [Wallets, Black]"
+          ]
+        },
+        {
+          "all": 0.3,
+          "articleType": 1,
+          "baseColour": 0.3,
+          "gender": null,
+          "top": [
+            "Revlon True Red Colorburst Lipstick 090 [Lipstick, Red]",
+            "Streetwear Lusicious Lips Hint of Pink Lipcolor 14 [Lipstick, Pink]",
+            "Revlon Color Burst Chocolate Lipstick 60 [Lipstick, Brown]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.9,
+          "baseColour": 0.8,
+          "gender": 1,
+          "top": [
+            "Park Avenue Men Blue Printed Tie [Free Gifts, Blue]",
+            "Park Avenue Blue Tie [Ties, Blue]",
+            "Reid & Taylor Men Stripes Navy Blue Tie [Ties, Navy Blue]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "photos",
+      "label": "384×512 photos",
+      "description": "Image vectors only, after re-embedding sharper photos (42,426 products).",
+      "date": "2026-11-19",
+      "adr": "0008-catalog-photos.md",
+      "summary": {
+        "articleType": 0.8074,
+        "baseColour": 0.7852,
+        "gender": 0.9412,
+        "all": 0.6037
+      },
+      "results": [
+        {
+          "all": 0.1,
+          "articleType": 0.1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Red Rose Women Red Bathrobe [Bath Robe, Red]",
+            "Red Rose Red Nightdress [Nightdress, Red]",
+            "Red Rose Women Red Nightdress [Nightdress, Red]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "SPYKAR Men Slim Fit Free Republic Wheeler Spirit Blue Jeans [Jeans, Blue]",
+            "Deni Yo Men Slim Fit Washed Blue Jeans [Jeans, Blue]",
+            "Locomotive Men Washed Blue Jeans [Jeans, Blue]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.5,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Status Quo Men White T-shirt [Tshirts, White]",
+            "ADIDAS Men Solid White Tshirt [Tshirts, White]",
+            "Levis Men Comfort Style White Innerwear Vest [Innerwear Vests, White]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.8,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Genesis Men Check Navy Blue Shirts [Shirts, Navy Blue]",
+            "Scullers Men Solid Navy Blue Shirts [Shirts, Navy Blue]",
+            "U.S. Polo Assn. Denim Co. Men Navy Blue Shirt [Shirts, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Puma Unisex Limnos Navy Blue Casual Shoes [Casual Shoes, Navy Blue]",
+            "Vans Men Navy Blue Versa Casual Shoes [Casual Shoes, Navy Blue]",
+            "Numero Uno Men Black Shoes [Casual Shoes, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "U.S. Polo Assn. Men Brown Formal Shoes [Formal Shoes, Brown]",
+            "Rockport Men Jefford Brown Formal Shoes [Formal Shoes, Brown]",
+            "Rockport Men's Aderner Friar Brown Shoe [Formal Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.8,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Nike Women Court Shuttle IV White Sports Shoes [Sports Shoes, White]",
+            "ADIDAS Men Sports White Sports Shoes [Sports Shoes, White]",
+            "Lotto Women Bilbao Blue White Shoe [Sports Shoes, Blue]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 1,
+          "baseColour": 0,
+          "gender": 0.8,
+          "top": [
+            "Aspen Women White Dial Watch AP1103 [Watches, Multi]",
+            "Titan Women White Dial Watch [Watches, White]",
+            "Titan Women Silver-toned Dial Watch NB2131YM04 [Watches, Silver]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 1,
+          "baseColour": 0.3,
+          "gender": 0.6,
+          "top": [
+            "Casio Enticer Men Silver Analogue Watch MTP-1216A-1BDF(A355) [Watches, Black]",
+            "Q&Q Women Black Dial Analog Watch [Watches, Black]",
+            "Fossil Men Grey Dial Chronograph Watch FS4584 [Watches, Grey]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "Spice Art Women Leatherette Black Handbag [Handbags, Black]",
+            "Murcia Women Hddcs Grey Handbags [Handbags, Grey]",
+            "Kiara Women Black Handbag [Handbags, Black]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": null,
+          "top": [
+            "Vogue Women Black Sunglasses [Sunglasses, Black]",
+            "M tv Unisex My Fab Eyewear Black Sunglasses [Sunglasses, Black]",
+            "Mayhem Women Sunglasses 1012-104 [Sunglasses, Grey]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.8,
+          "baseColour": 0.8,
+          "gender": 1,
+          "top": [
+            "Aneri Women Pink Kurta [Kurtas, Pink]",
+            "Folklore Women Pink Kurta [Kurtas, Pink]",
+            "BIBA OUTLET Women Fushsia Pink Kurti [Kurtis, Pink]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.7,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "Satya Paul Green Saree [Free Gifts, Green]",
+            "Fabindia Green Maheshwari Zari Saree [Sarees, Green]",
+            "Satya Paul Green Saree [Free Gifts, Green]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.6,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Carlton London Women Casual Black Casual Shoes [Casual Shoes, Black]",
+            "Catwalk Women Black Sandals [Heels, Black]",
+            "Catwalk Women Black Heels [Heels, Black]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 1,
+          "baseColour": 0.7,
+          "gender": null,
+          "top": [
+            "Nike Men's Splash Thong Blue Flip Flop [Flip Flops, Blue]",
+            "ADIDAS Men Distorted Blue Flip Flops [Flip Flops, Blue]",
+            "Puma Unisex Arizona Light Blue White Flip Flop [Flip Flops, Blue]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Nike Unisex Black Backpack [Backpacks, Black]",
+            "Nike Unisex Ultimatum Max Backpack [Backpacks, Black]",
+            "Nike Unisex Nike Black plain Black Backpacks [Backpacks, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 0.8,
+          "top": [
+            "Lino Perros Women Brown Belt [Belts, Brown]",
+            "Turtle Men Brown Belt [Belts, Brown]",
+            "United Colors of Benetton Men Printed Brown Belts [Belts, Brown]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.6,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "United Colors of Benetton Women Yellow Top [Tshirts, Yellow]",
+            "United Colors of Benetton Women Yellow T-shirt [Tshirts, Yellow]",
+            "United Colors of Benetton Women Yellow Sweater [Sweaters, Yellow]"
+          ]
+        },
+        {
+          "all": 0.4,
+          "articleType": 0.7,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Hanes Men Grey Panelled 3/4th Pants [Shorts, Grey Melange]",
+            "Proline Men Grey Melange Track Pants [Track Pants, Grey Melange]",
+            "Proline Men Grey Track Pants [Track Pants, Grey]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.8,
+          "baseColour": 0.9,
+          "gender": 0.9,
+          "top": [
+            "Nike Women Sptcas Black Jacket [Jackets, Black]",
+            "Timberland Men Bonded Fleece Full Zip Blue Jacket [Jackets, Blue]",
+            "Just Natural Men Black Jacket [Jackets, Black]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": 1,
+          "top": [
+            "ToniQ Women Gold Earrings [Earrings, Gold]",
+            "Adrika Green Earrings [Earrings, Green]",
+            "Rreverie Golden Earrings [Earrings, Gold]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Roxy Women Red Sweater [Sweaters, Red]",
+            "Puma Men Heritage Red Sweatshirt [Sweatshirts, Red]",
+            "United Colors of Benetton Women Solid Red Top [Tops, Red]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Nike Unisex Blue Tennis Cap [Caps, Blue]",
+            "Nike Unisex Feather lite Blue Caps [Caps, Blue]",
+            "Nike Unisex Blue Daybreak Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.6,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "GAS Men Brown Deeply Sandals [Sandals, Brown]",
+            "Lee Cooper Men Brown Sandals [Sandals, Brown]",
+            "Catwalk Women Lifestyle Brown Flats [Heels, Brown]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 0.9,
+          "top": [
+            "Lino Perros Men Leather Black Wallet [Wallets, Black]",
+            "American Tourister Men Black Coin Passcase Wallet [Wallets, Black]",
+            "Newhide Black Men Casual Wallet [Wallets, Black]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.9,
+          "baseColour": 0.2,
+          "gender": null,
+          "top": [
+            "Revlon Velvet Touch Royal Burgundy Lipstick 96 [Lipstick, Burgundy]",
+            "ColorBar Diva Red She Said Lipstick DL002 [Lipstick, Red]",
+            "Colorbar Soft Touch Citrine Lipstick 040 [Lipstick, Orange]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Peter England Men Elite Blue Tie [Ties, Blue]",
+            "Reid & Taylor Men Blue Diagonal Striped Tie [Ties, Blue]",
+            "Hakashi Men Blue Tie [Ties, Blue]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "hybrid",
+      "label": "Hybrid search",
+      "description": "Image vectors plus BM25 keyword vectors, fused by rank.",
+      "date": "2026-11-19",
+      "adr": "0009-hybrid-search.md",
+      "summary": {
+        "articleType": 0.8926,
+        "baseColour": 0.9111,
+        "gender": 0.9471,
+        "all": 0.7963
+      },
+      "results": [
+        {
+          "all": 0.5,
+          "articleType": 0.5,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "United Colors of Benetton Girls Red Printed Dress [Dresses, Red]",
+            "Red Rose Women Red Bathrobe [Bath Robe, Red]",
+            "AND Women Red Dress [Dresses, Red]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Denizen Men Blue Jeans [Jeans, Blue]",
+            "Denizen Men Blue Jeans [Jeans, Blue]",
+            "SPYKAR Men Slim Fit Free Republic Wheeler Spirit Blue Jeans [Jeans, Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "ADIDAS Men White T-shirt [Tshirts, White]",
+            "Proline Men White T-shirt [Tshirts, White]",
+            "Status Quo Men White T-shirt [Tshirts, White]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Scullers Men Solid Navy Blue Shirts [Shirts, Navy Blue]",
+            "Genesis Men Check Navy Blue Shirts [Shirts, Navy Blue]",
+            "Scullers Men Navy Blue Shirt [Shirts, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Puma Unisex Limnos Navy Blue Casual Shoes [Casual Shoes, Navy Blue]",
+            "Skechers Men Black Sneakers [Casual Shoes, Black]",
+            "Vans Men Navy Blue Versa Casual Shoes [Casual Shoes, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "U.S. Polo Assn. Men Brown Formal Shoes [Formal Shoes, Brown]",
+            "Enroute Men Leather Brown Formal Shoes [Formal Shoes, Brown]",
+            "Rockport Men Jefford Brown Formal Shoes [Formal Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Nike Women Court Shuttle IV White Sports Shoes [Sports Shoes, White]",
+            "Puma Women White Running Shoes [Sports Shoes, White]",
+            "ADIDAS Men Sports White Sports Shoes [Sports Shoes, White]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": 1,
+          "top": [
+            "Titan Women Gold Watch [Watches, Gold]",
+            "Miss Sixty Gold Dial Watch [Watches, Gold]",
+            "Just Cavalli Women Gold Watch [Watches, Gold]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": 0.8,
+          "top": [
+            "Fastrack Men Silver Watch [Watches, Silver]",
+            "Casio Enticer Men Silver Analogue Watch MTP-1216A-1BDF(A355) [Watches, Black]",
+            "Q&Q Men Silver Watch [Watches, Silver]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "Spice Art Women Leatherette Black Handbag [Handbags, Black]",
+            "Fiorelli Women Black Leather Handbag [Handbags, Black]",
+            "Murcia Women Hddcs Grey Handbags [Handbags, Grey]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Vogue Women Black Sunglasses [Sunglasses, Black]",
+            "Fastrack Unisex Fastrack Black sunglass with Black frame Black Sunglasses [Sunglasses, Black]",
+            "M tv Unisex My Fab Eyewear Black Sunglasses [Sunglasses, Black]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Folklore Women Pink Kurta [Kurtas, Pink]",
+            "Aneri Women Pink Kurta [Kurtas, Pink]",
+            "Aneri Women Pink Kurta [Kurtas, Pink]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Fabindia Green Maheshwari Zari Saree [Sarees, Green]",
+            "Fabindia Green Maheshwari Maheshwari Zari Saree [Sarees, Green]",
+            "FNF Women Green & Cream Fashion Saree [Sarees, Green]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 1,
+          "gender": 0.6,
+          "top": [
+            "Carlton London Women Casual Black Casual Shoes [Casual Shoes, Black]",
+            "Enamor Black High Spirits Bra [Bra, Black]",
+            "Catwalk Women Black Sandals [Heels, Black]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Puma Unisex Puma Flips Blue Flip Flops [Flip Flops, Blue]",
+            "Converse Men Blue Flip Flop [Flip Flops, Blue]",
+            "Quiksilver Men Blue Flip Flops [Flip Flops, Blue]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Nike Unisex Black Backpack [Backpacks, Black]",
+            "ADIDAS Black Backpack [Backpacks, Black]",
+            "Nike Unisex Ultimatum Max Backpack [Backpacks, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 0.8,
+          "top": [
+            "Wrangler Men Brown Leather Belt [Belts, Brown]",
+            "Lino Perros Women Brown Belt [Belts, Brown]",
+            "Lee Men Brown Leather Belt [Belts, Brown]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.6,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Sepia Women Yellow Top [Tops, Yellow]",
+            "Mineral Women Yellow Top [Tops, Yellow]",
+            "Puma Women Yellow Sleeveless Top [Tops, Yellow]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.9,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Proline Men Grey Track Pants [Track Pants, Grey]",
+            "Nike Men Grey Track Pants [Track Pants, Grey]",
+            "ADIDAS Men Grey Track Pants [Track Pants, Grey]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": 0.9,
+          "top": [
+            "ADIDAS Men Black Jacket [Jackets, Black]",
+            "ADIDAS Men Solid Black Jackets [Jackets, Black]",
+            "Wildcraft Men Solid Black Jacket [Jackets, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": 1,
+          "top": [
+            "Estelle Women Gold Earrings [Earrings, Gold]",
+            "Royal Diadem Green Earrings [Earrings, Gold]",
+            "Estelle Gold Earrings [Earrings, Gold]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.6,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "ADIDAS Originals Women Trefoil Hoodie Red Sweatshirt [Sweatshirts, Red]",
+            "Roxy Women Red Sweater [Sweaters, Red]",
+            "Nike Men Solid Red Sweatshirt [Sweatshirts, Red]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Puma Men Blue Cap [Caps, Blue]",
+            "Nike Unisex Blue Tennis Cap [Caps, Blue]",
+            "ADIDAS Blue Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Arrow Men Brown Sandals [Sandals, Brown]",
+            "GAS Men Brown Deeply Sandals [Sandals, Brown]",
+            "Coolers Men Brown Sandals [Sandals, Brown]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Lino Perros Men Leather Black Wallet [Wallets, Black]",
+            "JAG Men Black Leather Wallet [Wallets, Black]",
+            "American Tourister Men Black Coin Passcase Wallet [Wallets, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "ColorBar Diva Red She Said Lipstick DL002 [Lipstick, Red]",
+            "Revlon Ruby Colorburst Lipstick 85 [Lipstick, Red]",
+            "Colorbar Velvet Matte Diva Lipstick 02 M [Lipstick, Red]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Hakashi Men Blue Tie [Ties, Blue]",
+            "Park Avenue Blue Tie [Ties, Blue]",
+            "Park Avenue Men Blue Tie [Ties, Blue]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spanish-raw",
+      "label": "Spanish, no glossary",
+      "description": "The same queries in Spanish, sent as they are.",
+      "date": "2026-11-20",
+      "adr": "0011-spanish-queries.md",
+      "summary": {
+        "articleType": 0.4593,
+        "baseColour": 0.4296,
+        "gender": 0.8353,
+        "all": 0.1741
+      },
+      "results": [
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.6,
+          "gender": null,
+          "top": [
+            "Red Rose Women Red Nightdress [Nightdress, Red]",
+            "Clarks Women Un Spire White Sandals [Heels, White]",
+            "Red Rose Red Nightdress [Nightdress, Red]"
+          ]
+        },
+        {
+          "all": 0.4,
+          "articleType": 0.8,
+          "baseColour": 0.7,
+          "gender": 0.7,
+          "top": [
+            "Spykar Men Washed Blue Jeans [Jeans, Blue]",
+            "s.Oliver Men's De-Nim White T-shirt [Tshirts, White]",
+            "Spykar Men Blue Jeans [Jeans, Blue]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Status Quo Men White T-shirt [Tshirts, White]",
+            "Park Avenue Men Grey Melange Square Neck Vest [Innerwear Vests, Grey Melange]",
+            "Chromozome Men White Innerwear Vest [Innerwear Vests, White]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 1,
+          "baseColour": 0,
+          "gender": 1,
+          "top": [
+            "Belmonte Men Check Blue Shirts [Shirts, Blue]",
+            "Flying Machine Men Ydc Blue Shirts [Shirts, Blue]",
+            "Highlander Men Check Blue Shirt [Shirts, Blue]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.9,
+          "baseColour": 0.7,
+          "gender": null,
+          "top": [
+            "Playboy Men Black Shoes [Casual Shoes, Black]",
+            "Red Tape Men Casual Black Shoes [Casual Shoes, Black]",
+            "ADIDAS Neo Men Court Sequence Mid Brown Shoes [Casual Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.3,
+          "articleType": 0.3,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Franco Leone Men Brown Makhani Formal Shoes [Formal Shoes, Brown]",
+            "Vans Men Brown Zapato Del Barco Shoes [Casual Shoes, Brown]",
+            "Franco Leone Men Brown Formal Shoes [Formal Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.4,
+          "baseColour": 0.6,
+          "gender": null,
+          "top": [
+            "Red Tape Men Casual White Shoe [Casual Shoes, White]",
+            "Playboy Men Black Shoes [Casual Shoes, Black]",
+            "Puma Men PowerCat Calcetto Black Shoe [Sports Shoes, Black]"
+          ]
+        },
+        {
+          "all": 0.1,
+          "articleType": 1,
+          "baseColour": 0.1,
+          "gender": 1,
+          "top": [
+            "Titan Women Silver Dial Watch [Watches, Silver]",
+            "Giordano Women Blue Dial Watch [Watches, Blue]",
+            "Titan Women White Dial Watch [Watches, White]"
+          ]
+        },
+        {
+          "all": 0.1,
+          "articleType": 1,
+          "baseColour": 0.1,
+          "gender": 0.6,
+          "top": [
+            "Fastrack Men Black Dial Watch [Watches, Black]",
+            "Giordano Men Black Dial Watch [Watches, Black]",
+            "Maxima Men Steel Dial Attivo Watch [Watches, Steel]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0.1,
+          "baseColour": 0.4,
+          "gender": 0.7,
+          "top": [
+            "Spice Art Women Casual Black Evening Clutch [Clutches, Black]",
+            "s.Oliver Men's De-Nim Black T-shirt [Tshirts, Black]",
+            "Spice Art Women Brown Handbag [Handbags, Brown]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.2,
+          "gender": null,
+          "top": [
+            "Rreverie Dark Brown & Turquoise Earrings [Earrings, Brown]",
+            "s.Oliver Men's De-Nim Black T-shirt [Tshirts, Black]",
+            "Revv Men Steel Pendant [Pendant, Steel]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0.8,
+          "baseColour": 0,
+          "gender": 1,
+          "top": [
+            "Fabindia Women Printed Beige Kurti [Kurtis, Beige]",
+            "Lee Women Rosa Navy Blue Top [Tops, Navy Blue]",
+            "Folklore Women Blue Kurta [Kurtas, Blue]"
+          ]
+        },
+        {
+          "all": 0.3,
+          "articleType": 0.6,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Vishudh Women Printed Green Kurta [Kurtas, Green]",
+            "FNF Green Sari [Sarees, Green]",
+            "Satya Paul Green Saree [Free Gifts, Green]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.2,
+          "gender": 0,
+          "top": [
+            "Ganuchi Men Casual Red Sandals [Sandals, Red]",
+            "Buckaroo Men Alto Multi Flip Flops [Flip Flops, Multi]",
+            "Puma Men Navy Blue & Orange Comfort Sandals [Sandals, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Rasasi Men Blue Perfume [Perfume and Body Mist, Blue]",
+            "Ralph Lauren Men Perfume [Perfume and Body Mist, Blue]",
+            "ADIDAS Unisex Blue Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Nike Unisex Ultimatum Max Backpack [Backpacks, Black]",
+            "ADIDAS Unisex BP Clima Insp Black White Backpack [Backpacks, Black]",
+            "Puma Unisex Blaze Black Backpacks [Backpacks, Black]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.2,
+          "gender": 0.6,
+          "top": [
+            "Chromozome Men Charcoal Trunks [Trunk, Charcoal]",
+            "s.Oliver Men's De-Nim Black T-shirt [Tshirts, Black]",
+            "Chromozome Men Pack of Two Briefs [Briefs, Brown]"
+          ]
+        },
+        {
+          "all": 0.1,
+          "articleType": 0.6,
+          "baseColour": 0.4,
+          "gender": 1,
+          "top": [
+            "Nike Women Yellow T-shirt [Tshirts, Yellow]",
+            "Jealous 21 Women Black Top With Sequins Top [Tops, Black]",
+            "United Colors of Benetton Women Yellow T-shirt [Tshirts, Yellow]"
+          ]
+        },
+        {
+          "all": 0.3,
+          "articleType": 0.6,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Turtle Check Men Grey Trouser [Trousers, Grey]",
+            "United Colors of Benetton Men Solid Grey Track Pants [Track Pants, Grey]",
+            "Proline Men Charcoal Grey Track Pants [Track Pants, Charcoal]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0.3,
+          "baseColour": 0.7,
+          "gender": 0.9,
+          "top": [
+            "United Colors of Benetton Men Polo Black Tshirts [Tshirts, Black]",
+            "United Colors of Benetton Men Solid Black Sweater [Sweaters, Black]",
+            "Arrow Men Grey Scarf [Scarves, Grey]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.8,
+          "baseColour": 0.2,
+          "gender": 1,
+          "top": [
+            "Adrika Women Red & White Earrings [Earrings, Red]",
+            "ToniQ Women Teal Set of 6 Bangles [Bangle, Blue]",
+            "Adrika Women Red & Gold Earrings [Earrings, Red]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "ADIDAS Red Men Cap [Caps, Red]",
+            "Wildcraft Unisex Red Duffle Bag [Duffel Bag, Red]",
+            "Hakashi Men Red Tie [Ties, Red]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": null,
+          "top": [
+            "United Colors of Benetton Women Solid Blue Cap [Caps, Blue]",
+            "ADIDAS Unisex Corp Blue Cap [Caps, Blue]",
+            "United Colors of Benetton Men Solid Blue Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.2,
+          "gender": null,
+          "top": [
+            "Portia Women Red Heels [Heels, Red]",
+            "Catwalk Women Mary Janes Beige Flats [Heels, Beige]",
+            "HM Women Golden Heels [Heels, Gold]"
+          ]
+        },
+        {
+          "all": 0,
+          "articleType": 0,
+          "baseColour": 0.2,
+          "gender": 0.7,
+          "top": [
+            "Chromozome Men Black Brief [Briefs, Black]",
+            "s.Oliver Men's De-Nim Black T-shirt [Tshirts, Black]",
+            "Chromozome Men Navy Blue Brief [Briefs, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 0.6,
+          "gender": null,
+          "top": [
+            "Colorbar Get Ready Lipstick 11 [Lipstick, Red]",
+            "Revlon ColorStay Overtime Relentless Raisin Lip Gloss 270 [Lip Gloss, Purple]",
+            "Reebok Men Reespeed Deo [Deodorant, Black]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.8,
+          "baseColour": 0.2,
+          "gender": 1,
+          "top": [
+            "Park Avenue Men Blue Tie [Ties, Blue]",
+            "Park Avenue Men Blue Tie [Ties, Blue]",
+            "Peter England Men Elite Black Tie [Ties, Black]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "spanish",
+      "label": "Spanish with glossary",
+      "description": "Spanish queries rewritten in English by the fashion glossary first.",
+      "date": "2026-11-20",
+      "adr": "0011-spanish-queries.md",
+      "summary": {
+        "articleType": 0.8741,
+        "baseColour": 0.9185,
+        "gender": 0.9412,
+        "all": 0.7778
+      },
+      "results": [
+        {
+          "all": 0.5,
+          "articleType": 0.5,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "AND Women Red Dress [Dresses, Red]",
+            "Red Rose Women Red Nightdress [Nightdress, Red]",
+            "Red Rose Women Red Bathrobe [Bath Robe, Red]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Spykar Men Ep Jeans Blue Jeans [Jeans, Blue]",
+            "Deni Yo Men Slim Fit Washed Blue Jeans [Jeans, Blue]",
+            "Pepe Jeans Men Blue Jeans [Jeans, Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "ADIDAS Men White T-shirt [Tshirts, White]",
+            "Proline Men White T-shirt [Tshirts, White]",
+            "Status Quo Men White T-shirt [Tshirts, White]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Scullers Men Solid Navy Blue Shirts [Shirts, Navy Blue]",
+            "Genesis Men Check Navy Blue Shirts [Shirts, Navy Blue]",
+            "Scullers Men Navy Blue Shirt [Shirts, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "Puma Unisex Limnos Navy Blue Casual Shoes [Casual Shoes, Navy Blue]",
+            "Skechers Men Black Sneakers [Casual Shoes, Black]",
+            "Vans Men Navy Blue Versa Casual Shoes [Casual Shoes, Navy Blue]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Rockport Men's Aderner Friar Brown Shoe [Formal Shoes, Brown]",
+            "Enroute Men Leather Brown Formal Shoes [Formal Shoes, Brown]",
+            "Rockport Men Jefford Brown Formal Shoes [Formal Shoes, Brown]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 0.5,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Puma Men's Basket Bump Sneaker [Casual Shoes, White]",
+            "Puma Men's Jiyu Slip On Sneaker [Sports Shoes, White]",
+            "Nike Women Court Shuttle IV White Sports Shoes [Sports Shoes, White]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 1,
+          "baseColour": 0.5,
+          "gender": 1,
+          "top": [
+            "Miss Sixty Gold Dial Watch [Watches, Gold]",
+            "Aspen Women White Dial Watch AP1103 [Watches, Multi]",
+            "Titan Women Gold Watch [Watches, Gold]"
+          ]
+        },
+        {
+          "all": 0.5,
+          "articleType": 1,
+          "baseColour": 0.6,
+          "gender": 0.8,
+          "top": [
+            "Titan Men Silver Watch [Watches, Silver]",
+            "Casio Enticer Men Silver Analogue Watch MTP-1216A-1BDF(A355) [Watches, Black]",
+            "Q&Q Men Silver Watch [Watches, Silver]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": 1,
+          "top": [
+            "Murcia Women Leather Office Black Bag [Handbags, Black]",
+            "Murcia Women Leather Black Handbag [Handbags, Black]",
+            "Spice Art Women Black Handbag [Handbags, Black]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "Vogue Women Black Sunglasses [Sunglasses, Black]",
+            "Fastrack Unisex Fastrack Black sunglass with Black frame Black Sunglasses [Sunglasses, Black]",
+            "M tv Unisex My Fab Eyewear Black Sunglasses [Sunglasses, Black]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 0.9,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Folklore Women Pink Kurta [Kurtas, Pink]",
+            "Aneri Women Pink Kurta [Kurtas, Pink]",
+            "Aneri Women Pink Kurta [Kurtas, Pink]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Fabindia Green Maheshwari Zari Saree [Sarees, Green]",
+            "Fabindia Green Maheshwari Maheshwari Zari Saree [Sarees, Green]",
+            "FNF Women Green & Cream Fashion Saree [Sarees, Green]"
+          ]
+        },
+        {
+          "all": 0.2,
+          "articleType": 0.2,
+          "baseColour": 1,
+          "gender": 0.6,
+          "top": [
+            "Carlton London Women Casual Black Casual Shoes [Casual Shoes, Black]",
+            "Enamor Black High Spirits Bra [Bra, Black]",
+            "Catwalk Women Black Sandals [Heels, Black]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Puma Unisex Puma Flips Blue Flip Flops [Flip Flops, Blue]",
+            "Converse Men Blue Flip Flop [Flip Flops, Blue]",
+            "Quiksilver Men Blue Flip Flops [Flip Flops, Blue]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Nike Unisex Black Backpack [Backpacks, Black]",
+            "ADIDAS Black Backpack [Backpacks, Black]",
+            "Nike Unisex Ultimatum Max Backpack [Backpacks, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 0.8,
+          "top": [
+            "Lee Men Leather Brown Belt [Belts, Brown]",
+            "Turtle Men Leather Brown Belts [Belts, Brown]",
+            "Lino Perros Women Brown Belt [Belts, Brown]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.7,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Sepia Women Yellow Top [Tops, Yellow]",
+            "Mineral Women Yellow Top [Tops, Yellow]",
+            "Puma Women Yellow Sleeveless Top [Tops, Yellow]"
+          ]
+        },
+        {
+          "all": 0.7,
+          "articleType": 0.9,
+          "baseColour": 0.7,
+          "gender": 1,
+          "top": [
+            "Proline Men Grey Track Pants [Track Pants, Grey]",
+            "Nike Men Grey Track Pants [Track Pants, Grey]",
+            "Proline Men Grey Track Pants [Track Pants, Grey]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": 0.9,
+          "top": [
+            "ADIDAS Men Black Jacket [Jackets, Black]",
+            "ADIDAS Men Solid Black Jackets [Jackets, Black]",
+            "Wildcraft Men Solid Black Jacket [Jackets, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": 1,
+          "top": [
+            "Estelle Women Gold Earrings [Earrings, Gold]",
+            "Royal Diadem Green Earrings [Earrings, Gold]",
+            "Estelle Gold Earrings [Earrings, Gold]"
+          ]
+        },
+        {
+          "all": 0.6,
+          "articleType": 0.6,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "ADIDAS Originals Women Trefoil Hoodie Red Sweatshirt [Sweatshirts, Red]",
+            "Roxy Women Red Sweater [Sweaters, Red]",
+            "Nike Men Solid Red Sweatshirt [Sweatshirts, Red]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 0.9,
+          "gender": null,
+          "top": [
+            "ADIDAS Unisex Blue Cap [Caps, Blue]",
+            "Puma Men Blue Cap [Caps, Blue]",
+            "Nike Unisex Blue Tennis Cap [Caps, Blue]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 0.8,
+          "baseColour": 1,
+          "gender": null,
+          "top": [
+            "Arrow Men Brown Sandals [Sandals, Brown]",
+            "GAS Men Brown Deeply Sandals [Sandals, Brown]",
+            "Coolers Men Brown Sandals [Sandals, Brown]"
+          ]
+        },
+        {
+          "all": 0.9,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 0.9,
+          "top": [
+            "JAG Men Black Leather Wallet [Wallets, Black]",
+            "Lino Perros Men Black Wallet [Wallets, Black]",
+            "JAG Men Black Leather Wallet [Wallets, Black]"
+          ]
+        },
+        {
+          "all": 0.8,
+          "articleType": 1,
+          "baseColour": 0.8,
+          "gender": null,
+          "top": [
+            "ColorBar Diva Red She Said Lipstick DL002 [Lipstick, Red]",
+            "Revlon Ruby Colorburst Lipstick 85 [Lipstick, Red]",
+            "Colorbar Velvet Matte Diva Lipstick 02 M [Lipstick, Red]"
+          ]
+        },
+        {
+          "all": 1,
+          "articleType": 1,
+          "baseColour": 1,
+          "gender": 1,
+          "top": [
+            "Hakashi Men Blue Tie [Ties, Blue]",
+            "Park Avenue Men Blue Tie [Ties, Blue]",
+            "Park Avenue Blue Tie [Ties, Blue]"
+          ]
+        }
+      ]
+    }
+  ]
+}

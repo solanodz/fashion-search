@@ -11,6 +11,9 @@ export function SiteHeader({ titleAs: Title = "p" }: { titleAs?: "h1" | "p" }) {
         <Link className="link hover:text-ink" href="/how-it-works">
           How it works
         </Link>
+        <Link className="link hover:text-ink" href="/evaluation">
+          Evaluation
+        </Link>
         <a
           className="link hover:text-ink"
           href="https://github.com/solanodz/fashion-search"
