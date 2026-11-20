@@ -16,7 +16,7 @@ test("home page loads without errors", async ({ page }) => {
   // The embedding map loads its points from public/.
   await expect(
     page.getByRole("img", {
-      name: /^Map of [\d,]+ products by image similarity$/,
+      name: /^3D map of [\d,]+ products by image similarity$/,
     }),
   ).toBeVisible();
   expect(errors).toEqual([]);
@@ -32,7 +32,7 @@ test("the embedding map opens large, searches and closes", async ({ page }) => {
   const dialog = page.getByRole("dialog", { name: "Embedding space" });
   await expect(dialog).toBeVisible();
   await expect(
-    dialog.getByRole("img", { name: /^Map of [\d,]+ products/ }),
+    dialog.getByRole("img", { name: /^3D map of [\d,]+ products/ }),
   ).toBeVisible();
 
   const search = dialog.getByRole("textbox", {

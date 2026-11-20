@@ -1,6 +1,13 @@
 "use client";
 
-import { type FormEvent, useEffect, useMemo, useRef, useState } from "react";
+import {
+  type FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 
 import {
   CATEGORY_COLOURS,
@@ -10,21 +17,34 @@ import {
   type MapMeta,
   OTHER_COLOUR,
   placeQuery,
+  type Position,
 } from "@/lib/indexing/embedding-map";
 import type { SearchResult } from "@/lib/search/schema";
 
 import { IMAGE_BASE_URL } from "./results-grid";
 
 /**
- * Every product's image vector projected to 2D (UMAP, ADR 0010), with the
- * current results and the query drawn on top. Similar products sit close
- * together, which is what the search relies on. The sidebar shows a compact
- * map; "Expand" opens a large one with zoom, pan and its own search box.
+ * Every product's image vector projected to 3D (UMAP, ADR 0010), drawn as a
+ * point cloud in perspective, with the current results and the query on
+ * top. Similar products sit close together, which is what the search relies
+ * on. It turns slowly on its own until touched; drag to rotate. The sidebar
+ * shows a compact view; "Expand" opens a large one with zoom and a search
+ * box.
  */
 
-const PAD = 6;
-/** Results joined to the query by a line in the expanded map. */
+/** Results joined to the query by a line in the expanded view. */
 const LINKED_RESULTS = 10;
+/** Camera distance from the cube's centre, in cube widths. */
+const CAMERA = 2.4;
+const AUTO_TURN = 0.0022;
+const DEFAULT_VIEW = { yaw: -0.6, pitch: 0.35, zoom: 1 };
+const CATEGORY_NAMES = Object.keys(CATEGORY_COLOURS);
+/** Depth bands, far to near: dimmer and smaller further away. */
+const BANDS = [
+  { alpha: 0.18, size: 0.8 },
+  { alpha: 0.32, size: 1 },
+  { alpha: 0.55, size: 1.25 },
+];
 
 let mapRequest: Promise<EmbeddingMap> | null = null;
 
@@ -61,14 +81,29 @@ function useEmbeddingMap() {
   return { map, failed };
 }
 
-type View = { k: number; x: number; y: number };
-const IDENTITY: View = { k: 1, x: 0, y: 0 };
+const REDUCED_MOTION = "(prefers-reduced-motion: reduce)";
+function subscribeToReducedMotion(onChange: () => void) {
+  const media = window.matchMedia(REDUCED_MOTION);
+  media.addEventListener("change", onChange);
+  return () => media.removeEventListener("change", onChange);
+}
+function usePrefersReducedMotion() {
+  return useSyncExternalStore(
+    subscribeToReducedMotion,
+    () => window.matchMedia(REDUCED_MOTION).matches,
+    () => false,
+  );
+}
+
+type View = { yaw: number; pitch: number; zoom: number };
 type Hover = { left: number; top: number; text: string } | null;
+type Highlight = Position & { result: SearchResult };
 
 /**
- * The map itself: a square canvas as large as its container allows. With
- * `detailed`, it labels more types, joins the query to its closest results
- * and can be zoomed (wheel) and dragged.
+ * The 3D view: a square canvas as large as its container allows, redrawn on
+ * an animation frame while it turns or is dragged. With `detailed`, it
+ * labels more types, joins the query to its closest results, and zooms
+ * with the wheel.
  */
 function MapCanvas({
   map,
@@ -81,12 +116,17 @@ function MapCanvas({
 }) {
   const canvas = useRef<HTMLCanvasElement>(null);
   const frame = useRef<HTMLDivElement>(null);
+  const view = useRef<View>({ ...DEFAULT_VIEW });
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const pointerInside = useRef(false);
+  const touched = useRef(false);
+  const dirty = useRef(true);
+  /** Screen position of every point in the last frame, for hovering. */
+  const screen = useRef<Float32Array>(new Float32Array(0));
   const [size, setSize] = useState(0);
-  /** Horizontal offset of the centred canvas inside its frame. */
   const [offset, setOffset] = useState(0);
-  const [view, setView] = useState<View>(IDENTITY);
   const [hover, setHover] = useState<Hover>(null);
+  const reducedMotion = usePrefersReducedMotion();
 
   useEffect(() => {
     const element = frame.current;
@@ -95,6 +135,7 @@ function MapCanvas({
       const side = Math.max(0, Math.floor(Math.min(width, height)));
       setSize(side);
       setOffset(detailed ? (width - side) / 2 : 0);
+      dirty.current = true;
     };
     if (typeof ResizeObserver === "undefined") {
       fit(element.clientWidth, element.clientHeight || element.clientWidth);
@@ -107,206 +148,309 @@ function MapCanvas({
     return () => observer.disconnect();
   }, [detailed]);
 
-  const index = useMemo(() => {
-    const byId = new Map<number, number>();
-    map.ids.forEach((id, i) => byId.set(id, i));
-    return byId;
+  // Per point: its category index, for one fill colour per batch.
+  const categoryOf = useMemo(() => {
+    const out = new Uint8Array(map.ids.length);
+    map.types.forEach((type, i) => {
+      const name = map.meta.categories[map.meta.types[type]];
+      const index = CATEGORY_NAMES.indexOf(name);
+      out[i] = index === -1 ? CATEGORY_NAMES.length : index;
+    });
+    return out;
   }, [map]);
 
   // Label the largest article types at the median of their points.
   const labels = useMemo(() => {
-    const byType = new Map<number, { xs: number[]; ys: number[] }>();
+    const byType = new Map<number, number[][]>();
     map.types.forEach((type, i) => {
-      const entry = byType.get(type) ?? { xs: [], ys: [] };
-      entry.xs.push(map.xy[i * 2]);
-      entry.ys.push(map.xy[i * 2 + 1]);
-      byType.set(type, entry);
+      const list = byType.get(type) ?? [];
+      list.push([map.xyz[i * 3], map.xyz[i * 3 + 1], map.xyz[i * 3 + 2]]);
+      byType.set(type, list);
     });
     const median = (values: number[]) =>
       values.sort((a, b) => a - b)[Math.floor(values.length / 2)];
     return [...byType]
-      .sort(([, a], [, b]) => b.xs.length - a.xs.length)
-      .slice(0, detailed ? 24 : 8)
-      .map(([type, { xs, ys }]) => ({
+      .sort(([, a], [, b]) => b.length - a.length)
+      .slice(0, detailed ? 20 : 8)
+      .map(([type, points]) => ({
         text: map.meta.types[type],
-        x: median(xs),
-        y: median(ys),
+        x: median(points.map((p) => p[0])),
+        y: median(points.map((p) => p[1])),
+        z: median(points.map((p) => p[2])),
       }));
   }, [map, detailed]);
 
   const highlighted = useMemo(() => {
-    if (!results) return { points: [], query: null };
-    const points = results.flatMap((result) => {
+    if (!results) return { points: [] as Highlight[], query: null };
+    const index = new Map<number, number>();
+    map.ids.forEach((id, i) => index.set(id, i));
+    const points = results.flatMap((result): Highlight[] => {
       const i = index.get(result.id);
       return i === undefined
         ? []
-        : [{ x: map.xy[i * 2], y: map.xy[i * 2 + 1], result }];
+        : [
+            {
+              x: map.xyz[i * 3],
+              y: map.xyz[i * 3 + 1],
+              z: map.xyz[i * 3 + 2],
+              result,
+            },
+          ];
     });
     const query = placeQuery(
-      points.map((p) => ({ x: p.x, y: p.y, score: p.result.score })),
+      points.map((p) => ({ x: p.x, y: p.y, z: p.z, score: p.result.score })),
     );
     return { points, query };
-  }, [map, results, index]);
+  }, [map, results]);
 
-  // Map coordinates ([0, 1]) to canvas pixels, through the zoom and pan.
-  const inner = size - PAD * 2;
-  const toScreen = (x: number, y: number): [number, number] => [
-    (PAD + x * inner) * view.k + view.x,
-    (PAD + y * inner) * view.k + view.y,
-  ];
-  const toMap = (sx: number, sy: number): [number, number] => [
-    ((sx - view.x) / view.k - PAD) / inner,
-    ((sy - view.y) / view.k - PAD) / inner,
-  ];
+  useEffect(() => {
+    dirty.current = true;
+  }, [highlighted, labels, size]);
 
+  // The render loop: redraws when something changed or while turning.
   useEffect(() => {
     const element = canvas.current;
     if (!element || size === 0) return;
+    const context = element.getContext("2d");
+    if (!context) return;
     const ratio = window.devicePixelRatio || 1;
     element.width = size * ratio;
     element.height = size * ratio;
-    const context = element.getContext("2d");
-    if (!context) return;
-    context.scale(ratio, ratio);
-    context.clearRect(0, 0, size, size);
-    const ink =
-      getComputedStyle(element).getPropertyValue("--ink").trim() || "#21201c";
-    const at = (x: number, y: number) => [
-      (PAD + x * inner) * view.k + view.x,
-      (PAD + y * inner) * view.k + view.y,
+    const styles = getComputedStyle(element);
+    const ink = styles.getPropertyValue("--ink").trim() || "#21201c";
+    const line = styles.getPropertyValue("--line-strong").trim() || "#cfceca";
+    const colours = [
+      ...CATEGORY_NAMES.map((n) => CATEGORY_COLOURS[n]),
+      OTHER_COLOUR,
     ];
-    const dot = 1.5 * Math.sqrt(Math.min(view.k, 6));
+    const count = map.ids.length;
+    const groups = colours.length * BANDS.length;
+    const keys = new Uint8Array(count);
+    const order = new Uint32Array(count);
+    const starts = new Uint32Array(groups + 1);
+    const projected = new Float32Array(count * 2);
+    screen.current = projected;
 
-    const hasResults = highlighted.points.length > 0;
-    context.globalAlpha = hasResults ? 0.25 : 0.5;
-    for (let i = 0; i < map.ids.length; i++) {
-      const type = map.meta.types[map.types[i]];
-      context.fillStyle =
-        CATEGORY_COLOURS[map.meta.categories[type]] ?? OTHER_COLOUR;
-      const [x, y] = at(map.xy[i * 2], map.xy[i * 2 + 1]);
-      if (x < -4 || y < -4 || x > size + 4 || y > size + 4) continue;
-      context.fillRect(x - dot / 2, y - dot / 2, dot, dot);
-    }
-
-    context.globalAlpha = hasResults ? (detailed ? 0.55 : 0) : 1;
-    context.font = `${detailed ? 11 : 10}px var(--font-geist), sans-serif`;
-    context.textAlign = "center";
-    context.fillStyle = ink;
-    if (context.globalAlpha > 0) {
-      for (const label of labels) {
-        const [x, y] = at(label.x, label.y);
-        context.fillText(label.text, x, y);
+    let frameId = 0;
+    const render = () => {
+      frameId = requestAnimationFrame(render);
+      const turning =
+        !reducedMotion &&
+        !drag.current &&
+        !pointerInside.current &&
+        !touched.current;
+      if (turning) {
+        view.current.yaw += AUTO_TURN;
+        dirty.current = true;
       }
-    }
+      if (!dirty.current) return;
+      dirty.current = false;
 
-    context.globalAlpha = 1;
-    const query = highlighted.query
-      ? at(highlighted.query.x, highlighted.query.y)
-      : null;
-    if (detailed && query) {
-      // The query's closest products, joined to it.
-      context.strokeStyle = ink;
-      context.globalAlpha = 0.35;
+      const { yaw, pitch, zoom } = view.current;
+      const cy = Math.cos(yaw);
+      const sy = Math.sin(yaw);
+      const cp = Math.cos(pitch);
+      const sp = Math.sin(pitch);
+      const half = size / 2;
+      const scale = size * 0.5 * zoom;
+      const project = (x: number, y: number, z: number) => {
+        const px = x - 0.5;
+        const py = 0.5 - y;
+        const pz = z - 0.5;
+        const x1 = px * cy - pz * sy;
+        const z1 = px * sy + pz * cy;
+        const y1 = py * cp - z1 * sp;
+        const z2 = py * sp + z1 * cp;
+        const f = CAMERA / (CAMERA + z2);
+        return [half + x1 * scale * f, half - y1 * scale * f, z2, f] as const;
+      };
+
+      context.setTransform(ratio, 0, 0, ratio, 0, 0);
+      context.clearRect(0, 0, size, size);
+
+      // The unit cube's edges, as a depth cue.
+      context.globalAlpha = 0.5;
+      context.strokeStyle = line;
       context.lineWidth = 1;
-      for (const point of highlighted.points.slice(0, LINKED_RESULTS)) {
-        const [x, y] = at(point.x, point.y);
+      context.beginPath();
+      const corners = [0, 1].flatMap((x) =>
+        [0, 1].flatMap((y) => [0, 1].map((z) => project(x, y, z))),
+      );
+      for (let a = 0; a < 8; a++) {
+        for (const bit of [1, 2, 4]) {
+          const b = a | bit;
+          if (b === a) continue;
+          context.moveTo(corners[a][0], corners[a][1]);
+          context.lineTo(corners[b][0], corners[b][1]);
+        }
+      }
+      context.stroke();
+
+      // Project every point and sort it into (depth band, colour) batches.
+      starts.fill(0);
+      for (let i = 0; i < count; i++) {
+        const [x, y, z] = project(
+          map.xyz[i * 3],
+          map.xyz[i * 3 + 1],
+          map.xyz[i * 3 + 2],
+        );
+        projected[i * 2] = x;
+        projected[i * 2 + 1] = y;
+        const band = z > 0.15 ? 0 : z > -0.15 ? 1 : 2;
+        const key = band * colours.length + categoryOf[i];
+        keys[i] = key;
+        starts[key + 1]++;
+      }
+      for (let g = 0; g < groups; g++) starts[g + 1] += starts[g];
+      const fill = starts.slice(0, groups);
+      for (let i = 0; i < count; i++) order[fill[keys[i]]++] = i;
+
+      const dimmed = highlighted.points.length > 0;
+      const dot = Math.max(1.4, size / 360) * Math.sqrt(Math.min(zoom, 4));
+      for (let g = 0; g < groups; g++) {
+        const band = BANDS[Math.floor(g / colours.length)];
+        context.globalAlpha = band.alpha * (dimmed ? 0.6 : 1);
+        context.fillStyle = colours[g % colours.length];
+        const d = dot * band.size;
+        for (let k = starts[g]; k < starts[g + 1]; k++) {
+          const i = order[k];
+          context.fillRect(
+            projected[i * 2] - d / 2,
+            projected[i * 2 + 1] - d / 2,
+            d,
+            d,
+          );
+        }
+      }
+
+      context.font = `${detailed ? 11 : 10}px var(--font-geist), sans-serif`;
+      context.textAlign = "center";
+      context.fillStyle = ink;
+      if (!dimmed || detailed) {
+        for (const label of labels) {
+          const [x, y, z] = project(label.x, label.y, label.z);
+          context.globalAlpha = (dimmed ? 0.45 : 0.85) * (z > 0.15 ? 0.5 : 1);
+          context.fillText(label.text, x, y);
+        }
+      }
+
+      context.globalAlpha = 1;
+      const query = highlighted.query
+        ? project(highlighted.query.x, highlighted.query.y, highlighted.query.z)
+        : null;
+      if (detailed && query) {
+        context.strokeStyle = ink;
+        context.globalAlpha = 0.4;
         context.beginPath();
-        context.moveTo(query[0], query[1]);
-        context.lineTo(x, y);
+        for (const point of highlighted.points.slice(0, LINKED_RESULTS)) {
+          const [x, y] = project(point.x, point.y, point.z);
+          context.moveTo(query[0], query[1]);
+          context.lineTo(x, y);
+        }
+        context.stroke();
+        context.globalAlpha = 1;
+      }
+      context.fillStyle = ink;
+      for (const point of highlighted.points) {
+        const [x, y, , f] = project(point.x, point.y, point.z);
+        context.beginPath();
+        context.arc(x, y, (detailed ? 3 : 2.2) * f, 0, Math.PI * 2);
+        context.fill();
+      }
+      if (query) {
+        context.strokeStyle = ink;
+        context.lineWidth = 1.5;
+        context.beginPath();
+        context.arc(
+          query[0],
+          query[1],
+          (detailed ? 9 : 7) * query[3],
+          0,
+          Math.PI * 2,
+        );
         context.stroke();
       }
-      context.globalAlpha = 1;
+    };
+    dirty.current = true;
+    render();
+    return () => cancelAnimationFrame(frameId);
+  }, [map, size, categoryOf, labels, highlighted, detailed, reducedMotion]);
+
+  function findHover(sx: number, sy: number): Hover {
+    const points = screen.current;
+    const reach = 49;
+    let best: Hover = null;
+    let bestDistance = reach;
+    // Results first: they're what the visitor is looking at. Their screen
+    // position is the projected one of their catalog point.
+    if (highlighted.points.length) {
+      const index = new Map<number, number>();
+      map.ids.forEach((id, i) => index.set(id, i));
+      for (const point of highlighted.points) {
+        const i = index.get(point.result.id)!;
+        const d = (points[i * 2] - sx) ** 2 + (points[i * 2 + 1] - sy) ** 2;
+        if (d < bestDistance) {
+          bestDistance = d;
+          best = {
+            left: points[i * 2],
+            top: points[i * 2 + 1],
+            text: `${point.result.product.name}, ${point.result.score.toFixed(3)}`,
+          };
+        }
+      }
+      if (best) return best;
     }
-    context.fillStyle = ink;
-    for (const point of highlighted.points) {
-      const [x, y] = at(point.x, point.y);
-      context.beginPath();
-      context.arc(x, y, detailed ? 3 : 2.2, 0, Math.PI * 2);
-      context.fill();
+    for (let i = 0; i < map.ids.length; i++) {
+      const d = (points[i * 2] - sx) ** 2 + (points[i * 2 + 1] - sy) ** 2;
+      if (d < bestDistance) {
+        bestDistance = d;
+        best = {
+          left: points[i * 2],
+          top: points[i * 2 + 1],
+          text: map.meta.types[map.types[i]],
+        };
+      }
     }
-    if (query) {
-      context.strokeStyle = ink;
-      context.lineWidth = 1.5;
-      context.beginPath();
-      context.arc(query[0], query[1], detailed ? 9 : 7, 0, Math.PI * 2);
-      context.stroke();
-    }
-  }, [map, size, inner, labels, highlighted, view, detailed]);
+    return best;
+  }
 
   function onPointerMove(event: React.PointerEvent<HTMLCanvasElement>) {
-    const rect = event.currentTarget.getBoundingClientRect();
-    const sx = event.clientX - rect.left;
-    const sy = event.clientY - rect.top;
     if (drag.current) {
       const dx = event.clientX - drag.current.x;
       const dy = event.clientY - drag.current.y;
       drag.current = { x: event.clientX, y: event.clientY };
-      setView((v) => ({ ...v, x: v.x + dx, y: v.y + dy }));
+      view.current.yaw += dx * 0.008;
+      view.current.pitch = Math.max(
+        -1.45,
+        Math.min(1.45, view.current.pitch + dy * 0.008),
+      );
+      dirty.current = true;
       setHover(null);
       return;
     }
-    const [px, py] = toMap(sx, sy);
-    const reach = 7 / (inner * view.k);
-    let best: Hover = null;
-    let bestDistance = reach * reach;
-    // Results first: they're what the visitor is looking at.
-    for (const point of highlighted.points) {
-      const d = (point.x - px) ** 2 + (point.y - py) ** 2;
-      if (d < bestDistance) {
-        bestDistance = d;
-        const [left, top] = toScreen(point.x, point.y);
-        best = {
-          left,
-          top,
-          text: `${point.result.product.name}, ${point.result.score.toFixed(3)}`,
-        };
-      }
-    }
-    if (!best) {
-      for (let i = 0; i < map.ids.length; i++) {
-        const x = map.xy[i * 2];
-        const y = map.xy[i * 2 + 1];
-        const d = (x - px) ** 2 + (y - py) ** 2;
-        if (d < bestDistance) {
-          bestDistance = d;
-          const [left, top] = toScreen(x, y);
-          best = { left, top, text: map.meta.types[map.types[i]] };
-        }
-      }
-    }
-    setHover(best);
-  }
-
-  function onWheel(event: React.WheelEvent<HTMLCanvasElement>) {
-    if (!detailed) return;
     const rect = event.currentTarget.getBoundingClientRect();
-    const cx = event.clientX - rect.left;
-    const cy = event.clientY - rect.top;
-    setView((v) => {
-      const k = Math.min(
-        24,
-        Math.max(1, v.k * Math.exp(-event.deltaY * 0.0015)),
-      );
-      if (k === 1) return IDENTITY;
-      return {
-        k,
-        x: cx - (cx - v.x) * (k / v.k),
-        y: cy - (cy - v.y) * (k / v.k),
-      };
-    });
+    setHover(findHover(event.clientX - rect.left, event.clientY - rect.top));
   }
 
-  // Wheel zoom must not scroll the page behind the expanded map.
+  // Wheel zoom in the expanded view, without scrolling anything behind it.
   useEffect(() => {
     const element = canvas.current;
     if (!element || !detailed) return;
-    const stop = (event: WheelEvent) => event.preventDefault();
-    element.addEventListener("wheel", stop, { passive: false });
-    return () => element.removeEventListener("wheel", stop);
+    const onWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      view.current.zoom = Math.min(
+        8,
+        Math.max(0.6, view.current.zoom * Math.exp(-event.deltaY * 0.0015)),
+      );
+      touched.current = true;
+      dirty.current = true;
+    };
+    element.addEventListener("wheel", onWheel, { passive: false });
+    return () => element.removeEventListener("wheel", onWheel);
   }, [detailed]);
 
   const description =
-    `Map of ${map.ids.length.toLocaleString("en")} products by image similarity` +
+    `3D map of ${map.ids.length.toLocaleString("en")} products by image similarity` +
     (highlighted.points.length
       ? `, with the query and its ${highlighted.points.length} results highlighted`
       : "");
@@ -318,39 +462,38 @@ function MapCanvas({
         role="img"
         aria-label={description}
         style={{ width: size, height: size }}
-        className={`block rounded-sm border border-rule ${detailed ? "mx-auto cursor-grab touch-none active:cursor-grabbing" : ""}`}
+        className={`block cursor-grab rounded-sm border border-rule active:cursor-grabbing ${detailed ? "mx-auto touch-none" : ""}`}
+        onPointerEnter={() => {
+          pointerInside.current = true;
+        }}
         onPointerDown={(event) => {
-          if (!detailed) return;
+          // On phones the compact map leaves touch to page scrolling.
+          if (!detailed && event.pointerType !== "mouse") return;
           drag.current = { x: event.clientX, y: event.clientY };
+          touched.current = true;
           event.currentTarget.setPointerCapture(event.pointerId);
         }}
         onPointerUp={() => {
           drag.current = null;
         }}
         onPointerMove={onPointerMove}
-        onPointerLeave={() => setHover(null)}
-        onWheel={onWheel}
-        onDoubleClick={() => detailed && setView(IDENTITY)}
+        onPointerLeave={() => {
+          pointerInside.current = false;
+          setHover(null);
+        }}
+        onDoubleClick={() => {
+          view.current = { ...DEFAULT_VIEW };
+          touched.current = false;
+          dirty.current = true;
+        }}
       />
       {hover && (
         <span
           className="pointer-events-none absolute z-10 max-w-56 -translate-x-1/2 -translate-y-full rounded-sm bg-ink px-2 py-1 text-xs text-paper"
-          style={{
-            left: hover.left + offset,
-            top: hover.top - 8,
-          }}
+          style={{ left: hover.left + offset, top: hover.top - 8 }}
         >
           {hover.text}
         </span>
-      )}
-      {detailed && view.k > 1 && (
-        <button
-          type="button"
-          className="absolute top-2 right-2 rounded-sm border border-rule bg-paper px-2 py-1 text-xs text-muted hover:text-ink"
-          onClick={() => setView(IDENTITY)}
-        >
-          Reset zoom
-        </button>
       )}
     </div>
   );
@@ -403,8 +546,8 @@ export function EmbeddingMapView({
       </div>
       <p className="mt-0.5 text-xs text-muted">
         {results?.length
-          ? "Your query (ring) and its results (dots)"
-          : "Every product, placed by image similarity"}
+          ? "Your query (ring) and its results (dots), in 3D"
+          : "Every product in 3D, placed by image similarity"}
       </p>
       <div className="mt-2 aspect-square w-full lg:aspect-auto lg:min-h-24 lg:flex-1">
         {failed ? (
@@ -419,7 +562,8 @@ export function EmbeddingMapView({
 
 /**
  * The map in a large dialog, with a search box, so a visitor can search and
- * watch where the query lands and which products are its neighbours.
+ * watch where the query lands and which products are its neighbours. The
+ * page behind it doesn't scroll while it's open.
  */
 export function ExpandedMap({
   open,
@@ -449,6 +593,17 @@ export function ExpandedMap({
     } else if (!open && element.open) element.close();
   }, [open, query]);
 
+  // Lock the page scroll behind the dialog.
+  useEffect(() => {
+    if (!open) return;
+    const root = document.documentElement;
+    const previous = root.style.overflow;
+    root.style.overflow = "hidden";
+    return () => {
+      root.style.overflow = previous;
+    };
+  }, [open]);
+
   function submit(event: FormEvent) {
     event.preventDefault();
     if (text.trim()) onSearch(text);
@@ -459,7 +614,7 @@ export function ExpandedMap({
       ref={dialog}
       aria-labelledby="expanded-map-title"
       onClose={onClose}
-      className="m-auto h-[min(92dvh,56rem)] w-[min(96vw,80rem)] max-w-none rounded-md border border-rule bg-paper p-0 text-ink backdrop:bg-black/50"
+      className="m-auto h-[min(92dvh,56rem)] w-[min(96vw,80rem)] max-w-none overscroll-contain rounded-md border border-rule bg-paper p-0 text-ink backdrop:bg-black/50"
     >
       {/* Content only while open: no hidden duplicate map or status text. */}
       {open && (
@@ -510,10 +665,11 @@ export function ExpandedMap({
                 {status}
               </p>
               <p className="leading-relaxed text-muted">
-                Each dot is a product photo, placed so that similar photos sit
-                close together. Your query lands at the ring, among the products
-                it matches best; lines join it to its {LINKED_RESULTS} closest
-                results. Scroll to zoom, drag to move, double-click to reset.
+                Each dot is a product photo, placed in 3D so that similar photos
+                sit close together. Your query lands at the ring, among the
+                products it matches best; lines join it to its {LINKED_RESULTS}{" "}
+                closest results. Drag to rotate, scroll to zoom, double-click to
+                reset.
               </p>
               <Legend />
               {results && results.length > 0 && (

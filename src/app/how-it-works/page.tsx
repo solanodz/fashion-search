@@ -267,9 +267,9 @@ export default function HowItWorks() {
               <dt>Embedding space</dt>
               <dd className="text-muted">
                 Every product as a dot, placed so that similar photos sit close
-                together (the 512 numbers squeezed into two with UMAP). The ring
-                is your query and the dark dots are its results. Colours are
-                categories:
+                together (the 512 numbers squeezed into three with UMAP, drawn
+                in 3D). The ring is your query and the dark dots are its
+                results. Colours are categories:
                 <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
                   {[
                     ...Object.entries(CATEGORY_COLOURS),
