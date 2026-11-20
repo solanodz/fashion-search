@@ -115,6 +115,8 @@ type Rect = {
   labelRight: number;
   labelCy: number;
 };
+/** A measured piece inside a stage: its box and the vertical center of its photos. */
+type Anchor = { left: number; right: number; cy: number };
 type Point = [number, number];
 type Direction = "down" | "left" | "right";
 type Edge = {
@@ -221,7 +223,11 @@ function arrowPath([x, y]: Point, direction: Direction) {
  * Stacked (phones): one column in reading order, a line dropping from stage
  * to stage, and the return line up the right side.
  */
-function buildEdges(rects: Record<StageId, Rect>, width: number): Edge[] {
+function buildEdges(
+  rects: Record<StageId, Rect>,
+  anchors: Record<string, Anchor>,
+  width: number,
+): Edge[] {
   const { query, encode, keywords, search, fuse, results } = rects;
   const wide = encode.left >= query.right;
   // Phones keep the return line inside the list's right padding.
@@ -278,6 +284,29 @@ function buildEdges(rects: Record<StageId, Rect>, width: number): Edge[] {
     across("keywords", "fuse");
     across("fuse", "results");
 
+    // Inside Fusion: the image list and the keyword list each leave their row
+    // and join into one arrow pointing at the merged results.
+    const image = anchors["fuse-image"];
+    const words = anchors["fuse-keywords"];
+    const merged = anchors["results-row"];
+    if (image && words && merged) {
+      const joinX = snap(
+        (Math.max(image.right, words.right) + merged.left) / 2,
+      );
+      const into: Point = [merged.left - GAP, snap(merged.cy)];
+      for (const [id, row] of [
+        ["image", image],
+        ["keywords", words],
+      ] as const) {
+        const y = snap(row.cy);
+        edges.push({
+          id: `fuse-${id}-results`,
+          points: [[row.right + GAP, y], [joinX, y], [joinX, into[1]], into],
+          arrow: "right",
+        });
+      }
+    }
+
     const topY = snap(query.top - OVERHEAD);
     const resultsY = snap(results.labelCy);
     edges.push({
@@ -329,6 +358,7 @@ export function SearchFlow() {
   const nodeRefs = useRef(new Map<StageId, HTMLLIElement>());
   const [geometry, setGeometry] = useState<{
     rects: Record<StageId, Rect>;
+    anchors: Record<string, Anchor>;
     width: number;
   } | null>(null);
   const [hovered, setHovered] = useState<StageId | null>(null);
@@ -358,7 +388,20 @@ export function SearchFlow() {
           labelCy: label ? label.top - frame.top + label.height / 2 : top,
         };
       }
-      setGeometry({ rects, width: frame.width });
+      const anchors: Record<string, Anchor> = {};
+      for (const element of list.querySelectorAll<HTMLElement>(
+        "[data-flow-anchor]",
+      )) {
+        const box = element.getBoundingClientRect();
+        const photo = element.querySelector("img")?.getBoundingClientRect();
+        const middle = photo ?? box;
+        anchors[element.dataset.flowAnchor!] = {
+          left: box.left - frame.left,
+          right: box.right - frame.left,
+          cy: middle.top - frame.top + middle.height / 2,
+        };
+      }
+      setGeometry({ rects, anchors, width: frame.width });
     };
     if (typeof ResizeObserver === "undefined") {
       measure();
@@ -377,7 +420,9 @@ export function SearchFlow() {
     };
   }, []);
 
-  const edges = geometry ? buildEdges(geometry.rects, geometry.width) : [];
+  const edges = geometry
+    ? buildEdges(geometry.rects, geometry.anchors, geometry.width)
+    : [];
 
   return (
     <ol

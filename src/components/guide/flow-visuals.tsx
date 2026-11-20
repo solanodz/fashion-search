@@ -130,13 +130,17 @@ export function FuseVisual() {
     <div className="mt-3 space-y-1.5">
       <div className={row}>
         <span className={label}>Image</span>
-        <Thumb id={NIGHTDRESS} rank={1} />
-        <Thumb id={RED_DRESS} rank={2} />
+        <span data-flow-anchor="fuse-image" className="flex gap-2">
+          <Thumb id={NIGHTDRESS} rank={1} />
+          <Thumb id={RED_DRESS} rank={2} />
+        </span>
       </div>
       <div className={row}>
         <span className={label}>Keywords</span>
-        <Thumb id={RED_DRESS} rank={1} />
-        <Thumb id={DRESSES[0]} rank={2} />
+        <span data-flow-anchor="fuse-keywords" className="flex gap-2">
+          <Thumb id={RED_DRESS} rank={1} />
+          <Thumb id={DRESSES[0]} rank={2} />
+        </span>
       </div>
     </div>
   );
@@ -149,7 +153,7 @@ export function ResultsVisual() {
     { id: NIGHTDRESS, score: 0.269, width: 45 },
   ];
   return (
-    <div className="mt-3 grid grid-cols-3 gap-2">
+    <div data-flow-anchor="results-row" className="mt-3 grid grid-cols-3 gap-2">
       {results.map((result, index) => (
         <span key={result.id} className="text-[10px] tabular-nums">
           <ProductPhoto id={result.id} className="aspect-[3/4] w-full" />
