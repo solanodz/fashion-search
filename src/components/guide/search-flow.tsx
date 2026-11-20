@@ -2,6 +2,17 @@
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
+import {
+  BrowserIcon,
+  EncodeVisual,
+  FuseVisual,
+  KeywordsVisual,
+  QueryVisual,
+  ResultsVisual,
+  SearchVisual,
+  ServerIcon,
+} from "./flow-visuals";
+
 /**
  * The path of a search as a flowchart of text and hairlines, adapted from
  * the workflow chart on the author's portfolio: each stage is a name and a
@@ -13,12 +24,20 @@ import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 
 type StageId = "query" | "encode" | "keywords" | "search" | "fuse" | "results";
 
-type Stage = { id: StageId; label: string; where: string; description: string };
+type Stage = {
+  id: StageId;
+  label: string;
+  where: "Your browser" | "Server";
+  description: string;
+  /** A piece of the real search UI showing what the stage produces. */
+  visual: () => React.ReactNode;
+};
 
 /** In reading order; on phones this is also the order on screen. */
 const STAGES: Stage[] = [
   {
     id: "query",
+    visual: QueryVisual,
     label: "Query",
     where: "Your browser",
     description:
@@ -26,6 +45,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "encode",
+    visual: EncodeVisual,
     label: "CLIP",
     where: "Your browser",
     description:
@@ -33,6 +53,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "keywords",
+    visual: KeywordsVisual,
     label: "Keywords",
     where: "Your browser",
     description:
@@ -40,6 +61,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "search",
+    visual: SearchVisual,
     label: "Qdrant",
     where: "Server",
     description:
@@ -47,6 +69,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "fuse",
+    visual: FuseVisual,
     label: "Fusion",
     where: "Server",
     description:
@@ -54,6 +77,7 @@ const STAGES: Stage[] = [
   },
   {
     id: "results",
+    visual: ResultsVisual,
     label: "Results",
     where: "Your browser",
     description:
@@ -359,7 +383,7 @@ export function SearchFlow() {
     <ol
       ref={listRef}
       aria-label="The path of a search, from query to results"
-      className="relative mt-12 grid grid-cols-1 gap-y-16 pr-6 sm:grid-cols-3 sm:gap-x-10 sm:gap-y-[5.5rem] sm:pr-0"
+      className="relative mt-16 mb-20 grid grid-cols-1 gap-y-20 pr-6 sm:grid-cols-3 sm:gap-x-14 sm:gap-y-32 sm:pr-0 lg:-mx-28 lg:gap-x-20 xl:-mx-44"
       onPointerLeave={() => setHovered(null)}
     >
       {STAGES.map((stage) => (
@@ -380,10 +404,16 @@ export function SearchFlow() {
               {stage.label}
             </span>
           </p>
-          <p className="flow-detail mt-1 text-sm leading-[1.6]">
+          <p className="flow-detail mt-2 text-sm leading-[1.7]">
             {stage.description}
           </p>
-          <p className="mt-1.5 text-xs text-muted">{stage.where}</p>
+          <div aria-hidden className="pointer-events-none mt-2 select-none">
+            <stage.visual />
+          </div>
+          <p className="mt-3 flex items-center gap-1.5 text-xs text-muted">
+            {stage.where === "Server" ? <ServerIcon /> : <BrowserIcon />}
+            {stage.where}
+          </p>
         </li>
       ))}
 

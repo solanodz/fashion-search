@@ -17,22 +17,22 @@ export function Figure({
   children: React.ReactNode;
 }) {
   return (
-    <figure className="mt-4">
+    <figure className="mt-6">
       <div
         role="img"
         aria-label={caption}
-        className="rounded-md border border-rule p-4 sm:p-5"
+        className="rounded-md border border-rule p-5 sm:p-7"
       >
         <div aria-hidden className="pointer-events-none select-none">
           {children}
         </div>
       </div>
-      <figcaption className="mt-2 text-sm text-muted">{caption}</figcaption>
+      <figcaption className="mt-3 text-sm text-muted">{caption}</figcaption>
     </figure>
   );
 }
 
-function ProductPhoto({
+export function ProductPhoto({
   id,
   className = "",
 }: {

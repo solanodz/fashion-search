@@ -113,7 +113,7 @@ function Section({
   children: React.ReactNode;
 }) {
   return (
-    <section aria-labelledby={id} className="mt-16">
+    <section aria-labelledby={id} className="mt-24">
       <h2 id={id} className="font-medium">
         {title}
       </h2>
@@ -130,9 +130,9 @@ function Step({
   children: React.ReactNode;
 }) {
   return (
-    <li className="mt-10 first:mt-6">
+    <li className="mt-16 first:mt-8">
       <h3 className="font-medium">{title}</h3>
-      <div className="mt-1 leading-relaxed text-muted">{children}</div>
+      <div className="mt-2 leading-relaxed text-muted">{children}</div>
     </li>
   );
 }
@@ -141,7 +141,7 @@ export default function HowItWorks() {
   return (
     <div className="flex w-full flex-1 flex-col px-5 pt-8 pb-16 sm:px-8 lg:px-10">
       <SiteHeader />
-      <main className="mx-auto mt-12 w-full max-w-3xl flex-1">
+      <main className="mx-auto mt-16 w-full max-w-3xl flex-1">
         <h1 className="font-medium">How fashion-search works</h1>
         <p className="mt-3 leading-relaxed text-muted">
           fashion-search finds products in a catalog of 42,426 fashion items by
