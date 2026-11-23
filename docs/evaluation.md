@@ -10,6 +10,37 @@ The full report is written to `data/eval/latest.json`.
 Run it after any change to the model, quantization, preprocessing or indexing,
 and compare against the baseline below.
 
+## Likes and dislikes (2026-11-23)
+
+Relevance feedback ([ADR 0016](adr/0016-relevance-feedback.md)), measured
+with a simulated shopper: `npm run index:feedback-eval`. Each round they like
+the first result on the page that fits and dislike the first of the top 10
+that doesn't. Precision@10 counts results where every expected attribute
+matches, on the first 10 of a page of 36.
+
+**Unstated preference:** the 27 queries reduced to their type ("dresses"); the
+shopper also wants the colour and gender of the original query.
+
+| What the marks do            | Start | Round 1 | Round 2 | Round 3 |
+| ---------------------------- | ----: | ------: | ------: | ------: |
+| Marked products only removed |   23% |     22% |     20% |     20% |
+| Query vector moved           |   23% |     38% |     46% |     46% |
+| Catalog fields read          |   23% |     79% |     79% |     78% |
+| Both                         |   23% |     83% |     84% |     85% |
+
+**Full queries:** the original 27, which already say everything.
+
+| What the marks do            | Start | Round 1 | Round 2 | Round 3 |
+| ---------------------------- | ----: | ------: | ------: | ------: |
+| Marked products only removed |   93% |     95% |     95% |     93% |
+| Query vector moved           |   93% |     89% |     93% |     90% |
+| Catalog fields read          |   93% |     99% |     99% |    100% |
+| Both                         |   93% |    100% |     99% |    100% |
+
+The start of the full queries is 93%, not the 80% of the hybrid table below:
+here each list brings 72 candidates (a page of 36), there 20 (a page of 10),
+and fusion works better with more candidates.
+
 ## Catalog labels (2026-11-23)
 
 `npm run index:health` runs the tagging vote over every product: each one is

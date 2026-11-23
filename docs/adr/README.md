@@ -17,3 +17,4 @@
 | [0013](0013-outfit-search.md)                 | Shop the look: search every garment in a photo            | Accepted |
 | [0014](0014-shopping-assistant.md)            | Shopping assistant: a language model plans the searches   | Accepted |
 | [0015](0015-photo-tagging.md)                 | Tag a new product from its photo with a neighbour vote    | Accepted |
+| [0016](0016-relevance-feedback.md)            | Refine a search with likes and dislikes                   | Accepted |

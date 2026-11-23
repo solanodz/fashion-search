@@ -1,10 +1,17 @@
 import type { QdrantClient } from "@qdrant/js-client-rest";
 
 import type { CatalogItem } from "../indexing/catalog.ts";
+import {
+  hasLeaning,
+  type Leaning,
+  leaning as readLeaning,
+  rerank,
+} from "./feedback.ts";
 import type { SparseVector } from "./keywords.ts";
 import type {
   QueryPart,
   SearchExclude,
+  SearchFeedback,
   SearchFilters,
   SearchResult,
   Signal,
@@ -25,20 +32,27 @@ export const KEYWORD_VECTOR = "keywords";
 /** RRF constant from the original paper; damps the weight of top ranks. */
 export const RRF_K = 60;
 
+/** Candidates each list brings when feedback reorders them (ADR 0016). */
+export const FEEDBACK_CANDIDATES = 100;
+
 /**
- * Qdrant filter matching every given field exactly and, when values are
- * excluded, none of them.
+ * Qdrant filter matching every given field exactly and, when values or
+ * products are excluded, none of them.
  */
 export function toQdrantFilter(
   filters: SearchFilters,
   exclude: SearchExclude = {},
+  withoutIds: number[] = [],
 ) {
   const must = Object.entries(filters)
     .filter(([, value]) => value)
     .map(([key, value]) => ({ key, match: { value: value as string } }));
-  const must_not = Object.entries(exclude)
-    .filter(([, values]) => values && values.length > 0)
-    .map(([key, values]) => ({ key, match: { any: values as string[] } }));
+  const must_not = [
+    ...Object.entries(exclude)
+      .filter(([, values]) => values && values.length > 0)
+      .map(([key, values]) => ({ key, match: { any: values as string[] } })),
+    ...(withoutIds.length > 0 ? [{ has_id: withoutIds }] : []),
+  ];
   if (must.length === 0 && must_not.length === 0) return undefined;
   return {
     ...(must.length > 0 ? { must } : {}),
@@ -107,6 +121,13 @@ export type SearchRequestData = {
   filters: SearchFilters;
   /** Values to leave out, per field. */
   exclude?: SearchExclude;
+  /** Results the shopper marked: more like these, less like those. */
+  feedback?: SearchFeedback;
+  /**
+   * Which half of the feedback to use; both by default. The evaluation
+   * compares them (`npm run index:feedback-eval`).
+   */
+  feedbackMode?: "vectors" | "fields" | "both";
   limit: number;
   keywords?: SparseVector;
   parts?: { name: QueryPart; vector: number[] }[];
@@ -120,6 +141,8 @@ export const COMPARE_LIMIT = 12;
 export type SearchOutput = {
   results: SearchResult[];
   lists?: { image: SearchResult[]; keywords: SearchResult[] };
+  /** With feedback: what the marked products say the shopper wants. */
+  leaning?: Leaning;
 };
 
 type Hit = { id: number; payload: CatalogItem; vector: number[] | null };
@@ -140,23 +163,49 @@ export async function runSearchWithLists(
     vector,
     filters,
     exclude,
+    feedback,
+    feedbackMode = "both",
     limit,
     keywords,
     parts,
     compare,
   }: SearchRequestData,
 ): Promise<SearchOutput> {
-  const filter = toQdrantFilter(filters, exclude);
+  // Relevance feedback (ADR 0016): the marked products leave the results,
+  // the liked ones pull the image query towards their look and the disliked
+  // ones push it away, and what they share in the catalog's fields reorders
+  // the candidates.
+  const like = feedback?.like ?? [];
+  const dislike = feedback?.dislike ?? [];
+  const marked = [...like, ...dislike];
+  const refining = marked.length > 0;
+  const moveQuery = refining && feedbackMode !== "fields";
+  const readFields = refining && feedbackMode !== "vectors";
+
+  const filter = toQdrantFilter(filters, exclude, marked);
   const hybrid = !!keywords && keywords.indices.length > 0;
   const breakdown = !!parts && parts.length > 1;
-  // Image vectors are needed to score keyword-only hits and query parts.
-  const withVector = hybrid || breakdown ? [IMAGE_VECTOR] : false;
+  // Image vectors are needed to score keyword-only hits and query parts and,
+  // with feedback, every result against the query as it was typed.
+  const withVector = hybrid || breakdown || refining ? [IMAGE_VECTOR] : false;
   // Each list brings more candidates than shown, so fusion has room to reorder.
-  const candidates = hybrid ? Math.min(100, limit * 2) : limit;
+  const candidates = refining
+    ? FEEDBACK_CANDIDATES
+    : hybrid
+      ? Math.min(100, limit * 2)
+      : limit;
 
   const searches = [
     {
-      query: vector,
+      query: moveQuery
+        ? {
+            recommend: {
+              positive: [vector, ...like],
+              negative: dislike,
+              strategy: "average_vector" as const,
+            },
+          }
+        : vector,
       using: IMAGE_VECTOR,
       filter,
       limit: candidates,
@@ -176,7 +225,28 @@ export async function runSearchWithLists(
         ]
       : []),
   ];
-  const responses = await client.queryBatch(collection, { searches });
+  const [responses, markedPoints] = await Promise.all([
+    client.queryBatch(collection, { searches }),
+    readFields
+      ? client.retrieve(collection, {
+          ids: marked,
+          with_payload: true,
+          with_vector: false,
+        })
+      : [],
+  ]);
+  const markedItems = new Map(
+    markedPoints.map((point) => [
+      Number(point.id),
+      point.payload as CatalogItem,
+    ]),
+  );
+  const towards = readFields
+    ? readLeaning(
+        like.flatMap((id) => markedItems.get(id) ?? []),
+        dislike.flatMap((id) => markedItems.get(id) ?? []),
+      )
+    : undefined;
 
   const hits = new Map<number, Hit>();
   const lists = responses.map((response, index) => ({
@@ -193,30 +263,41 @@ export async function runSearchWithLists(
       return id;
     }),
   }));
+  // With a moved query, the image list's scores are not similarities to the
+  // query as typed, so those are computed from the vectors instead.
   const imageScores = new Map(
-    responses[0].points.map((point) => [Number(point.id), point.score]),
+    moveQuery
+      ? []
+      : responses[0].points.map((point) => [Number(point.id), point.score]),
   );
 
-  const results = fuseRanks(lists)
-    .slice(0, limit)
-    .map(({ id, signals }) => {
-      const hit = hits.get(id)!;
-      const result: SearchResult = {
-        id,
-        score:
-          imageScores.get(id) ?? (hit.vector ? cosine(vector, hit.vector) : 0),
-        product: hit.payload,
-      };
-      if (hybrid) result.signals = signals;
-      if (breakdown && hit.vector) {
-        result.parts = Object.fromEntries(
-          parts.map((part) => [part.name, cosine(part.vector, hit.vector!)]),
-        );
-      }
-      return result;
-    });
+  const fused = fuseRanks(lists).map((entry) => ({
+    ...entry,
+    product: hits.get(entry.id)!.payload,
+  }));
+  const ordered =
+    towards && hasLeaning(towards) ? rerank(fused, towards) : fused;
+  const results = ordered.slice(0, limit).map(({ id, signals }) => {
+    const hit = hits.get(id)!;
+    const result: SearchResult = {
+      id,
+      score:
+        imageScores.get(id) ?? (hit.vector ? cosine(vector, hit.vector) : 0),
+      product: hit.payload,
+    };
+    if (hybrid) result.signals = signals;
+    if (breakdown && hit.vector) {
+      result.parts = Object.fromEntries(
+        parts.map((part) => [part.name, cosine(part.vector, hit.vector!)]),
+      );
+    }
+    return result;
+  });
 
-  if (!compare || !hybrid) return { results };
+  const output: SearchOutput = towards
+    ? { results, leaning: towards }
+    : { results };
+  if (!compare || !hybrid || refining) return output;
   // Where each fused result sat in the full candidate lists.
   for (const result of results) {
     result.ranks = {};

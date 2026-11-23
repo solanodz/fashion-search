@@ -13,21 +13,24 @@ describe("search state in the URL", () => {
         baseColour: "Red",
       },
       like: 15970,
+      feedback: { like: [25908, 57057], dislike: [52406] },
     };
     const search = serializeSearchState(state);
     expect(search).toBe(
-      "?q=red+dress&like=15970&gender=Women&category=Apparel&type=Dresses&colour=Red",
+      "?q=red+dress&like=15970&gender=Women&category=Apparel&type=Dresses&colour=Red&up=25908&up=57057&down=52406",
     );
     expect(parseSearchState(new URLSearchParams(search))).toEqual(state);
   });
 
   it("is empty for an empty search", () => {
-    expect(serializeSearchState({ q: "  ", filters: {}, like: null })).toBe("");
-    expect(parseSearchState(new URLSearchParams(""))).toEqual({
+    const empty = {
       q: "",
       filters: {},
       like: null,
-    });
+      feedback: { like: [], dislike: [] },
+    };
+    expect(serializeSearchState({ ...empty, q: "  " })).toBe("");
+    expect(parseSearchState(new URLSearchParams(""))).toEqual(empty);
   });
 
   it("ignores invalid values", () => {
@@ -38,8 +41,20 @@ describe("search state in the URL", () => {
       q: "",
       filters: { baseColour: "Blue" },
       like: null,
+      feedback: { like: [], dislike: [] },
     });
     expect(parseSearchState(new URLSearchParams("like=1.5")).like).toBeNull();
+  });
+
+  it("keeps valid marked products, once each and at most ten", () => {
+    const { feedback } = parseSearchState(
+      new URLSearchParams("up=7&up=7&up=x&up=-2&down=9&down=1.5"),
+    );
+    expect(feedback).toEqual({ like: [7], dislike: [9] });
+    const many = new URLSearchParams(
+      Array.from({ length: 14 }, (_, i) => ["up", String(i + 1)]),
+    );
+    expect(parseSearchState(many).feedback.like).toHaveLength(10);
   });
 
   it("caps very long values", () => {

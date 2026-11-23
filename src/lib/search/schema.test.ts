@@ -37,6 +37,21 @@ describe("searchRequestSchema", () => {
     ).toBe(false);
   });
 
+  test("accepts marked products, up to ten each way", () => {
+    expect(
+      searchRequestSchema.parse({ vector, feedback: { like: [3] } }).feedback,
+    ).toEqual({ like: [3], dislike: [] });
+    const eleven = Array.from({ length: 11 }, (_, i) => i + 1);
+    expect(
+      searchRequestSchema.safeParse({ vector, feedback: { dislike: eleven } })
+        .success,
+    ).toBe(false);
+    expect(
+      searchRequestSchema.safeParse({ vector, feedback: { like: [-1] } })
+        .success,
+    ).toBe(false);
+  });
+
   test("caps the limit and rejects unknown filter values types", () => {
     expect(searchRequestSchema.safeParse({ vector, limit: 500 }).success).toBe(
       false,

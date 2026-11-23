@@ -1,12 +1,18 @@
 import { IMAGE_BASE_URL } from "@/lib/images";
 import type { SearchResult } from "@/lib/search/schema";
 
+/** Like and Dislike appear with the tile's other buttons. */
+const MARK_BUTTON = "rounded-sm bg-paper/90 px-2 py-0.5 text-xs";
+
 export function ResultsGrid({
   results,
   onMoreLikeThis,
+  onMark,
 }: {
   results: SearchResult[];
   onMoreLikeThis: (result: SearchResult) => void;
+  /** Marks a result to refine the search: more like it, or less (ADR 0016). */
+  onMark?: (result: SearchResult, as: "like" | "dislike") => void;
 }) {
   if (results.length === 0) {
     return (
@@ -37,6 +43,28 @@ export function ResultsGrid({
                 loading="lazy"
                 className="h-full w-full object-contain mix-blend-multiply"
               />
+              {onMark && (
+                <span className="absolute inset-x-2 top-2 flex justify-between opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100">
+                  <button
+                    type="button"
+                    className={MARK_BUTTON}
+                    title="Show more results like this one"
+                    aria-label={`Like ${product.name}`}
+                    onClick={() => onMark(result, "like")}
+                  >
+                    Like
+                  </button>
+                  <button
+                    type="button"
+                    className={MARK_BUTTON}
+                    title="Show fewer results like this one"
+                    aria-label={`Dislike ${product.name}`}
+                    onClick={() => onMark(result, "dislike")}
+                  >
+                    Dislike
+                  </button>
+                </span>
+              )}
               <button
                 type="button"
                 className="absolute inset-x-2 bottom-2 rounded-sm bg-paper/90 py-1 text-sm opacity-0 transition-opacity group-focus-within:opacity-100 group-hover:opacity-100 focus-visible:opacity-100 motion-reduce:transition-none [@media(hover:none)]:opacity-100"

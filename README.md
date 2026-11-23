@@ -25,6 +25,11 @@ and color.
   are rewritten in English with a fashion glossary before searching; on the
   evaluation they score 78% vs 80% in English
   ([ADR 0011](docs/adr/0011-spanish-queries.md)).
+- **Like and Dislike** on a result refine the search: the query moves towards
+  the look of what you liked, and what your likes share in the catalog (type,
+  colour, who it is for) comes first. On a vague search, one like and one
+  dislike take the results that fit from 23% to 83%
+  ([ADR 0016](docs/adr/0016-relevance-feedback.md)).
 - **Compare mode** shows the image, keyword and hybrid lists side by side,
   and **[/evaluation](https://fashion-search-mu.vercel.app/evaluation)** shows
   how precision changed with each decision, search by search.
@@ -81,33 +86,34 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 <http://localhost:6333/dashboard>. Environment variables are documented in
 [`.env.example`](.env.example) and validated at startup by `src/env.ts`.
 
-| Script                     | What it does                                |
-| -------------------------- | ------------------------------------------- |
-| `npm run setup`            | Create `.env.local` and start Qdrant        |
-| `npm run dev`              | Development server                          |
-| `npm run dev:all`          | Start Qdrant, then the development server   |
-| `npm run lint`             | ESLint, fails on warnings                   |
-| `npm run typecheck`        | Generate route types, then TypeScript       |
-| `npm run test`             | Unit tests (Vitest), single run             |
-| `npm run test:watch`       | Unit tests in watch mode                    |
-| `npm run test:integration` | Integration tests against a running Qdrant  |
-| `npm run test:model`       | CLIP model tests (local only, downloads it) |
-| `npm run test:e2e`         | E2E tests (Playwright, Chromium)            |
-| `npm run test:e2e:ui`      | E2E tests in Playwright's UI mode           |
-| `npm run format`           | Format every file with Prettier             |
-| `npm run format:check`     | Check formatting without writing            |
-| `npm run build`            | Production build                            |
-| `npm run index:prepare`    | Dataset → catalog and images in `data/`     |
-| `npm run index:embed`      | Catalog images → CLIP vectors in `data/`    |
-| `npm run index:upload`     | Vectors → Qdrant, then move the alias       |
-| `npm run index:images`     | Catalog images → Cloudflare R2 (resumable)  |
-| `npm run index:map`        | 3D map of the embedding space (UMAP)        |
-| `npm run index:eval`       | Retrieval quality report                    |
-| `npm run index:tag-eval`   | Auto-tagging accuracy report                |
-| `npm run index:health`     | Catalog labels their neighbours contradict  |
-| `npm run db:up`            | Start Qdrant                                |
-| `npm run db:down`          | Stop Qdrant, keep its data                  |
-| `npm run db:reset`         | Stop Qdrant and delete its data             |
+| Script                        | What it does                                 |
+| ----------------------------- | -------------------------------------------- |
+| `npm run setup`               | Create `.env.local` and start Qdrant         |
+| `npm run dev`                 | Development server                           |
+| `npm run dev:all`             | Start Qdrant, then the development server    |
+| `npm run lint`                | ESLint, fails on warnings                    |
+| `npm run typecheck`           | Generate route types, then TypeScript        |
+| `npm run test`                | Unit tests (Vitest), single run              |
+| `npm run test:watch`          | Unit tests in watch mode                     |
+| `npm run test:integration`    | Integration tests against a running Qdrant   |
+| `npm run test:model`          | CLIP model tests (local only, downloads it)  |
+| `npm run test:e2e`            | E2E tests (Playwright, Chromium)             |
+| `npm run test:e2e:ui`         | E2E tests in Playwright's UI mode            |
+| `npm run format`              | Format every file with Prettier              |
+| `npm run format:check`        | Check formatting without writing             |
+| `npm run build`               | Production build                             |
+| `npm run index:prepare`       | Dataset → catalog and images in `data/`      |
+| `npm run index:embed`         | Catalog images → CLIP vectors in `data/`     |
+| `npm run index:upload`        | Vectors → Qdrant, then move the alias        |
+| `npm run index:images`        | Catalog images → Cloudflare R2 (resumable)   |
+| `npm run index:map`           | 3D map of the embedding space (UMAP)         |
+| `npm run index:eval`          | Retrieval quality report                     |
+| `npm run index:tag-eval`      | Auto-tagging accuracy report                 |
+| `npm run index:feedback-eval` | Likes and dislikes, with a simulated shopper |
+| `npm run index:health`        | Catalog labels their neighbours contradict   |
+| `npm run db:up`               | Start Qdrant                                 |
+| `npm run db:down`             | Stop Qdrant, keep its data                   |
+| `npm run db:reset`            | Stop Qdrant and delete its data              |
 
 Every pull request runs lint, format check, typecheck, unit and integration
 tests (against a Qdrant service container), E2E tests on a production build,

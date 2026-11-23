@@ -2,6 +2,7 @@ import { z } from "zod";
 
 import { CLIP_DIMENSIONS } from "../clip/config.ts";
 import type { CatalogItem } from "../indexing/catalog.ts";
+import type { Leaning } from "./feedback.ts";
 
 /** Filterable product fields. Keep in sync with FILTER_FIELDS in indexing/collection.ts. */
 export const searchFiltersSchema = z
@@ -19,6 +20,20 @@ export const searchExcludeSchema = z
   .object({ baseColour: z.array(z.string().min(1)).min(1).max(10) })
   .partial();
 
+/** Most products a shopper can mark each way. */
+export const MAX_MARKED = 10;
+
+const productIdsSchema = z
+  .array(z.number().int().positive())
+  .max(MAX_MARKED)
+  .default([]);
+
+/** Results the shopper marked: more like these, less like those (ADR 0016). */
+export const searchFeedbackSchema = z.object({
+  like: productIdsSchema,
+  dislike: productIdsSchema,
+});
+
 const vectorSchema = z.array(z.number().finite()).length(CLIP_DIMENSIONS);
 
 /** The pieces of a combined query, scored separately against each result. */
@@ -29,6 +44,7 @@ export const searchRequestSchema = z.object({
   vector: vectorSchema,
   filters: searchFiltersSchema.default({}),
   exclude: searchExcludeSchema.optional(),
+  feedback: searchFeedbackSchema.optional(),
   limit: z.number().int().min(1).max(60).default(36),
   parts: z
     .array(z.object({ name: z.enum(QUERY_PARTS), vector: vectorSchema }))
@@ -60,6 +76,7 @@ export type Signal = "image" | "keywords";
 
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
 export type SearchExclude = z.infer<typeof searchExcludeSchema>;
+export type SearchFeedback = z.infer<typeof searchFeedbackSchema>;
 export type SearchRequest = z.input<typeof searchRequestSchema>;
 
 export type SearchResult = {
@@ -78,6 +95,8 @@ export type SearchResult = {
 };
 export type SearchResponse = {
   results: SearchResult[];
+  /** With feedback: what the marked products say the shopper wants. */
+  leaning?: Leaning;
   /** Compare mode: the image and keyword lists before fusion. */
   lists?: { image: SearchResult[]; keywords: SearchResult[] };
 };

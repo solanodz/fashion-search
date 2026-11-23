@@ -22,10 +22,12 @@ import { IMAGE_BASE_URL } from "@/lib/images";
 import type { Facets } from "@/lib/search/facets";
 import { queryKeywords, tokenize } from "@/lib/search/keywords";
 import { translateQuery } from "@/lib/search/spanish";
-import type {
-  SearchFilters,
-  SearchResponse,
-  SearchResult,
+import {
+  MAX_MARKED,
+  type SearchFeedback,
+  type SearchFilters,
+  type SearchResponse,
+  type SearchResult,
 } from "@/lib/search/schema";
 import {
   parseSearchState,
@@ -38,6 +40,7 @@ import { CompareView } from "./compare-view";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
 import { Pipeline, type Trace } from "./pipeline";
+import { RefineBar } from "./refine-bar";
 import { ResultsGrid } from "./results-grid";
 
 const SUGGESTIONS = [
@@ -47,6 +50,7 @@ const SUGGESTIONS = [
   "men's blue jeans",
 ];
 const MAX_PHOTO_BYTES = 10 * 1024 * 1024;
+const NO_FEEDBACK: SearchFeedback = { like: [], dislike: [] };
 
 /** The query photo. `productId` is set for a catalog product's photo, which can be shared by URL. */
 export type Photo = {
@@ -73,6 +77,7 @@ type Status =
       description: string;
       results: SearchResult[];
       lists?: SearchResponse["lists"];
+      leaning?: SearchResponse["leaning"];
     }
   | { kind: "error"; message: string };
 
@@ -87,6 +92,8 @@ export function SearchExperience() {
   const [trace, setTrace] = useState<Trace | null>(null);
   const [mapOpen, setMapOpen] = useState(false);
   const [view, setView] = useState<"results" | "compare">("results");
+  const [feedback, setFeedback] = useState<SearchFeedback>(NO_FEEDBACK);
+  const [markedNames, setMarkedNames] = useState<Record<number, string>>({});
   const latest = useRef(0);
   const usedEncoders = useRef(new Set<string>());
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
@@ -121,14 +128,19 @@ export function SearchExperience() {
     currentPhoto: Photo | null,
     currentFilters: SearchFilters = filters,
     history: HistoryMode = "push",
+    // A new search starts without marks; refining one passes them on.
+    currentFeedback: SearchFeedback = NO_FEEDBACK,
   ) {
     const trimmed = text.trim();
     if (!trimmed && !currentPhoto) return;
+    setFeedback(currentFeedback);
+    const marks = currentFeedback.like.length + currentFeedback.dislike.length;
     writeUrl(
       {
         q: trimmed,
         filters: currentFilters,
         like: currentPhoto?.productId ?? null,
+        feedback: currentFeedback,
       },
       history,
     );
@@ -164,8 +176,12 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
-          // Text searches also ask for the unfused lists, for compare mode.
-          ...(keywords ? { keywords, compare: true } : {}),
+          // Text searches also ask for the unfused lists, for compare mode;
+          // not while refining, when the image list follows the marks.
+          ...(keywords
+            ? { keywords, ...(marks ? {} : { compare: true }) }
+            : {}),
+          ...(marks ? { feedback: currentFeedback } : {}),
           // A combined query also sends its parts, to score each result
           // against the photo and the text separately.
           ...(photoPart && textPart
@@ -193,6 +209,7 @@ export function SearchExperience() {
         description: scope ? `${description} in ${scope}` : description,
         results: body.results,
         lists: body.lists,
+        leaning: body.leaning,
       });
       const encoders = [
         ...(currentPhoto ? (["image"] as const) : []),
@@ -212,6 +229,7 @@ export function SearchExperience() {
         results: body.results.length,
         keywordHits: body.results.filter((r) => r.signals?.includes("keywords"))
           .length,
+        marks,
       });
     } catch (error) {
       if (run === latest.current) {
@@ -249,8 +267,26 @@ export function SearchExperience() {
     if (query.trim()) void search(query, null);
     else {
       setStatus({ kind: "idle" });
-      writeUrl({ q: "", filters, like: null }, "push");
+      setFeedback(NO_FEEDBACK);
+      writeUrl({ q: "", filters, like: null, feedback: NO_FEEDBACK }, "push");
     }
+  }
+
+  /** Refines the current search with a result: more like it, or less. */
+  function mark(result: SearchResult, as: "like" | "dislike") {
+    setMarkedNames((names) => ({ ...names, [result.id]: result.product.name }));
+    void search(query, photo, filters, "push", {
+      ...feedback,
+      // The oldest mark makes room once there are too many.
+      [as]: [...feedback[as], result.id].slice(-MAX_MARKED),
+    });
+  }
+
+  function unmark(id: number) {
+    void search(query, photo, filters, "push", {
+      like: feedback.like.filter((marked) => marked !== id),
+      dislike: feedback.dislike.filter((marked) => marked !== id),
+    });
   }
 
   /** Downloads a catalog product's photo to search with it. */
@@ -291,9 +327,11 @@ export function SearchExperience() {
         : await productPhoto(state.like, `product ${state.like}`);
     if (state.like !== null && !next) return;
     setPhoto(next);
-    if (state.q || next) void search(state.q, next, state.filters, "none");
-    else {
+    if (state.q || next) {
+      void search(state.q, next, state.filters, "none", state.feedback);
+    } else {
       latest.current++;
+      setFeedback(NO_FEEDBACK);
       setStatus({ kind: "idle" });
     }
   });
@@ -349,8 +387,15 @@ export function SearchExperience() {
 
   function changeFilters(next: SearchFilters) {
     setFilters(next);
-    if (query.trim() || photo) void search(query, photo, next);
-    else writeUrl({ q: "", filters: next, like: null }, "replace");
+    // Filters narrow the same search, so the marks stay.
+    if (query.trim() || photo)
+      void search(query, photo, next, "push", feedback);
+    else {
+      writeUrl(
+        { q: "", filters: next, like: null, feedback: NO_FEEDBACK },
+        "replace",
+      );
+    }
   }
 
   function onSubmit(event: FormEvent) {
@@ -492,6 +537,15 @@ export function SearchExperience() {
             ))}
           </div>
         )}
+        {status.kind === "done" && (
+          <RefineBar
+            feedback={feedback}
+            leaning={status.leaning}
+            names={markedNames}
+            onRemove={unmark}
+            onClear={() => void search(query, photo, filters)}
+          />
+        )}
         {status.kind === "done" &&
           (view === "compare" && status.lists ? (
             <CompareView lists={status.lists} results={status.results} />
@@ -499,6 +553,7 @@ export function SearchExperience() {
             <ResultsGrid
               results={status.results}
               onMoreLikeThis={moreLikeThis}
+              onMark={mark}
             />
           ))}
       </div>
