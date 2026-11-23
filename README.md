@@ -25,8 +25,6 @@ and color.
   are rewritten in English with a fashion glossary before searching; on the
   evaluation they score 78% vs 80% in English
   ([ADR 0011](docs/adr/0011-spanish-queries.md)).
-- **"Why?"** on a result shows which parts of the photo made it match
-  (occlusion sensitivity with the image model, in the browser).
 - **Compare mode** shows the image, keyword and hybrid lists side by side,
   and **[/evaluation](https://fashion-search-mu.vercel.app/evaluation)** shows
   how precision changed with each decision, search by search.
@@ -205,8 +203,8 @@ Security issues: [SECURITY.md](SECURITY.md).
 ## Status
 
 Live at <https://fashion-search-mu.vercel.app> (v0.4.0): search by text
-(English or Spanish), by photo or both, with filters, compare mode, "Why?",
-the 3D embedding map, a guide at `/how-it-works` and the measurements at
+(English or Spanish), by photo or both, with filters, compare mode, the 3D
+embedding map, a guide at `/how-it-works` and the measurements at
 `/evaluation`. Production runs on free tiers: Vercel for the app, Qdrant
 Cloud (AWS us-east-1) for the vectors, Cloudflare R2 for the photos. Next
 on the [project board](https://github.com/users/solanodz/projects/1): rate
