@@ -35,6 +35,9 @@ and color.
   searched in its part of the catalog. An optional description by a small
   OpenAI vision model adds colour and type as text
   ([ADR 0013](docs/adr/0013-outfit-search.md)).
+- **Use cases** ([/use-cases](https://fashion-search-mu.vercel.app/use-cases)):
+  what each feature solves for a store, with a search to try, and where the
+  same engine applies outside fashion.
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server;
   the only model API is the optional outfit description.
