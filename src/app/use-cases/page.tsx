@@ -35,35 +35,69 @@ function PhotoRow({ ids }: { ids: number[] }) {
   );
 }
 
+type MatchRow = { label: string; ids: number[] };
+
+/** Several searches at once: a label and the first matches of each. */
+function MatchRows({ rows }: { rows: MatchRow[] }) {
+  return (
+    <div className="grid min-w-0 flex-1 gap-2">
+      {rows.map(({ label, ids }) => (
+        <div key={label} className="flex items-center gap-2">
+          <span className="w-[4.5rem] shrink-0 text-xs text-muted sm:w-20 sm:text-sm">
+            {label}
+          </span>
+          {ids.map((id) => (
+            <ProductPhoto
+              key={id}
+              id={id}
+              className="aspect-[3/4] w-8 sm:w-11"
+            />
+          ))}
+        </div>
+      ))}
+    </div>
+  );
+}
+
 /** The sample outfit photo and the matches of each garment found in it. */
-const LOOK = [
-  { garment: "Sunglasses", ids: [29127, 8703, 50208] },
-  { garment: "Jacket", ids: [57063, 57066, 57068] },
-  { garment: "Jeans", ids: [57077, 57209, 54334] },
-  { garment: "Bag", ids: [53670, 53671, 54394] },
+const LOOK: MatchRow[] = [
+  { label: "Sunglasses", ids: [29127, 8703, 50208] },
+  { label: "Jacket", ids: [57063, 57066, 57068] },
+  { label: "Jeans", ids: [57077, 57209, 54334] },
+  { label: "Bag", ids: [53670, 53671, 54394] },
 ];
 
 function LookFigure() {
   return (
     <div className="flex items-start gap-4 sm:gap-5">
       <ProductPhoto id={57068} className="aspect-[3/4] w-20 shrink-0 sm:w-32" />
-      <div className="grid min-w-0 flex-1 gap-2">
-        {LOOK.map(({ garment, ids }) => (
-          <div key={garment} className="flex items-center gap-2">
-            <span className="w-[4.5rem] shrink-0 text-xs text-muted sm:w-20 sm:text-sm">
-              {garment}
-            </span>
-            {ids.map((id) => (
-              <ProductPhoto
-                key={id}
-                id={id}
-                className="aspect-[3/4] w-8 sm:w-11"
-              />
-            ))}
-          </div>
-        ))}
-      </div>
+      <MatchRows rows={LOOK} />
     </div>
+  );
+}
+
+/** What the assistant planned and found for the wedding request. */
+const WEDDING_REQUEST = "Outfit para una boda de verano, hombre, nada de negro";
+const WEDDING: MatchRow[] = [
+  { label: "Camisa", ids: [57291, 12267, 37791] },
+  { label: "Pantalón", ids: [26135, 40275, 12218] },
+  { label: "Zapatos", ids: [10129, 16151, 10153] },
+  { label: "Cinturón", ids: [15937, 32616, 19895] },
+];
+
+function PlanFigure() {
+  return (
+    <>
+      <div className="flex h-11 items-center gap-1 rounded-md border border-rule bg-paper pr-1">
+        <span className="min-w-0 flex-1 truncate px-3">{WEDDING_REQUEST}</span>
+        <span className="shrink-0 rounded bg-ink px-3 py-1.5 text-sm text-paper">
+          Plan it
+        </span>
+      </div>
+      <div className="mt-5 flex">
+        <MatchRows rows={WEDDING} />
+      </div>
+    </>
   );
 }
 
@@ -181,6 +215,42 @@ const FOR_SHOPPERS: UseCase[] = [
       content: <LookFigure />,
     },
     links: [{ label: "a sample photo or your own", href: "/outfit" }],
+  },
+  {
+    id: "assistant",
+    title: "Shopping in plain language",
+    problem:
+      "Some needs aren't one product. “Something for a summer wedding, nothing black” is a shirt, trousers, shoes and a belt, plus a rule. A search box takes one query, and it reads “nothing black” as black: typed into the normal search, half of the first results are black.",
+    answer: (
+      <>
+        A small language model reads the request and writes a plan: a few
+        searches, each with a catalog type, who it is for and the colours to
+        leave out. The page shows the plan and the same engine runs it. The
+        model never sees the catalog, so it can&apos;t make up a product (
+        <a
+          className="link"
+          href={`${REPO}/blob/main/docs/adr/0014-shopping-assistant.md`}
+        >
+          how it was decided
+        </a>
+        ).
+      </>
+    ),
+    figure: {
+      caption:
+        "A request in Spanish for a summer wedding outfit with nothing black becomes four searches: shirts, trousers, shoes and belts, none of them black.",
+      content: <PlanFigure />,
+    },
+    links: [
+      {
+        label: "the summer wedding outfit",
+        href: `/assistant?q=${encodeURIComponent(WEDDING_REQUEST)}`,
+      },
+      {
+        label: "a gift for dad",
+        href: `/assistant?q=${encodeURIComponent("Un regalo para mi papá, que usa reloj")}`,
+      },
+    ],
   },
   {
     id: "similar",

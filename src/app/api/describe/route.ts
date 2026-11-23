@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 import { serverEnv } from "@/env";
+import { createResponse } from "@/lib/openai";
 import {
   describeBodySchema,
   describeRequest,
@@ -53,20 +54,10 @@ export async function POST(request: Request) {
   }
 
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${OPENAI_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(describeRequest(OPENAI_MODEL, parsed.data.image)),
-      signal: AbortSignal.timeout(20_000),
-    });
-    const reply: unknown = await response.json();
-    if (!response.ok) {
-      console.error("Describe failed", response.status, reply);
-      throw new Error(String(response.status));
-    }
+    const reply = await createResponse(
+      OPENAI_API_KEY,
+      describeRequest(OPENAI_MODEL, parsed.data.image),
+    );
     return Response.json(
       parseDescribeResponse(reply) satisfies OutfitDescription,
     );

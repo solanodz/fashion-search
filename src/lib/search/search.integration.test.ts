@@ -16,20 +16,25 @@ import { runSearchWithLists, searchProducts } from "./search";
 const collection = `test_search_${randomUUID().slice(0, 8)}`;
 const axis = (index: number) =>
   Array.from({ length: 512 }, (_, i) => (i === index ? 1 : 0));
-const product = (id: number, gender: string, name = `Product ${id}`) =>
+const product = (
+  id: number,
+  gender: string,
+  name = `Product ${id}`,
+  baseColour = "Blue",
+) =>
   ({
     id,
     name,
     gender,
     articleType: "Tshirts",
-    baseColour: "Blue",
+    baseColour,
   }) as CatalogItem;
 
 beforeAll(async () => {
   await createCollection(qdrant(), collection, 512);
   const items = [
     product(1, "Men"),
-    product(2, "Women"),
+    product(2, "Women", "Product 2", "Black"),
     product(3, "Women", "Striped Polka Scarf"),
   ];
   await upsertPoints(
@@ -123,5 +128,17 @@ describe("searchProducts", () => {
       limit: 2,
     });
     expect(results.map((r) => r.id)).toEqual([1]);
+  });
+
+  test("leaves out excluded colours, in both lists of a hybrid search", async () => {
+    const results = await searchProducts(qdrant(), collection, {
+      vector: axis(1),
+      filters: {},
+      exclude: { baseColour: ["Black"] },
+      limit: 3,
+      keywords: queryKeywords("product")!,
+    });
+    // Product 2 is the closest by image and matches the keyword, but is black.
+    expect(results.map((r) => r.id).sort()).toEqual([1, 3]);
   });
 });

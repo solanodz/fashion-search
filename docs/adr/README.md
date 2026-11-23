@@ -15,3 +15,4 @@
 | [0011](0011-spanish-queries.md)               | Search in Spanish with a fashion glossary                 | Accepted |
 | [0012](0012-qdrant-keepalive.md)              | Keep the free Qdrant Cloud cluster in use                 | Accepted |
 | [0013](0013-outfit-search.md)                 | Shop the look: search every garment in a photo            | Accepted |
+| [0014](0014-shopping-assistant.md)            | Shopping assistant: a language model plans the searches   | Accepted |

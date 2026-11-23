@@ -20,6 +20,9 @@ export function SiteHeader({ titleAs: Title = "p" }: { titleAs?: "h1" | "p" }) {
         <Link className={navLink} href="/outfit">
           Shop the look
         </Link>
+        <Link className={navLink} href="/assistant">
+          Assistant
+        </Link>
         <Link className={navLink} href="/use-cases">
           Use cases
         </Link>

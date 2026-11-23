@@ -35,12 +35,19 @@ and color.
   searched in its part of the catalog. An optional description by a small
   OpenAI vision model adds colour and type as text
   ([ADR 0013](docs/adr/0013-outfit-search.md)).
+- **Shopping assistant**
+  ([/assistant](https://fashion-search-mu.vercel.app/assistant)): a request
+  in plain language ("an outfit for a summer wedding, nothing black") goes to
+  a small OpenAI model that plans a few searches: text, catalog type, who it
+  is for and colours to avoid. The page shows the plan and runs each search
+  as usual ([ADR 0014](docs/adr/0014-shopping-assistant.md)).
 - **Use cases** ([/use-cases](https://fashion-search-mu.vercel.app/use-cases)):
   what each feature solves for a store, with a search to try, and where the
   same engine applies outside fashion.
 - **Queries run in the visitor's browser.** The model turns the text or photo
   into a vector; the server only queries the vector database. No GPU server;
-  the only model API is the optional outfit description.
+  the only model API is OpenAI's, for the optional outfit description and the
+  shopping assistant.
 - **Vector database:** Qdrant: Docker in development, Qdrant Cloud in
   production (read-only key in the app).
 - **App:** Next.js (App Router), TypeScript, Tailwind CSS, deployed on Vercel
@@ -186,9 +193,11 @@ Finally set `NEXT_PUBLIC_IMAGE_BASE_URL` in Vercel to the bucket's public URL
 (no trailing slash) and redeploy, since `NEXT_PUBLIC_*` values are inlined at
 build time.
 
-For outfit descriptions on `/outfit` (optional), set `OPENAI_API_KEY` in Vercel
-as a Sensitive variable; `OPENAI_MODEL` defaults to `gpt-6-luna`. Without the
-key the page reads each garment with CLIP alone.
+For outfit descriptions on `/outfit` and the shopping assistant on
+`/assistant` (both optional), set `OPENAI_API_KEY` in Vercel as a Sensitive
+variable; `OPENAI_MODEL` defaults to `gpt-6-luna`. Without the key the outfit
+page reads each garment with CLIP alone and the assistant offers the plain
+search.
 
 ### Retrieval quality
 

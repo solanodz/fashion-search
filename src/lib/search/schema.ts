@@ -14,6 +14,11 @@ export const searchFiltersSchema = z
   })
   .partial();
 
+/** Values to leave out of the results: "anything but black". */
+export const searchExcludeSchema = z
+  .object({ baseColour: z.array(z.string().min(1)).min(1).max(10) })
+  .partial();
+
 const vectorSchema = z.array(z.number().finite()).length(CLIP_DIMENSIONS);
 
 /** The pieces of a combined query, scored separately against each result. */
@@ -23,6 +28,7 @@ export type QueryPart = (typeof QUERY_PARTS)[number];
 export const searchRequestSchema = z.object({
   vector: vectorSchema,
   filters: searchFiltersSchema.default({}),
+  exclude: searchExcludeSchema.optional(),
   limit: z.number().int().min(1).max(60).default(36),
   parts: z
     .array(z.object({ name: z.enum(QUERY_PARTS), vector: vectorSchema }))
@@ -53,6 +59,7 @@ export const searchRequestSchema = z.object({
 export type Signal = "image" | "keywords";
 
 export type SearchFilters = z.infer<typeof searchFiltersSchema>;
+export type SearchExclude = z.infer<typeof searchExcludeSchema>;
 export type SearchRequest = z.input<typeof searchRequestSchema>;
 
 export type SearchResult = {

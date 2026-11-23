@@ -21,7 +21,8 @@ const serverEnvSchema = z.object({
     .string()
     .optional()
     .transform((value) => value || undefined),
-  // Optional: enables outfit descriptions (ADR 0013). Empty means off.
+  // Optional: enables outfit descriptions (ADR 0013) and the shopping
+  // assistant (ADR 0014). Empty means off.
   OPENAI_API_KEY: z
     .string()
     .optional()
