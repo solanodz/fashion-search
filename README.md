@@ -103,6 +103,8 @@ Qdrant runs in Docker (`docker-compose.yml`); its dashboard is at
 | `npm run index:images`     | Catalog images → Cloudflare R2 (resumable)  |
 | `npm run index:map`        | 3D map of the embedding space (UMAP)        |
 | `npm run index:eval`       | Retrieval quality report                    |
+| `npm run index:tag-eval`   | Auto-tagging accuracy report                |
+| `npm run index:health`     | Catalog labels their neighbours contradict  |
 | `npm run db:up`            | Start Qdrant                                |
 | `npm run db:down`          | Stop Qdrant, keep its data                  |
 | `npm run db:reset`         | Stop Qdrant and delete its data             |
@@ -205,6 +207,13 @@ Precision@10 over 27 text queries, without filters, with hybrid search:
 article type 89%, colour 91%, gender 95%, all attributes 79% (image vectors
 alone: 77%, 78%, 94%, 59%). History, details and known weak spots in
 [docs/evaluation.md](docs/evaluation.md).
+
+Also measured there, though not on the site: tagging a new product from its
+photo by a vote of the products it looks like
+([ADR 0015](docs/adr/0015-photo-tagging.md)). Hiding 2,021 catalog products
+in turn, the category is right 99% of the time and the type 87%; run over
+the whole catalog, the same vote lists 552 products whose type their
+neighbours contradict.
 
 ## Contributing
 

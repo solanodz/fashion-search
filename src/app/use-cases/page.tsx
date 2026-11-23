@@ -269,7 +269,7 @@ const FOR_SHOPPERS: UseCase[] = [
 ];
 
 /** Where the same pipeline would apply. Not built here. */
-const BEYOND_FASHION = [
+const BEYOND_FASHION: { domain: string; example: React.ReactNode }[] = [
   {
     domain: "Furniture and decor",
     example:
@@ -287,8 +287,20 @@ const BEYOND_FASHION = [
   },
   {
     domain: "Marketplaces",
-    example:
-      "Spotting the same item listed twice, and suggesting a category when a seller uploads a photo.",
+    example: (
+      <>
+        Spotting the same item listed twice, and suggesting a category when a
+        seller uploads a photo. The second is measured on this catalog: the
+        products a photo looks like get its type right 87% of the time (
+        <a
+          className="link"
+          href={`${REPO}/blob/main/docs/evaluation.md#auto-tagging-2026-11-23`}
+        >
+          the numbers
+        </a>
+        ).
+      </>
+    ),
   },
   {
     domain: "Art, stock photos and archives",
