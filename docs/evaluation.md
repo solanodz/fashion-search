@@ -10,6 +10,61 @@ The full report is written to `data/eval/latest.json`.
 Run it after any change to the model, quantization, preprocessing or indexing,
 and compare against the baseline below.
 
+## Catalog labels (2026-11-23)
+
+`npm run index:health` runs the tagging vote over every product: each one is
+tagged by its 10 nearest neighbours and flagged when at least
+90% of the vote names a different type than its label
+([ADR 0015](adr/0015-photo-tagging.md)). 552 of 42,426 products
+(1.3%) are flagged. The most common disagreements:
+
+| Labelled     | Looks like   | Products |
+| ------------ | ------------ | -------: |
+| Sports Shoes | Casual Shoes |       50 |
+| Kurtis       | Kurtas       |       41 |
+| Casual Shoes | Sports Shoes |       38 |
+| Flats        | Heels        |       29 |
+| Casual Shoes | Formal Shoes |       23 |
+| Free Gifts   | Watches      |       23 |
+| Tops         | Tshirts      |       15 |
+| Sandals      | Flip Flops   |       15 |
+
+Some are types that overlap; others are real, like the watches filed under
+"Free Gifts". No photo is in the catalog twice: the two most alike products
+are 0.987 similar; 728 pairs are above 0.98 and
+9,106 above 0.97.
+
+## Auto-tagging (2026-11-23)
+
+Not retrieval but classification, and not on the site: a new product's
+catalog fields are suggested from its photo by letting its nearest products
+vote ([ADR 0015](adr/0015-photo-tagging.md)). `npm run index:tag-eval` takes
+2,021 catalog products (every 21st), hides each one in turn, tags it
+from the rest and compares with its own labels.
+
+| Field         | Right | Without near-identical products | Always the most common value | Confident suggestions | Confident and right |
+| ------------- | ----: | ------------------------------: | ---------------------------: | --------------------: | ------------------: |
+| Category      | 99.4% |                           94.4% |              47.8% (Apparel) |                 99.3% |               99.5% |
+| Subcategory   | 96.2% |                           90.9% |              34.7% (Topwear) |                 91.6% |               98.5% |
+| Type          | 87.4% |                           81.8% |              16.1% (Tshirts) |                 71.4% |               96.7% |
+| Colour        | 61.9% |                           57.8% |                22.3% (Black) |                 34.4% |               88.5% |
+| Who it is for | 91.7% |                           87.1% |                  50.5% (Men) |                 83.1% |               97.6% |
+| Use           | 92.6% |                           87.3% |               77.6% (Casual) |                 84.0% |               97.0% |
+| Season        | 77.3% |                           71.6% |               48.6% (Summer) |                 46.2% |               95.1% |
+
+- **Without near-identical products:** neighbours at 0.95 similarity or more
+  (the same item in another colour, or listed twice) don't vote. Closer to
+  tagging a kind of product the catalog hasn't seen.
+- **Confident suggestions:** the share of products whose suggestion got at
+  least 80% of the vote, and how often those are right. The rest are marked
+  to check.
+- **Colour:** voted by CLIP similarity alone it is right
+  50.7% of the time; weighting 30 neighbours by
+  colour histogram, 61.9%; with 60
+  neighbours, 64.7% on the half of the sample not used for tuning.
+- Catalog photos are studio shots, so a seller's phone photo will do worse;
+  that is not measured.
+
 ## Spanish (2026-11-20)
 
 The same 27 queries in Rioplatense Spanish (`es` in the queries file),
