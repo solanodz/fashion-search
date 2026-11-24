@@ -98,30 +98,6 @@ export function encodeImage(image: Blob): Promise<Float32Array> {
 }
 
 /**
- * How much each cell of a cols × rows grid over a product photo contributes
- * to its match with the query vector, from 0 to 1, row by row. Uses the
- * vision model (downloaded on first use).
- */
-export function explainMatch(
-  image: Blob,
-  query: Float32Array,
-  cols: number,
-  rows: number,
-): Promise<Float32Array> {
-  if (STUB) {
-    // The middle of the photo matters most.
-    return Promise.resolve(
-      Float32Array.from({ length: cols * rows }, (_, i) => {
-        const dx = (i % cols) - (cols - 1) / 2;
-        const dy = Math.floor(i / cols) - (rows - 1) / 2;
-        return Math.max(0, 1 - Math.hypot(dx, dy) / 3);
-      }),
-    );
-  }
-  return send({ type: "explain", image, query, cols, rows });
-}
-
-/**
  * Finds the garments in a photo of a person and encodes each one cut out on
  * white. Downloads the segmentation and vision models on first use.
  */

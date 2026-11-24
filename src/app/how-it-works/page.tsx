@@ -242,15 +242,6 @@ export default function HowItWorks() {
               </dd>
             </div>
             <div>
-              <dt>&ldquo;Why?&rdquo; on a result</dt>
-              <dd className="text-muted">
-                Hides each part of the product photo in turn and measures how
-                much the similarity to your query drops. Parts that made it
-                match stay bright; the rest dims. It runs in your browser with
-                the image model, about 20 encodings per photo.
-              </dd>
-            </div>
-            <div>
               <dt>Compare</dt>
               <dd className="text-muted">
                 The image list, the keyword list and the merged list of a text

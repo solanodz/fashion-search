@@ -173,20 +173,3 @@ test("compare mode shows the image, keyword and hybrid lists", async ({
   await expect(page.getByText("BM25 9.50 · cosine 0.300")).toBeVisible();
   await expect(page.getByText("image #3 + keywords #1")).toBeVisible();
 });
-
-test("'Why?' shows which parts of a photo made it match", async ({ page }) => {
-  await page.route("**/api/search", (route) =>
-    route.fulfill({ json: { results } }),
-  );
-  await page.route("**/images/*", (route) =>
-    route.fulfill({ contentType: "image/jpeg", body: pixel }),
-  );
-  await page.goto("/?q=white+sneakers");
-  const why = page.getByRole("button", { name: "Why?" }).first();
-  await why.click();
-  await expect(
-    page.getByText("Bright areas made it match; dimmed ones barely mattered."),
-  ).toBeVisible();
-  await page.getByRole("button", { name: "Hide" }).click();
-  await expect(page.getByText(/^Bright areas made it match/)).toHaveCount(0);
-});

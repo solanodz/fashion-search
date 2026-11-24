@@ -499,7 +499,6 @@ export function SearchExperience() {
             <ResultsGrid
               results={status.results}
               onMoreLikeThis={moreLikeThis}
-              query={trace?.vector ?? null}
             />
           ))}
       </div>
