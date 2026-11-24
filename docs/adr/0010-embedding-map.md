@@ -1,6 +1,8 @@
 # 0010. Show a 3D map of the embedding space
 
-- **Status:** Accepted
+- **Status:** Withdrawn (2026-11-23): the map was taken off the home page,
+  with the search pipeline panel and compare mode, to keep the page to the
+  search box, filters and results. The code is in the git history.
 - **Date:** 2026-11-19
 
 ## Context

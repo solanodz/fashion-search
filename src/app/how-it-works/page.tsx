@@ -13,7 +13,6 @@ import {
 } from "@/components/guide/figures";
 import { SearchFlow } from "@/components/guide/search-flow";
 import { SiteHeader } from "@/components/site-header";
-import { CATEGORY_COLOURS, OTHER_COLOUR } from "@/lib/indexing/embedding-map";
 
 export const metadata: Metadata = {
   title: "How it works · Fashion Search",
@@ -234,14 +233,6 @@ export default function HowItWorks() {
         <Section id="reading" title="Reading the screen">
           <dl className="mt-4 space-y-5 leading-relaxed">
             <div>
-              <dt>The number on each result</dt>
-              <dd className="text-muted">
-                Cosine similarity between your query and that product&apos;s
-                photo. The bar next to it compares it with the other results of
-                the same search.
-              </dd>
-            </div>
-            <div>
               <dt>Like and Dislike on a result</dt>
               <dd className="text-muted">
                 They refine the search you already made. The query moves towards
@@ -249,13 +240,6 @@ export default function HowItWorks() {
                 what your likes share in the catalog (type, colour, who it is
                 for) comes first. The bar above the results says what it
                 understood, and each mark can be removed.
-              </dd>
-            </div>
-            <div>
-              <dt>Compare</dt>
-              <dd className="text-muted">
-                The image list, the keyword list and the merged list of a text
-                search side by side, with the rank each result came from.
               </dd>
             </div>
             <div>
@@ -284,52 +268,6 @@ export default function HowItWorks() {
                 <Link className="link hover:text-ink" href="/assistant">
                   Try it
                 </Link>
-              </dd>
-            </div>
-            <div>
-              <dt>&ldquo;keyword&rdquo;</dt>
-              <dd className="text-muted">
-                The keyword search also found this product: its name contains
-                your words.
-              </dd>
-            </div>
-            <div>
-              <dt>&ldquo;photo 0.944 · text 0.243&rdquo;</dt>
-              <dd className="text-muted">
-                With a photo and words, how close the product is to each one on
-                its own.
-              </dd>
-            </div>
-            <div>
-              <dt>How it works, on the right</dt>
-              <dd className="text-muted">
-                The steps of your last search as they happened: the encoder used
-                and its time, your embedding, the keywords, and the database
-                search with its time.
-              </dd>
-            </div>
-            <div>
-              <dt>Embedding space</dt>
-              <dd className="text-muted">
-                Every product as a dot, placed so that similar photos sit close
-                together (the 512 numbers squeezed into three with UMAP, drawn
-                in 3D). The ring is your query and the dark dots are its
-                results. Colours are categories:
-                <span className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-sm">
-                  {[
-                    ...Object.entries(CATEGORY_COLOURS),
-                    ["Other", OTHER_COLOUR],
-                  ].map(([name, colour]) => (
-                    <span key={name} className="flex items-center gap-1.5">
-                      <span
-                        aria-hidden
-                        className="size-2.5 rounded-full"
-                        style={{ background: colour }}
-                      />
-                      {name}
-                    </span>
-                  ))}
-                </span>
               </dd>
             </div>
           </dl>

@@ -21,17 +21,10 @@ export function ResultsGrid({
       </p>
     );
   }
-  // Bars are relative to this result set: CLIP text-to-image similarities
-  // sit in a narrow band (around 0.2–0.35), so absolute bars would look equal.
-  const scores = results.map((r) => r.score);
-  const top = Math.max(...scores);
-  const bottom = Math.min(...scores);
-  const span = top - bottom || 1;
-
   return (
     <ol className="grid grid-cols-[repeat(auto-fill,minmax(9rem,1fr))] gap-x-4 gap-y-8">
-      {results.map((result, index) => {
-        const { id, product, score } = result;
+      {results.map((result) => {
+        const { id, product } = result;
         return (
           <li key={id} className="group text-sm">
             <div className="relative isolate flex aspect-[3/4] items-center justify-center overflow-hidden rounded-sm bg-tile">
@@ -74,37 +67,7 @@ export function ResultsGrid({
               </button>
             </div>
 
-            <div
-              className="mt-2.5 flex items-center gap-2 tabular-nums"
-              title="Cosine similarity between the query vector and this product's image vector"
-            >
-              <span className="text-muted">{index + 1}</span>
-              <span>{score.toFixed(3)}</span>
-              {result.signals?.includes("keywords") && (
-                <span
-                  className="text-xs text-muted"
-                  title="Also found by the keyword search"
-                >
-                  keyword
-                </span>
-              )}
-              <span aria-hidden className="h-px flex-1 bg-rule">
-                <span
-                  className="block h-full bg-ink"
-                  style={{ width: `${15 + ((score - bottom) / span) * 85}%` }}
-                />
-              </span>
-            </div>
-            {result.parts && (
-              <p
-                className="mt-0.5 text-xs text-muted tabular-nums"
-                title="Cosine similarity to the photo and to the text on their own"
-              >
-                photo {result.parts.photo?.toFixed(3)} · text{" "}
-                {result.parts.text?.toFixed(3)}
-              </p>
-            )}
-            <p className="mt-1 line-clamp-2 leading-snug">{product.name}</p>
+            <p className="mt-2.5 line-clamp-2 leading-snug">{product.name}</p>
             <p className="mt-0.5 text-muted">
               {product.articleType}
               {product.baseColour

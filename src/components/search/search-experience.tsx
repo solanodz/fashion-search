@@ -20,7 +20,7 @@ import { COMBINED_TEXT_WEIGHT } from "@/lib/clip/config";
 import { combine } from "@/lib/clip/vector";
 import { IMAGE_BASE_URL } from "@/lib/images";
 import type { Facets } from "@/lib/search/facets";
-import { queryKeywords, tokenize } from "@/lib/search/keywords";
+import { queryKeywords } from "@/lib/search/keywords";
 import { translateQuery } from "@/lib/search/spanish";
 import {
   MAX_MARKED,
@@ -35,11 +35,8 @@ import {
   serializeSearchState,
 } from "@/lib/search/url-state";
 
-import { EmbeddingMapView, ExpandedMap } from "./embedding-map";
-import { CompareView } from "./compare-view";
 import { Filters } from "./filters";
 import { PhotoChip } from "./photo-chip";
-import { Pipeline, type Trace } from "./pipeline";
 import { RefineBar } from "./refine-bar";
 import { ResultsGrid } from "./results-grid";
 
@@ -76,7 +73,6 @@ type Status =
       kind: "done";
       description: string;
       results: SearchResult[];
-      lists?: SearchResponse["lists"];
       leaning?: SearchResponse["leaning"];
     }
   | { kind: "error"; message: string };
@@ -89,13 +85,9 @@ export function SearchExperience() {
   const [dragging, setDragging] = useState(false);
   const [filters, setFilters] = useState<SearchFilters>({});
   const [facets, setFacets] = useState<Facets | null>(null);
-  const [trace, setTrace] = useState<Trace | null>(null);
-  const [mapOpen, setMapOpen] = useState(false);
-  const [view, setView] = useState<"results" | "compare">("results");
   const [feedback, setFeedback] = useState<SearchFeedback>(NO_FEEDBACK);
   const [markedNames, setMarkedNames] = useState<Record<number, string>>({});
   const latest = useRef(0);
-  const usedEncoders = useRef(new Set<string>());
   const photoVectors = useRef(new WeakMap<Blob, Float32Array>());
   const fileInput = useRef<HTMLInputElement>(null);
   const textInput = useRef<HTMLInputElement>(null);
@@ -149,7 +141,6 @@ export function SearchExperience() {
     const { text: english, translated } = translateQuery(trimmed);
     setStatus({ kind: "searching" });
     try {
-      const encodeStart = performance.now();
       const parts = await Promise.all([
         currentPhoto
           ? photoVector(currentPhoto).then((vector) => ({ vector, weight: 1 }))
@@ -161,14 +152,11 @@ export function SearchExperience() {
             }))
           : null,
       ]);
-      const [photoPart, textPart] = parts;
       // Keyword vector for hybrid search: token hashes, not the text itself.
       // Text-only searches use it; with a photo, a refinement like "in blue"
       // would match thousands of unrelated blue products (ADR 0009).
       const keywords = english && !currentPhoto ? queryKeywords(english) : null;
       const vector = combine(parts.filter((part) => part !== null));
-      const encodeMs = performance.now() - encodeStart;
-      const searchStart = performance.now();
       const response = await fetch("/api/search", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -176,22 +164,8 @@ export function SearchExperience() {
           vector: Array.from(vector),
           filters: currentFilters,
           limit: 36,
-          // Text searches also ask for the unfused lists, for compare mode;
-          // not while refining, when the image list follows the marks.
-          ...(keywords
-            ? { keywords, ...(marks ? {} : { compare: true }) }
-            : {}),
+          ...(keywords ? { keywords } : {}),
           ...(marks ? { feedback: currentFeedback } : {}),
-          // A combined query also sends its parts, to score each result
-          // against the photo and the text separately.
-          ...(photoPart && textPart
-            ? {
-                parts: [
-                  { name: "photo", vector: Array.from(photoPart.vector) },
-                  { name: "text", vector: Array.from(textPart.vector) },
-                ],
-              }
-            : {}),
         }),
       });
       const body = (await response.json()) as SearchResponse & {
@@ -199,8 +173,12 @@ export function SearchExperience() {
       };
       if (!response.ok) throw new Error(body.error ?? "Search failed.");
       if (run !== latest.current) return;
-      const searchMs = performance.now() - searchStart;
-      const description = [currentPhoto?.label, trimmed && `“${trimmed}”`]
+      // A Spanish query says what it was read as (ADR 0011).
+      const readAs = translated ? ` (read as “${english}”)` : "";
+      const description = [
+        currentPhoto?.label,
+        trimmed && `“${trimmed}”${readAs}`,
+      ]
         .filter(Boolean)
         .join(" + ");
       const scope = Object.values(currentFilters).filter(Boolean).join(", ");
@@ -208,28 +186,7 @@ export function SearchExperience() {
         kind: "done",
         description: scope ? `${description} in ${scope}` : description,
         results: body.results,
-        lists: body.lists,
         leaning: body.leaning,
-      });
-      const encoders = [
-        ...(currentPhoto ? (["image"] as const) : []),
-        ...(trimmed ? (["text"] as const) : []),
-      ];
-      const firstRun = encoders.some((e) => !usedEncoders.current.has(e));
-      encoders.forEach((e) => usedEncoders.current.add(e));
-      setTrace({
-        query: description,
-        encoders,
-        encodeMs,
-        firstRun,
-        vector,
-        keywords: keywords ? [...new Set(tokenize(english))] : [],
-        readAs: translated ? english : null,
-        searchMs,
-        results: body.results.length,
-        keywordHits: body.results.filter((r) => r.signals?.includes("keywords"))
-          .length,
-        marks,
       });
     } catch (error) {
       if (run === latest.current) {
@@ -414,7 +371,7 @@ export function SearchExperience() {
     : "Describe a product, e.g. a red dress";
 
   return (
-    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-6 lg:grid-cols-[12rem_minmax(0,1fr)_17rem] lg:grid-rows-[auto_1fr] xl:grid-cols-[13rem_minmax(0,1fr)_19rem]">
+    <div className="grid grid-cols-[minmax(0,1fr)] gap-x-10 gap-y-6 lg:grid-cols-[12rem_minmax(0,1fr)] lg:grid-rows-[auto_1fr] xl:grid-cols-[13rem_minmax(0,1fr)]">
       <section
         aria-label="Search the catalog"
         className="lg:col-start-2 lg:row-start-1"
@@ -489,7 +446,13 @@ export function SearchExperience() {
               , or drop a photo anywhere.
             </p>
           ) : status.kind === "searching" ? (
-            <p aria-live="polite">Searching…</p>
+            <p aria-live="polite">
+              Searching…
+              {progress &&
+                progress.total > 0 &&
+                progress.loaded < progress.total &&
+                ` Downloading the model: ${Math.round((progress.loaded / progress.total) * 100)}% (first time only).`}
+            </p>
           ) : status.kind === "done" ? (
             <p aria-live="polite">
               {status.results.length} closest matches for {status.description}
@@ -512,31 +475,6 @@ export function SearchExperience() {
       </aside>
 
       <div className="lg:col-start-2 lg:row-start-2">
-        {status.kind === "done" && status.lists && (
-          <div
-            role="tablist"
-            aria-label="Results view"
-            className="mb-5 flex gap-4 border-b border-rule text-sm"
-          >
-            {(
-              [
-                ["results", "Results"],
-                ["compare", "Compare image, keywords and hybrid"],
-              ] as const
-            ).map(([id, label]) => (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={view === id}
-                className={`-mb-px border-b py-2 ${view === id ? "border-ink text-ink" : "border-transparent text-muted hover:text-ink"}`}
-                onClick={() => setView(id)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        )}
         {status.kind === "done" && (
           <RefineBar
             feedback={feedback}
@@ -546,49 +484,14 @@ export function SearchExperience() {
             onClear={() => void search(query, photo, filters)}
           />
         )}
-        {status.kind === "done" &&
-          (view === "compare" && status.lists ? (
-            <CompareView lists={status.lists} results={status.results} />
-          ) : (
-            <ResultsGrid
-              results={status.results}
-              onMoreLikeThis={moreLikeThis}
-              onMark={mark}
-            />
-          ))}
+        {status.kind === "done" && (
+          <ResultsGrid
+            results={status.results}
+            onMoreLikeThis={moreLikeThis}
+            onMark={mark}
+          />
+        )}
       </div>
-
-      {/* Fits the viewport below the page header, so nothing in it scrolls. */}
-      <aside className="flex flex-col gap-6 lg:sticky lg:top-8 lg:col-start-3 lg:row-span-2 lg:row-start-1 lg:h-[calc(100dvh-12rem)] lg:min-h-[34rem] lg:self-start">
-        <Pipeline
-          trace={trace}
-          progress={progress}
-          matching={facets ? matchingCount(facets, filters) : null}
-        />
-        <EmbeddingMapView
-          results={status.kind === "done" ? status.results : null}
-          onExpand={() => setMapOpen(true)}
-        />
-        <ExpandedMap
-          open={mapOpen}
-          onClose={() => setMapOpen(false)}
-          results={status.kind === "done" ? status.results : null}
-          query={query}
-          status={
-            status.kind === "done"
-              ? `${status.results.length} closest matches for ${status.description}`
-              : status.kind === "searching"
-                ? "Searching…"
-                : status.kind === "error"
-                  ? status.message
-                  : "Search to see where your query lands."
-          }
-          onSearch={(text) => {
-            setQuery(text);
-            void search(text, photo);
-          }}
-        />
-      </aside>
 
       {dragging && (
         <div className="pointer-events-none fixed inset-4 z-10 flex items-center justify-center rounded-lg border border-dashed border-muted bg-paper/90">
@@ -597,15 +500,4 @@ export function SearchExperience() {
       )}
     </div>
   );
-}
-
-/**
- * Products matching the current filters. Each facet is counted with every
- * other filter applied, so the gender facet (every product has one) gives
- * the total, narrowed to the selected gender if there is one.
- */
-function matchingCount(facets: Facets, filters: SearchFilters): number {
-  return facets.gender
-    .filter(({ value }) => !filters.gender || value === filters.gender)
-    .reduce((sum, { count }) => sum + count, 0);
 }

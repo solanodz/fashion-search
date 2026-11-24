@@ -22,7 +22,6 @@ const pixel = Buffer.from(
 
 type Body = {
   feedback?: { like: number[]; dislike: number[] };
-  compare?: boolean;
 };
 let requests: Body[];
 
@@ -65,8 +64,6 @@ test("liking and disliking results refines the search, and marks can be undone",
 }) => {
   await page.goto("/?q=dresses");
   await expect(page.getByText("4 closest matches for “dresses”")).toBeVisible();
-  // A plain text search also asks for the compare lists.
-  expect(requests.at(-1)).toMatchObject({ compare: true });
   expect(requests.at(-1)?.feedback).toBeUndefined();
 
   await page
@@ -77,13 +74,11 @@ test("liking and disliking results refines the search, and marks can be undone",
     marks.getByText("First, what your likes share: dresses, red."),
   ).toBeVisible();
   expect(requests.at(-1)?.feedback).toEqual({ like: [101], dislike: [] });
-  expect(requests.at(-1)?.compare).toBeUndefined();
   // The liked product moves from the results to the marks.
   await expect(
     page.getByRole("button", { name: "Like Red Dress", exact: true }),
   ).toHaveCount(0);
   await expect(page).toHaveURL(/\?q=dresses&up=101$/);
-  await expect(page.getByText("refined by 1 mark")).toBeVisible();
 
   await page
     .getByRole("button", { name: "Dislike Black Dress", exact: true })
