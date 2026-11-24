@@ -70,19 +70,8 @@ test("searching by text shows matching products", async ({ page }) => {
   expect(request?.keywords?.values).toEqual([1, 1, 1]);
   expect(JSON.stringify(request)).not.toContain("running");
 
-  // Each result shows its cosine similarity to the query.
-  await expect(page.getByText("0.310", { exact: true })).toBeVisible();
-  await expect(page.getByText("0.300", { exact: true })).toBeVisible();
-
-  // The pipeline shows what the search did.
-  const pipeline = page.getByRole("region", { name: "How it works" });
-  await expect(pipeline.getByText("“white running shoes”")).toBeVisible();
-  await expect(pipeline.getByText("Text encoder")).toBeVisible();
-  await expect(
-    pipeline.getByRole("img", { name: "Query vector, 512 dimensions" }),
-  ).toBeVisible();
-  await expect(pipeline.getByText("white, running, shoe")).toBeVisible();
-  await expect(pipeline.getByText(/^Top 2 of /)).toBeVisible();
+  // Results show the product, not the similarity scores.
+  await expect(page.getByText("0.310", { exact: true })).toHaveCount(0);
 });
 
 test("a suggestion runs a search", async ({ page }) => {
@@ -132,44 +121,11 @@ test("a Spanish search is read in English first", async ({ page }) => {
   await input.fill("remera blanca para hombre");
   await input.press("Enter");
 
-  const pipeline = page.getByRole("region", { name: "How it works" });
   await expect(
-    pipeline.getByText("Read as “white t-shirt for men”, in this browser"),
+    page.getByText(
+      "2 closest matches for “remera blanca para hombre” (read as “white t-shirt for men”)",
+    ),
   ).toBeVisible();
-  await expect(pipeline.getByText("white, tshirt, men")).toBeVisible();
   // The keywords are the English words: white, tshirt, men.
   expect(keywords).toHaveLength(3);
-});
-
-test("compare mode shows the image, keyword and hybrid lists", async ({
-  page,
-}) => {
-  let compare: boolean | undefined;
-  await page.route("**/api/search", async (route) => {
-    compare = route.request().postDataJSON().compare;
-    await route.fulfill({
-      json: {
-        results: [
-          { ...results[1], ranks: { image: 3, keywords: 1 } },
-          { ...results[0], ranks: { image: 1 } },
-        ],
-        lists: {
-          image: [results[0], results[1]],
-          keywords: [{ ...results[1], keywordScore: 9.5 }],
-        },
-      },
-    });
-  });
-  await page.goto("/?q=white+sneakers");
-  await page
-    .getByRole("tab", { name: "Compare image, keywords and hybrid" })
-    .click();
-  // Text searches ask for the unfused lists.
-  expect(compare).toBe(true);
-  await expect(page.getByRole("heading", { name: "Image only" })).toBeVisible();
-  await expect(
-    page.getByRole("heading", { name: "Keywords only" }),
-  ).toBeVisible();
-  await expect(page.getByText("BM25 9.50 · cosine 0.300")).toBeVisible();
-  await expect(page.getByText("image #3 + keywords #1")).toBeVisible();
 });

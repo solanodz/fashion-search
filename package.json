@@ -21,7 +21,6 @@
     "index:embed": "node scripts/indexing/embed.ts",
     "index:upload": "node --env-file-if-exists=.env.local scripts/indexing/upload.ts",
     "index:images": "node --env-file-if-exists=.env.local scripts/indexing/images.ts",
-    "index:map": "node scripts/indexing/map.ts",
     "index:eval": "node --env-file-if-exists=.env.local scripts/indexing/eval.ts",
     "index:outfit-eval": "node --env-file-if-exists=.env.local scripts/indexing/outfit-eval.ts",
     "index:tag-eval": "node --env-file-if-exists=.env.local scripts/indexing/tag-eval.ts",
@@ -69,7 +68,6 @@
     "prettier-plugin-tailwindcss": "^0.8.1",
     "tailwindcss": "4.3.5",
     "typescript": "^5",
-    "umap-js": "^1.4.0",
     "vitest": "^5.1.1"
   },
   "engines": {

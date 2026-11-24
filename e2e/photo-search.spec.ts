@@ -75,12 +75,6 @@ test("a photo plus text searches for 'this, but in blue'", async ({ page }) => {
   expect(vectors[1][0]).toBeCloseTo(2 / Math.sqrt(5), 5);
   expect(vectors[1][1]).toBeCloseTo(1 / Math.sqrt(5), 5);
 
-  // The photo and text vectors go along, and each result shows both scores.
-  expect(bodies[1].parts?.map((p) => [p.name, p.vector.slice(0, 2)])).toEqual([
-    ["photo", [0, 1]],
-    ["text", [1, 0]],
-  ]);
-  await expect(page.getByText("photo 0.900 · text 0.270")).toBeVisible();
   // With a photo, the refinement doesn't run a keyword search (ADR 0009).
   expect(bodies[1].keywords).toBeUndefined();
 });
