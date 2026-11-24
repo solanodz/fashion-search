@@ -1,5 +1,23 @@
 # Changelog
 
+## [0.5.0](https://github.com/solanodz/fashion-search/compare/v0.4.0...v0.5.0) (2026-11-24)
+
+
+### Features
+
+* **assistant:** plan a shopping request with a language model ([#66](https://github.com/solanodz/fashion-search/issues/66)) ([019ae5a](https://github.com/solanodz/fashion-search/commit/019ae5a815147cbf1a2a18097988368079b70544))
+* **eval:** measure tagging a product from its photo ([#67](https://github.com/solanodz/fashion-search/issues/67)) ([b7946d6](https://github.com/solanodz/fashion-search/commit/b7946d6648d1eb56ff15585969136657b13f629b))
+* **infra:** keep the free Qdrant Cloud cluster in use ([#59](https://github.com/solanodz/fashion-search/issues/59)) ([0f401c2](https://github.com/solanodz/fashion-search/commit/0f401c2656ecc0825683b03aff03400af103a171))
+* **outfit:** shop the look from a photo of a person ([#60](https://github.com/solanodz/fashion-search/issues/60)) ([4d8f892](https://github.com/solanodz/fashion-search/commit/4d8f892697502bfcfbc5e23d6ba91453300aa844))
+* **search:** refine a search with likes and dislikes ([#68](https://github.com/solanodz/fashion-search/issues/68)) ([b70cbd1](https://github.com/solanodz/fashion-search/commit/b70cbd142d2409b358b40bb6fe3084dd63b65132))
+* **ui:** use cases page ([#65](https://github.com/solanodz/fashion-search/issues/65)) ([d4659f8](https://github.com/solanodz/fashion-search/commit/d4659f8ed83f6b09b285e461900a2d00abebeddd))
+
+
+### Refactoring
+
+* **ui:** keep the home to search, filters and results ([#69](https://github.com/solanodz/fashion-search/issues/69)) ([b9d38ee](https://github.com/solanodz/fashion-search/commit/b9d38ee0ba4b59fd0bca491a8b2db0fd9e714bb6))
+* **ui:** remove "Why?" from search results ([#64](https://github.com/solanodz/fashion-search/issues/64)) ([5b331f7](https://github.com/solanodz/fashion-search/commit/5b331f7823fca6c59b1f42d7b3cb9b46a6503a29))
+
 ## [0.4.0](https://github.com/solanodz/fashion-search/compare/v0.3.0...v0.4.0) (2026-11-20)
 
 
