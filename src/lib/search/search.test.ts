@@ -34,6 +34,18 @@ describe("toQdrantFilter", () => {
       must_not: [{ key: "baseColour", match: { any: ["Black"] } }],
     });
   });
+
+  test("leaves out products by id", () => {
+    expect(toQdrantFilter({}, {}, [7, 9])).toEqual({
+      must_not: [{ has_id: [7, 9] }],
+    });
+    expect(toQdrantFilter({}, { baseColour: ["Black"] }, [7])).toEqual({
+      must_not: [
+        { key: "baseColour", match: { any: ["Black"] } },
+        { has_id: [7] },
+      ],
+    });
+  });
 });
 
 describe("cosine", () => {

@@ -242,6 +242,16 @@ export default function HowItWorks() {
               </dd>
             </div>
             <div>
+              <dt>Like and Dislike on a result</dt>
+              <dd className="text-muted">
+                They refine the search you already made. The query moves towards
+                the look of what you liked and away from what you disliked, and
+                what your likes share in the catalog (type, colour, who it is
+                for) comes first. The bar above the results says what it
+                understood, and each mark can be removed.
+              </dd>
+            </div>
+            <div>
               <dt>Compare</dt>
               <dd className="text-muted">
                 The image list, the keyword list and the merged list of a text

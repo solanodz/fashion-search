@@ -26,6 +26,7 @@
     "index:outfit-eval": "node --env-file-if-exists=.env.local scripts/indexing/outfit-eval.ts",
     "index:tag-eval": "node --env-file-if-exists=.env.local scripts/indexing/tag-eval.ts",
     "index:health": "node --env-file-if-exists=.env.local scripts/indexing/health.ts",
+    "index:feedback-eval": "node --env-file-if-exists=.env.local scripts/indexing/feedback-eval.ts",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "db:up": "docker compose up -d --wait",

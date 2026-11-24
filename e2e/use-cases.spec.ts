@@ -28,6 +28,7 @@ test("the use cases page lists what the demo solves, each with a search to try",
     "This one, but different",
     "Shop the look",
     "Shopping in plain language",
+    "Refine by reacting",
     "Alternatives and recommendations",
   ]) {
     await expect(

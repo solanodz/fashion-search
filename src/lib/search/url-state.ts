@@ -1,15 +1,21 @@
-import type { SearchFilters } from "./schema.ts";
+import {
+  MAX_MARKED,
+  type SearchFeedback,
+  type SearchFilters,
+} from "./schema.ts";
 
 /**
  * The shareable part of a search, kept in the page URL:
  * `?q=red+dress&gender=Women&category=Apparel&type=Dresses&colour=Red&like=15970`.
  * An uploaded photo can't be shared; a catalog product's photo ("More like
- * this") is referenced by its id.
+ * this") is referenced by its id. Results marked to refine the search are
+ * `up` (liked) and `down` (disliked) product ids: `&up=25908&down=52406`.
  */
 export type SearchState = {
   q: string;
   filters: SearchFilters;
   like: number | null;
+  feedback: SearchFeedback;
 };
 
 /** URL parameter for each filter field, short and readable. */
@@ -28,6 +34,14 @@ function clean(value: string | null): string | undefined {
   return trimmed ? trimmed : undefined;
 }
 
+/** Valid product ids among a parameter's values, without repeats. */
+function productIds(values: string[]): number[] {
+  const ids = values
+    .map(Number)
+    .filter((id) => Number.isSafeInteger(id) && id > 0);
+  return [...new Set(ids)].slice(0, MAX_MARKED);
+}
+
 export function parseSearchState(params: URLSearchParams): SearchState {
   const filters: SearchFilters = {};
   for (const [field, param] of Object.entries(PARAMS)) {
@@ -39,6 +53,10 @@ export function parseSearchState(params: URLSearchParams): SearchState {
     q: clean(params.get("q")) ?? "",
     filters,
     like: Number.isSafeInteger(like) && like > 0 ? like : null,
+    feedback: {
+      like: productIds(params.getAll("up")),
+      dislike: productIds(params.getAll("down")),
+    },
   };
 }
 
@@ -50,6 +68,8 @@ export function serializeSearchState(state: SearchState): string {
     const value = state.filters[field as keyof SearchFilters];
     if (value) params.set(param, value);
   }
+  for (const id of state.feedback.like) params.append("up", String(id));
+  for (const id of state.feedback.dislike) params.append("down", String(id));
   const query = params.toString();
   return query ? `?${query}` : "";
 }

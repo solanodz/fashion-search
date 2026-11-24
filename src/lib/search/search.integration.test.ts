@@ -142,3 +142,107 @@ describe("searchProducts", () => {
     expect(results.map((r) => r.id).sort()).toEqual([1, 3]);
   });
 });
+
+describe("search with feedback", () => {
+  const feedbackCollection = `test_feedback_${randomUUID().slice(0, 8)}`;
+  /** A unit vector near axis 0, leaning towards another axis. */
+  const near = (towards: number, amount: number) => {
+    const vector: number[] = axis(0);
+    vector[towards] = amount;
+    const norm = Math.hypot(1, amount);
+    return Float32Array.from(vector, (value) => value / norm);
+  };
+  const item = (
+    id: number,
+    articleType: string,
+    baseColour: string,
+    gender: string,
+  ) =>
+    ({
+      id,
+      name: `Product ${id}`,
+      gender,
+      articleType,
+      baseColour,
+    }) as CatalogItem;
+
+  beforeAll(async () => {
+    await createCollection(qdrant(), feedbackCollection, 512);
+    // By similarity to axis 0: 10, 11, 13, 14, 12, 15.
+    await upsertPoints(
+      qdrant(),
+      feedbackCollection,
+      buildPoints(
+        [
+          item(10, "Dresses", "Red", "Women"),
+          item(11, "Dresses", "Black", "Women"),
+          item(12, "Dresses", "Red", "Women"),
+          item(13, "Tops", "Red", "Men"),
+          item(14, "Dresses", "Black", "Women"),
+          item(15, "Dresses", "Red", "Women"),
+        ],
+        [
+          { id: 10, vector: near(1, 0.1) },
+          { id: 11, vector: near(1, 0.2) },
+          { id: 12, vector: near(2, 0.6) },
+          { id: 13, vector: near(1, 0.3) },
+          { id: 14, vector: near(1, 0.4) },
+          { id: 15, vector: near(2, 0.9) },
+        ],
+      ),
+    );
+  });
+
+  afterAll(async () => {
+    await qdrant().deleteCollection(feedbackCollection);
+  });
+
+  const search = (
+    feedback: { like: number[]; dislike: number[] },
+    feedbackMode?: "vectors" | "fields" | "both",
+  ) =>
+    runSearchWithLists(qdrant(), feedbackCollection, {
+      vector: axis(0),
+      filters: {},
+      limit: 6,
+      feedback,
+      feedbackMode,
+    });
+
+  test("without feedback, results are ordered by similarity", async () => {
+    const { results, leaning } = await search({ like: [], dislike: [] });
+    expect(results.map((r) => r.id)).toEqual([10, 11, 13, 14, 12, 15]);
+    expect(leaning).toBeUndefined();
+  });
+
+  test("a like and a dislike reorder the rest by what the liked one has", async () => {
+    const { results, leaning } = await search({ like: [10], dislike: [11] });
+    // The marked ones leave; red women's dresses come first, then the rest.
+    expect(results.map((r) => r.id)).toEqual([12, 15, 13, 14]);
+    expect(leaning).toEqual({
+      prefer: { articleType: "Dresses", baseColour: "Red", gender: "Women" },
+      avoid: { baseColour: ["Black"] },
+    });
+    // Scores are still similarities to the query as typed.
+    expect(results[0].score).toBeCloseTo(1 / Math.hypot(1, 0.6));
+  });
+
+  test("the vectors alone move the query away from a dislike", async () => {
+    const { results, leaning } = await search(
+      { like: [], dislike: [11] },
+      "vectors",
+    );
+    // 11 leans towards axis 1, like 10, 13 and 14: the axis 2 ones gain.
+    expect(results.map((r) => r.id)).not.toContain(11);
+    expect(results.map((r) => r.id).indexOf(12)).toBeLessThan(
+      results.map((r) => r.id).indexOf(14),
+    );
+    expect(leaning).toBeUndefined();
+  });
+
+  test("a dislike alone says nothing about fields", async () => {
+    const { results, leaning } = await search({ like: [], dislike: [11] });
+    expect(results).toHaveLength(5);
+    expect(leaning).toEqual({ prefer: {}, avoid: {} });
+  });
+});

@@ -253,6 +253,45 @@ const FOR_SHOPPERS: UseCase[] = [
     ],
   },
   {
+    id: "feedback",
+    title: "Refine by reacting",
+    problem:
+      "A shopper who types “dresses” knows the right one on sight, but won't write “red, for women, casual”. Filters ask them to translate what they see into the catalog's vocabulary.",
+    answer: (
+      <>
+        Like and Dislike on any result refine the same search. The query moves
+        towards the look of what was liked, and what the liked products share in
+        the catalog (type, colour, who it is for) comes first. With a simulated
+        shopper, one like and one dislike take the results that fit an unstated
+        preference from 23% to 83% (
+        <a
+          className="link"
+          href={`${REPO}/blob/main/docs/adr/0016-relevance-feedback.md`}
+        >
+          how it was decided
+        </a>
+        ).
+      </>
+    ),
+    figure: {
+      caption:
+        "A search for “dresses”, before and after liking one red dress: the second row puts red dresses first without the word red being typed.",
+      content: (
+        <>
+          <SearchBar text="dresses" />
+          <PhotoRow ids={[51465, 40413, 42217, 34585, 52429, 39232]} />
+          <PhotoRow ids={[57059, 25908, 49633, 33199, 45777, 16567]} />
+        </>
+      ),
+    },
+    links: [
+      {
+        label: "dresses, with one red dress liked",
+        href: "/?q=dresses&up=41571",
+      },
+    ],
+  },
+  {
     id: "similar",
     title: "Alternatives and recommendations",
     problem:

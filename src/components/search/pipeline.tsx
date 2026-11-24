@@ -21,6 +21,8 @@ export type Trace = {
   results: number;
   /** Results that the keyword search also found. */
   keywordHits: number;
+  /** Results the shopper marked to refine this search. */
+  marks: number;
 };
 
 const number = new Intl.NumberFormat("en");
@@ -138,7 +140,7 @@ export function Pipeline({
           title="Qdrant, hybrid search"
           detail={
             trace
-              ? `${ms(trace.searchMs)}${trace.keywords.length ? `, ${trace.keywordHits} of ${trace.results} also matched by keywords` : ""}`
+              ? `${ms(trace.searchMs)}${trace.marks ? `, refined by ${trace.marks} ${trace.marks === 1 ? "mark" : "marks"}` : trace.keywords.length ? `, ${trace.keywordHits} of ${trace.results} also matched by keywords` : ""}`
               : "Image and keyword matches, fused by rank"
           }
         >
