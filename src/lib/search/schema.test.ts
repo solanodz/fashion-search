@@ -24,6 +24,19 @@ describe("searchRequestSchema", () => {
     ).toBe(false);
   });
 
+  test("accepts colours to exclude, up to ten", () => {
+    expect(
+      searchRequestSchema.parse({ vector, exclude: { baseColour: ["Black"] } })
+        .exclude,
+    ).toEqual({ baseColour: ["Black"] });
+    expect(
+      searchRequestSchema.safeParse({
+        vector,
+        exclude: { baseColour: Array.from({ length: 11 }, () => "Black") },
+      }).success,
+    ).toBe(false);
+  });
+
   test("caps the limit and rejects unknown filter values types", () => {
     expect(searchRequestSchema.safeParse({ vector, limit: 500 }).success).toBe(
       false,

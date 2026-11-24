@@ -20,6 +20,19 @@ describe("toQdrantFilter", () => {
 
   test("returns no filter when nothing is selected", () => {
     expect(toQdrantFilter({})).toBeUndefined();
+    expect(toQdrantFilter({}, {})).toBeUndefined();
+  });
+
+  test("leaves out excluded values", () => {
+    expect(
+      toQdrantFilter({ gender: "Men" }, { baseColour: ["Black", "Grey"] }),
+    ).toEqual({
+      must: [{ key: "gender", match: { value: "Men" } }],
+      must_not: [{ key: "baseColour", match: { any: ["Black", "Grey"] } }],
+    });
+    expect(toQdrantFilter({}, { baseColour: ["Black"] })).toEqual({
+      must_not: [{ key: "baseColour", match: { any: ["Black"] } }],
+    });
   });
 });
 

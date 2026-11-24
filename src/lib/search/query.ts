@@ -4,6 +4,7 @@ import type { CatalogItem } from "../indexing/catalog.ts";
 import type { SparseVector } from "./keywords.ts";
 import type {
   QueryPart,
+  SearchExclude,
   SearchFilters,
   SearchResult,
   Signal,
@@ -24,12 +25,25 @@ export const KEYWORD_VECTOR = "keywords";
 /** RRF constant from the original paper; damps the weight of top ranks. */
 export const RRF_K = 60;
 
-/** Qdrant filter matching every given field exactly. */
-export function toQdrantFilter(filters: SearchFilters) {
+/**
+ * Qdrant filter matching every given field exactly and, when values are
+ * excluded, none of them.
+ */
+export function toQdrantFilter(
+  filters: SearchFilters,
+  exclude: SearchExclude = {},
+) {
   const must = Object.entries(filters)
     .filter(([, value]) => value)
     .map(([key, value]) => ({ key, match: { value: value as string } }));
-  return must.length > 0 ? { must } : undefined;
+  const must_not = Object.entries(exclude)
+    .filter(([, values]) => values && values.length > 0)
+    .map(([key, values]) => ({ key, match: { any: values as string[] } }));
+  if (must.length === 0 && must_not.length === 0) return undefined;
+  return {
+    ...(must.length > 0 ? { must } : {}),
+    ...(must_not.length > 0 ? { must_not } : {}),
+  };
 }
 
 /** Cosine similarity of two vectors of the same length. */
@@ -91,6 +105,8 @@ export function fuseRanks<S extends string>(
 export type SearchRequestData = {
   vector: number[];
   filters: SearchFilters;
+  /** Values to leave out, per field. */
+  exclude?: SearchExclude;
   limit: number;
   keywords?: SparseVector;
   parts?: { name: QueryPart; vector: number[] }[];
@@ -120,9 +136,17 @@ export async function runSearch(
 export async function runSearchWithLists(
   client: QdrantClient,
   collection: string,
-  { vector, filters, limit, keywords, parts, compare }: SearchRequestData,
+  {
+    vector,
+    filters,
+    exclude,
+    limit,
+    keywords,
+    parts,
+    compare,
+  }: SearchRequestData,
 ): Promise<SearchOutput> {
-  const filter = toQdrantFilter(filters);
+  const filter = toQdrantFilter(filters, exclude);
   const hybrid = !!keywords && keywords.indices.length > 0;
   const breakdown = !!parts && parts.length > 1;
   // Image vectors are needed to score keyword-only hits and query parts.

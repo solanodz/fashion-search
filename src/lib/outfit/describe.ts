@@ -1,5 +1,6 @@
 import { z } from "zod";
 
+import { outputText } from "../openai.ts";
 import { COLOURS, TYPES } from "./attributes.ts";
 import { GARMENTS } from "./garments.ts";
 
@@ -102,13 +103,7 @@ export function describeRequest(model: string, imageDataUrl: string) {
 
 /** The validated description in a Responses API reply, or an error. */
 export function parseDescribeResponse(body: unknown): OutfitDescription {
-  const output = (body as { output?: unknown[] })?.output ?? [];
-  const text = output
-    .flatMap(
-      (item) =>
-        (item as { content?: { type: string; text?: string }[] }).content ?? [],
-    )
-    .find((part) => part.type === "output_text")?.text;
+  const text = outputText(body);
   if (!text) throw new Error("The model returned no description.");
   return outfitDescriptionSchema.parse(JSON.parse(text));
 }

@@ -263,6 +263,20 @@ export default function HowItWorks() {
               </dd>
             </div>
             <div>
+              <dt>Shopping assistant</dt>
+              <dd className="text-muted">
+                Write what you need in your own words (&ldquo;an outfit for a
+                summer wedding, nothing black&rdquo;). A small OpenAI model
+                turns it into a few searches, each with a text, a catalog type,
+                who it is for and the colours to avoid. The page shows that plan
+                and runs each search as usual; the model never picks the
+                products.{" "}
+                <Link className="link hover:text-ink" href="/assistant">
+                  Try it
+                </Link>
+              </dd>
+            </div>
+            <div>
               <dt>&ldquo;keyword&rdquo;</dt>
               <dd className="text-muted">
                 The keyword search also found this product: its name contains
